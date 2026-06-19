@@ -49,7 +49,7 @@ end
 "Document settings (analogous to TeX \\documentclass + preamble)."
 mutable struct DocMeta
     title::String
-    theme::Symbol
+    theme::Any                    # theme spec: a Theme instance, a registered Symbol, or a path
     base_url::String
     format::Vector{Symbol}        # [:svg, :pdf]
     bib_sources::Vector{String}

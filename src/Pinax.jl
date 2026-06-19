@@ -32,7 +32,7 @@ export @pinaxsetup,
     @md_str
 
 # render / theme / backend contract
-export render, Theme, GalleryTheme, pinax_save, is_figure
+export render, Theme, GalleryTheme, register_theme!, pinax_save, is_figure
 
 # comment store (CLI / LLM-loop substrate)
 export read_comments, add_comment, set_bookmark!
