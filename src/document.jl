@@ -32,6 +32,17 @@ struct Diagnostics
 end
 Diagnostics() = Diagnostics(DiagEntry[])
 
+"""
+Default numbering function: `Sec. N` / `Fig. N`. Override it in the preamble with
+`@pinaxsetup numberer = (kind, c) -> …`, where `kind` is `:section` or `:figure` and `c` is
+`(; section, figure, subfigure)` — `section` is the current section number, `figure` the
+document-wide figure count, and `subfigure` the figure's index within its section (for
+hierarchical schemes like `Fig. 2.3`).
+"""
+function _default_numberer(kind::Symbol, c)
+    return kind === :section ? "Sec. $(c.section)" : "Fig. $(c.figure)"
+end
+
 "Document settings (analogous to TeX \\documentclass + preamble)."
 mutable struct DocMeta
     title::String
@@ -41,7 +52,8 @@ mutable struct DocMeta
     bib_sources::Vector{String}
     debug::Bool
     index::Union{Symbol,Nothing}  # :toc|:cards|:rich override (nothing = theme default)
-    numbering::Symbol             # CSS counter scope :global|:page
+    numbering::Symbol             # numbering scope :global|:page (reset counters per page)
+    numberer::Function            # (kind, counters) -> label string; preamble-overridable
 end
 function DocMeta(;
     title="",
@@ -52,6 +64,7 @@ function DocMeta(;
     debug=false,
     index=nothing,
     numbering=:global,
+    numberer=_default_numberer,
 )
     return DocMeta(
         title,
@@ -62,6 +75,7 @@ function DocMeta(;
         debug,
         index,
         numbering,
+        numberer,
     )
 end
 
@@ -145,6 +159,7 @@ function reset!(; kwargs...)
         debug=get(kw, :debug, false),
         index=get(kw, :index, nothing),
         numbering=get(kw, :numbering, :global),
+        numberer=get(kw, :numberer, _default_numberer),
     )  # css/js/features are interpreted by the theme layer (ignored in this structure slice)
     CTX.document = Document(meta)
     CTX.page = nothing
