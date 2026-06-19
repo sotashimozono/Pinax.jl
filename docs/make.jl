@@ -1,3 +1,5 @@
+ENV["GKSwstype"] = "100"   # headless GR backend for the Plots-based @example gallery
+
 using Pinax
 using Documenter
 using Downloads
