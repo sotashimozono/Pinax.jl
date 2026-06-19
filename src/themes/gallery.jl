@@ -107,13 +107,19 @@ const _GALLERY_CSS = """
 </style>
 """
 
-# KaTeX (loaded from a CDN; offline vendoring is a later slice). Inline `\$…\$` is rendered
-# client-side; display `\$\$…\$\$` is pre-processed server-side (numbered, anchored, @label
-# consumed) then rendered by KaTeX.
+# KaTeX. `katex=:cdn` (default) loads from jsDelivr; `katex=:local` references the vendored copy
+# (`_copy_katex` mirrors assets/default/katex into out/assets/katex) so the gallery renders math
+# fully offline. Inline `\$…\$` and display `\$\$…\$\$` (server-side numbered/anchored) are rendered
+# client-side by KaTeX, with `@newcommand` macros wired in.
 const _KATEX_CDN = "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist"
-const _KATEX_HEAD = string(
-    "<link rel=\"stylesheet\" href=\"", _KATEX_CDN, "/katex.min.css\">"
-)
+_katex_base(mode) = mode === :local ? "assets/katex" : _KATEX_CDN
+
+function _katex_head(mode)
+    return string(
+        "<link rel=\"stylesheet\" href=\"", _katex_base(mode), "/katex.min.css\">"
+    )
+end
+
 # `@newcommand "\\E" raw"\\langle H\\rangle"` notation macros -> KaTeX `macros` option (notes 08 §2).
 function _macros_json(nc)
     return if isempty(nc)
@@ -126,13 +132,14 @@ function _macros_json(nc)
 end
 
 # KaTeX loader + auto-render, with the document's @newcommand macros wired into the renderer.
-function _katex_foot(newcommands)
+function _katex_foot(newcommands, mode)
+    base = _katex_base(mode)
     return string(
         "<script defer src=\"",
-        _KATEX_CDN,
+        base,
         "/katex.min.js\"></script>",
         "<script defer src=\"",
-        _KATEX_CDN,
+        base,
         "/contrib/auto-render.min.js\"></script>",
         "<script>window.addEventListener(\"load\",function(){renderMathInElement(document.body,",
         "{delimiters:[{left:\"\$\$\",right:\"\$\$\",display:true},",
@@ -140,6 +147,15 @@ function _katex_foot(newcommands)
         _macros_json(newcommands),
         ",throwOnError:false});});</script>",
     )
+end
+
+# Mirror the vendored KaTeX (css/js/contrib/woff2 fonts) into out/assets/katex for offline math.
+function _copy_katex(outdir)
+    src = joinpath(pkgdir(@__MODULE__), "assets", "default", "katex")
+    dst = joinpath(outdir, "assets", "katex")
+    mkpath(dirname(dst))
+    cp(src, dst; force=true)
+    return nothing
 end
 
 # Inline a user css/js overlay (notes 06 §5: appended after the theme's own assets, keeping the
@@ -459,6 +475,8 @@ function emit_document(
     comments, bookmarks = read_comments(comments_file)
     features = doc.meta.features
     interactive = any(in(features), (:comments, :bookmarks, :export))
+    katex_mode = doc.meta.katex
+    katex_mode === :local && _copy_katex(outdir)   # vendor math assets for offline viewing
     ctx = EmitCtx(
         String(outdir),
         io,
@@ -476,7 +494,7 @@ function emit_document(
     title = isempty(doc.meta.title) ? "Pinax gallery" : doc.meta.title
     print(io, "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">")
     print(io, "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">")
-    print(io, "<title>", _esc(title), "</title>", _GALLERY_CSS, _KATEX_HEAD)
+    print(io, "<title>", _esc(title), "</title>", _GALLERY_CSS, _katex_head(katex_mode))
     interactive && print(io, "<style>", _asset("pinax.css"), "</style>")
     _emit_overlay(io, doc.meta.css, "style", rdiag)   # user CSS overlay (notes 06 §5)
     print(io, "</head><body>\n")
@@ -511,7 +529,7 @@ function emit_document(
 
     interactive && print(io, "<script>", _asset("pinax.js"), "</script>")
     _emit_overlay(io, doc.meta.js, "script", rdiag)   # user JS overlay (notes 06 §5)
-    print(io, _katex_foot(doc.newcommands))           # @newcommand -> KaTeX macros (notes 08 §2)
+    print(io, _katex_foot(doc.newcommands, katex_mode))   # @newcommand -> KaTeX macros (notes 08 §2)
     println(io, "</body></html>")
     path = joinpath(outdir, "index.html")
     write(path, String(take!(io)))

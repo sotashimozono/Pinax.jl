@@ -62,6 +62,7 @@ mutable struct DocMeta
     features::Vector{Symbol}      # gallery interactive layer toggles: :comments / :bookmarks / :export
     css::Vector{String}           # user CSS overlay files (inlined after the theme's own CSS)
     js::Vector{String}            # user JS overlay files (inlined after the theme's own JS)
+    katex::Symbol                 # gallery math assets: :cdn (default) | :local (vendored, offline)
 end
 function DocMeta(;
     title="",
@@ -76,6 +77,7 @@ function DocMeta(;
     features=Symbol[:comments, :bookmarks, :export],
     css=String[],
     js=String[],
+    katex=:cdn,
 )
     return DocMeta(
         title,
@@ -90,6 +92,7 @@ function DocMeta(;
         collect(Symbol, features),
         collect(String, css),
         collect(String, js),
+        katex,
     )
 end
 
@@ -178,6 +181,7 @@ function reset!(; kwargs...)
         features=get(kw, :features, Symbol[:comments, :bookmarks, :export]),
         css=get(kw, :css, String[]),
         js=get(kw, :js, String[]),
+        katex=get(kw, :katex, :cdn),
     )
     CTX.document = Document(meta)
     CTX.page = nothing
