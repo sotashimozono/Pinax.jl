@@ -1,17 +1,17 @@
 ENV["GKSwstype"] = "100"
 
-using MyModule
+using Pinax
 using Test, Aqua
 const dirs = []
 
-const FIG_BASE = joinpath(pkgdir(MyModule), "docs", "src", "assets")
+const FIG_BASE = joinpath(pkgdir(Pinax), "docs", "src", "assets")
 const PATHS = Dict()
 mkpath.(values(PATHS))
 
 @testset "tests" begin
     # ----- Test the module itself. -----
     @testset "Aqua tests" begin
-        Aqua.test_all(MyModule)
+        Aqua.test_all(Pinax)
     end
     # ----- Test files in the "test" directory. -----
     test_args = copy(ARGS)

@@ -1,7 +1,7 @@
-# MyModule.jl
+# Pinax.jl
 
 ## Models
 
 ```@autodocs
-Modules = [MyModule]
+Modules = [Pinax]
 ```
