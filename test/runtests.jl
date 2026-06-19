@@ -2,7 +2,7 @@ ENV["GKSwstype"] = "100"
 
 using Pinax
 using Test, Aqua
-const dirs = []
+const dirs = ["."]
 
 const FIG_BASE = joinpath(pkgdir(Pinax), "docs", "src", "assets")
 const PATHS = Dict()

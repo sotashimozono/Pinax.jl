@@ -8,8 +8,8 @@ DataVault = "23f5f8f6-b4da-40ee-8c72-c53b6c5de94f"
 ParamIO = "938a3ac2-d340-473c-bcf1-88af577e4ccf"
 
 [sources]
-DataVault = {url = "https://github.com/sotashimozono/DataVault.jl"}
-ParamIO = {url = "https://github.com/sotashimozono/ParamIO.jl"}
+DataVault = {rev = "main", url = "https://github.com/sotashimozono/DataVault.jl"}
+ParamIO = {rev = "main", url = "https://github.com/sotashimozono/ParamIO.jl"}
 
 [compat]
 Aqua = "0.8"
@@ -19,8 +19,8 @@ Test = "1"
 julia = "1.12"
 
 [extras]
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
+Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [targets]
 test = ["Test", "Aqua"]
