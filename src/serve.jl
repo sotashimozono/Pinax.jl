@@ -160,7 +160,12 @@ function serve(
         end
     end
     if blocking
-        @info "Pinax serving — open this link (Ctrl-C to stop)" url root
+        # Print the URL as a bare token on its own line so the terminal makes it clickable.
+        println()
+        printstyled("  Pinax gallery  →  "; bold=true)
+        printstyled(url, "\n"; bold=true, color=:cyan)
+        println("  open the link in a browser  ·  serving $(root)  ·  Ctrl-C to stop\n")
+        flush(stdout)   # show the link immediately, even when stdout is piped/redirected
         try
             accept_loop()
         catch e
