@@ -142,4 +142,32 @@ using Test
         html = read(Pinax.render(; out=sitedir("numref")), String)
         @test occursin("<a href=\"#k\">Plot 1</a>", html)
     end
+
+    @testset "numberer receives page context (per-part section prefixes)" begin
+        nb(kind, c) =
+            if kind === :section
+                (c.page_id === :eq ? "EQ$(c.section)" : "GQ$(c.section)")
+            else
+                "Fig. $(c.figure)"
+            end
+        @pinaxsetup numbering = :page numberer = nb
+        @page :eq "Thermal" begin
+            @section :a "A" begin
+                @figure svg
+            end
+            @section :b "B" begin
+                @figure svg
+            end
+        end
+        @page :gq "Quench" begin
+            @section :c "C" begin
+                @figure svg
+            end
+        end
+        html = read(Pinax.render(; out=sitedir("partnum")), String)
+        @test occursin("EQ1", html)
+        @test occursin("EQ2", html)
+        @test occursin("GQ1", html)    # section counter reset per page + page-derived prefix
+        @test !occursin("EQ3", html)
+    end
 end

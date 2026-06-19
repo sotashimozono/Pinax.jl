@@ -35,10 +35,12 @@ Diagnostics() = Diagnostics(DiagEntry[])
 """
 Default numbering function: `Sec. N` / `Fig. N` / `(N)` for equations. Override it in the
 preamble with `@pinaxsetup numberer = (kind, c) -> …`, where `kind` is `:section`, `:figure`,
-or `:equation` and `c` is `(; section, figure, subfigure, equation)` — `section` is the current
-section number, `figure` the document-wide figure count, `subfigure` the figure's index within
-its section (for hierarchical schemes like `Fig. 2.3`), and `equation` the document-wide
-equation count.
+or `:equation` and `c` is `(; page, page_id, section, figure, subfigure, equation)` — `page` is
+the 1-based page index and `page_id` its id (Symbol), so a numberer can prefix per "part" (e.g.
+`c.page_id === :eq ? "EQ\$(c.section)" : "GQ\$(c.section)"`, usually with `numbering=:page`);
+`section` is the current section number, `figure` the document-wide figure count, `subfigure`
+the figure's index within its section (for hierarchical schemes like `Fig. 2.3`), and `equation`
+the document-wide equation count.
 """
 function _default_numberer(kind::Symbol, c)
     kind === :section && return "Sec. $(c.section)"

@@ -184,9 +184,18 @@ const _REF_RE = r"\[([^\]]*)\]\(@ref\s+:(\w+)\)|@ref\(:(\w+)\)"
 # Resolve @cite forms: `@cite(:key)` and `[text](@cite key)` (colon optional in the link form).
 const _CITE_RE = r"\[([^\]]*)\]\(@cite\s+:?(\w+)\)|@cite\(:(\w+)\)"
 
-# Build the counters NamedTuple handed to the numberer.
-function _counters(secn, fign, subfig, eqn)
-    return (; section=secn, figure=fign, subfigure=subfig, equation=eqn)
+# Build the counters NamedTuple handed to the numberer. `page` is the 1-based page index and
+# `page_id` the page's id (Symbol) — so a numberer can prefix section numbers per "part" (e.g.
+# `c.page_id === :eq ? "EQ$(c.section)" : "GQ$(c.section)"`), typically with numbering=:page.
+function _counters(pagen, pageid, secn, fign, subfig, eqn)
+    return (;
+        page=pagen,
+        page_id=pageid,
+        section=secn,
+        figure=fign,
+        subfigure=subfig,
+        equation=eqn,
+    )
 end
 
 # Theme-side numbering (notes 03/06). Assigns Sec./Fig./Eq. numbers in document order (continuous,
@@ -199,7 +208,10 @@ function _gallery_numbers(doc::Document)
     perpage = doc.meta.numbering === :page
     numberer = doc.meta.numberer
     secn = fign = eqn = 0
+    pagen = 0
     for pg in doc.pages
+        pagen += 1
+        pid = pg.id
         if perpage
             secn = fign = eqn = 0
         end
@@ -207,11 +219,13 @@ function _gallery_numbers(doc::Document)
             secn += 1
             subfig = 0
             nums[sec.anchor] = string(
-                numberer(:section, _counters(secn, fign, subfig, eqn))
+                numberer(:section, _counters(pagen, pid, secn, fign, subfig, eqn))
             )
             eqn = _scan_eqs!(
                 _descsrc(sec.desc),
                 sec.anchor,
+                pagen,
+                pid,
                 secn,
                 fign,
                 subfig,
@@ -225,11 +239,13 @@ function _gallery_numbers(doc::Document)
                 fign += 1
                 subfig += 1
                 nums[fig.anchor] = string(
-                    numberer(:figure, _counters(secn, fign, subfig, eqn))
+                    numberer(:figure, _counters(pagen, pid, secn, fign, subfig, eqn))
                 )
                 eqn = _scan_eqs!(
                     fig.caption,
                     fig.anchor,
+                    pagen,
+                    pid,
                     secn,
                     fign,
                     subfig,
@@ -250,7 +266,7 @@ _descsrc(d) = d === nothing ? "" : d.source
 # Scan one source for `$$…$$` blocks: number each equation (numberer gets the live section/figure
 # counters), register `@label(:id)` ids, record the per-node ordered (anchor, number) list.
 function _scan_eqs!(
-    source, node_anchor, secn, fign, subfig, nums, ids_eq, eqseq, numberer, eqn
+    source, node_anchor, pagen, pid, secn, fign, subfig, nums, ids_eq, eqseq, numberer, eqn
 )
     isempty(source) && return eqn
     lst = Tuple{String,Int}[]
@@ -260,7 +276,9 @@ function _scan_eqs!(
         k += 1
         label = m.captures[1]
         anchor = label !== nothing ? _anchor(Symbol(label)) : string(node_anchor, "_eq", k)
-        nums[anchor] = string(numberer(:equation, _counters(secn, fign, subfig, eqn)))
+        nums[anchor] = string(
+            numberer(:equation, _counters(pagen, pid, secn, fign, subfig, eqn))
+        )
         label !== nothing && (ids_eq[Symbol(label)] = anchor)
         push!(lst, (anchor, eqn))
     end
