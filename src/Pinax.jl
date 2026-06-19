@@ -27,6 +27,7 @@ export @pinaxsetup,
     @figure,
     @caption,
     @desc,
+    @raw,
     @thumbnail,
     @no_thumbnail,
     @md_str

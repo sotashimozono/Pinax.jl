@@ -217,4 +217,23 @@ using Test
         html = read(Pinax.render(; out=outdir), String)
         @test occursin("<div class=\"pinax-meta\">1 figure</div>", html)
     end
+
+    @testset "@raw injects verbatim HTML between desc and figures" begin
+        outdir = joinpath(tmp, "rawpanel")
+        Pinax.reset!()
+        @page :p "P" begin
+            @section :s "S" begin
+                @desc md"intro prose"
+                @raw raw"<table class='cov'><tr><td>24</td></tr></table>"
+                @figure svg1
+            end
+        end
+        html = read(Pinax.render(; out=outdir), String)
+        @test occursin("<table class='cov'><tr><td>24</td></tr></table>", html)  # verbatim
+        @test !occursin("&lt;table class='cov'", html)                          # NOT escaped
+        di = findfirst("intro prose", html).start
+        ti = findfirst("class='cov'", html).start
+        fi = findfirst("s_fig1.svg", html).start
+        @test di < ti < fi          # desc, then @raw panel, then figures
+    end
 end

@@ -567,6 +567,9 @@ function _emit_section(theme, sec::Section, pg::Page, ctx::EmitCtx)
             "</div>",
         )
     end
+    for panel in sec.panels        # @raw blocks, emitted verbatim (notes 06 §6)
+        println(io, panel)
+    end
     if sec.facet isa AbstractString
         for (val, figs) in _facet_groups(sec.figures, sec.facet)
             label = if val === missing

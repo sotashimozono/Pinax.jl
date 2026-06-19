@@ -116,6 +116,7 @@ mutable struct Section
     thumbnail::Union{FigRef,Nothing} # section-level main figure
     layout::Union{Symbol,Nothing}    # :wide|:grid|:single (theme hint)
     figures::Vector{Figure}
+    panels::Vector{String}           # @raw HTML blocks (project-specific UI escape hatch, notes 06 §6)
 end
 
 "A page (standalone HTML + shared nav)."
@@ -345,6 +346,7 @@ function _enter_section!(id::Symbol, title; by=nothing, summary=nothing, layout=
         nothing,
         layout,
         Figure[],
+        String[],
     )
     push!(pg.sections, sec)
     CTX.section = sec
@@ -417,6 +419,24 @@ function _set_desc!(s)
     sec = CTX.section
     sec === nothing && error("@desc outside of a @section")
     sec.desc = Desc(string(s))
+    return nothing
+end
+
+"""
+Inject a raw block into the current section — the escape hatch for project-specific UI that markdown
+can't express (coverage tables, broken-data banners; notes 06 §6). `@raw x` evaluates `x` to a
+string and the theme emits it verbatim (the gallery as raw HTML; trusted author content):
+`@raw raw\"<table class=cov>…</table>\"`. Use `@desc` for prose; `@raw` for hand-built markup.
+"""
+macro raw(x)
+    return quote
+        _push_panel!($(esc(x)))
+    end
+end
+function _push_panel!(s)
+    sec = CTX.section
+    sec === nothing && error("@raw outside of a @section")
+    push!(sec.panels, string(s))
     return nothing
 end
 
