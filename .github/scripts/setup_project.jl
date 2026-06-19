@@ -2,7 +2,7 @@ using UUIDs
 
 new_name = ARGS[1]
 new_uuid = string(uuid4())
-old_name = "MyModule"
+old_name = "Pinax"
 
 files_to_fix = [
     "Project.toml",
