@@ -1,0 +1,25 @@
+name: AutoMerge
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, labeled]
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  auto-merge:
+    runs-on: ubuntu-latest
+    if: >
+      github.event.pull_request.user.type == 'Bot' ||
+      contains(github.event.pull_request.labels.*.name, 'automerge')
+    steps:
+      - name: Enable auto-merge (squash, delete branch)
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        # `--auto` + `--squash` で必要 check が green になった瞬間に squash-merge し、
+        # `--delete-branch` で bot 用の throwaway branch を即削除する。
+        # Bot PR (CompatHelper / dependabot / TagBot 等) を 1 step で完結させる。
+        run: gh pr merge --auto --squash --delete-branch "$PR_URL"
