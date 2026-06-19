@@ -24,7 +24,20 @@ function RenderCache(outdir::AbstractString, force::Bool)
     return RenderCache(String(outdir), force, _read_manifest(outdir), Dict{String,Any}())
 end
 
-_cache_key(fig::Figure, fmts) = string(hash((fig.code, repr(fig.params), Tuple(fmts))))
+# Stable identity for the figure's params: ParamIO's order-/version-independent `canonical`
+# for a DataKey (so equal params in any insertion order yield the same key), else `repr`.
+function _params_id(p)
+    p isa ParamIO.DataKey || return repr(p)
+    try
+        return ParamIO.canonical(p)
+    catch
+        return repr(p)
+    end
+end
+
+function _cache_key(fig::Figure, fmts)
+    return string(hash((fig.code, _params_id(fig.params), Tuple(fmts))))
+end
 
 # Manifest key: the figure's output base path (unique per page/section/figure), TOML-safe.
 _manifest_key(base, outdir) = replace(relpath(base, outdir), r"[^A-Za-z0-9_-]" => "_")

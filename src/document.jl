@@ -176,6 +176,25 @@ end
 _anchor(id::Symbol) = replace(string(id), r"[^A-Za-z0-9_-]" => "_")
 _auto_fig_id(sec::Section) = Symbol(string(sec.id), "_fig", length(sec.figures) + 1)
 
+# Stringify the @figure expression for change detection, stripping source line numbers so that
+# moving a figure to a different line does not spuriously invalidate its cache entry (notes 10).
+_code_str(expr) = string(expr isa Expr ? Base.remove_linenums!(deepcopy(expr)) : expr)
+
+# A stable, param-derived figure id when params is a ParamIO.DataKey (so a sweep keeps each
+# figure's id across reordering); otherwise the explicit id, otherwise a positional fallback.
+function _fig_id(sec::Section, id, params)
+    id === nothing || return id
+    if params isa ParamIO.DataKey
+        try
+            tag = replace(ParamIO.canonical(params), r"[^A-Za-z0-9_-]" => "_")
+            return Symbol(string(sec.id), "_", tag)
+        catch
+            # canonical can throw on hand-built keys with reserved delimiters; fall back.
+        end
+    end
+    return _auto_fig_id(sec)
+end
+
 function _diag!(sev::Severity, item, msg)
     doc = CTX.document
     if doc === nothing
@@ -321,7 +340,7 @@ macro figure(args...)
     expr === nothing && error("@figure needs a plot expression")
     allk = vcat(
         Expr(:kw, :gen, Expr(:(->), Expr(:tuple), esc(expr))),
-        Expr(:kw, :code, string(expr)),
+        Expr(:kw, :code, _code_str(expr)),
         _kwspecs(kws),
     )
     return _call(:_push_figure!, (), allk)
@@ -330,7 +349,7 @@ end
 function _push_figure!(; gen, code, params=nothing, caption="", id=nothing, thumbnail=false)
     sec = CTX.section
     sec === nothing && error("@figure outside of a @section")
-    fid = id === nothing ? _auto_fig_id(sec) : id
+    fid = _fig_id(sec, id, params)
     fig = Figure(fid, _anchor(fid), string(caption), params, gen, code, thumbnail, String[])
     push!(sec.figures, fig)
     return fig
