@@ -3,6 +3,7 @@ module Pinax
 using ParamIO
 using DataVault
 using TOML
+using Markdown: Markdown
 
 # Design spec lives in notes/ (00–10).
 # Implemented incrementally: document model + structure macros -> resolve -> render -> cache -> theme …

@@ -1,10 +1,11 @@
 # theme.jl — a theme is a renderer over the structure IR (doc tree) (notes 06). Default = GalleryTheme.
 #
 # v1 gallery: a single `index.html` with figures materialized into
-# `assets/figures/<page>/<section>/<id>.<fmt>`. Sec./Fig. numbers are assigned by the theme
-# (notes 03: numbering is the theme's job), display equations are numbered + rendered with KaTeX,
-# and `@ref(:id)` / `@label(:id)` cross-references resolve to numbered links. @cite, CSS-counter
-# display, and interactive JS come in later slices.
+# `assets/figures/<page>/<section>/<id>.<fmt>`. Sec./Fig./Eq. numbers are assigned by the theme
+# server-side (notes 03: numbering is the theme's job); `@desc`/`@caption` prose is rendered to HTML
+# server-side via the Markdown stdlib, with math left to KaTeX (client-side). `@ref(:id)` resolves to
+# a numbered link; `@label(:id)` defines a label (for equations). @cite, CSS-counter display, and
+# interactive JS come in later slices.
 
 abstract type Theme end
 
@@ -25,7 +26,10 @@ const _GALLERY_CSS = """
   h1,h2{border-bottom:1px solid #eee;padding-bottom:.2rem}
   nav{background:#fafafa;border:1px solid #eee;border-radius:8px;padding:.6rem .9rem;margin:1rem 0}
   nav a{display:block;text-decoration:none;color:#0366d6}
-  .desc{white-space:pre-wrap;background:#f6f8fa;padding:.6rem .8rem;border-radius:6px;margin:.6rem 0}
+  .desc{background:#f6f8fa;padding:.6rem .8rem;border-radius:6px;margin:.6rem 0}
+  .desc p:first-child{margin-top:0}.desc p:last-child{margin-bottom:0}
+  .desc table{border-collapse:collapse;margin:.5rem 0}
+  .desc th,.desc td{border:1px solid #ccd;padding:.15rem .5rem;font-size:.9rem}
   .figgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:1rem}
   figure{margin:0;border:1px solid #ddd;border-radius:8px;padding:.5rem;background:#fff}
   figure img{width:100%;height:auto}
@@ -166,17 +170,60 @@ end
 # Label id -> node anchor, from the resolve table (single-page hrefs are "#anchor").
 _id2anchor(doc::Document) = Dict{Symbol,String}(id => n.anchor for (id, n) in doc.refs)
 
-# Render a desc/caption source: escape, wrap `$$…$$` equations (anchor + \tag for KaTeX), resolve
-# @ref links, and drop leftover @label tokens. `item` is the owning node's anchor.
-function _render_text(source::AbstractString, item, ctx::EmitCtx)
+# Inline `$…$` math (single delimiters, one line, no inner `$`); HTML-escaped then re-injected for
+# client-side KaTeX.
+const _INLINE_EQ_RE = r"\$[^\$\n]+?\$"
+
+# Placeholder token wrapping a protected fragment (math / cross-reference) across the markdown pass.
+_tok(k) = string("PINAXxTOKx", k, "xENDx")
+
+# Render a desc/caption source to HTML. Prose is authored in markdown and rendered server-side via
+# the Markdown stdlib; math and `@ref` cross-references are first replaced with placeholder tokens so
+# the markdown pass cannot mangle them, then re-injected. Display `$$…$$` become numbered, anchored
+# spans (KaTeX renders them client-side); inline `$…$` is HTML-escaped and re-injected for KaTeX;
+# `@ref` resolves to a numbered link; a bare `@label` (not bound to a `$$…$$` block) is dropped.
+# `item` is the owning node's anchor. `block=false` unwraps the single paragraph markdown adds, for
+# inline use in figure captions.
+function _render_text(source::AbstractString, item::String, ctx::EmitCtx; block::Bool=true)
     eqs = get(ctx.eqseq, item, Tuple{String,Int}[])
+    subs = String[]
+    tok!(html) = (push!(subs, html); _tok(length(subs)))
+    # 1. Protect math + refs (display `$$` before inline `$`, since `$$` contains `$`).
     i = Ref(0)
-    out = replace(_esc(source), _EQ_RE => s -> _eq_sub(s, eqs, i))
-    out = replace(out, _REF_RE => s -> _ref_sub(s, ctx, item))
-    return replace(out, r"@label\(:\w+\)\s*" => "")
+    s = replace(source, _EQ_RE => m -> tok!(_eq_html(m, eqs, i)))
+    s = replace(s, _INLINE_EQ_RE => m -> tok!(_esc(m)))
+    s = replace(s, _REF_RE => m -> tok!(_ref_html(m, ctx, item)))
+    s = replace(s, r"@label\(:\w+\)\s*" => "")
+    # 2. Render the surviving prose as markdown (raw HTML is escaped -> safe). A parse failure is
+    #    non-fatal: fall back to escaped text and record a diagnostic (notes 09).
+    html = try
+        _markdown(s)
+    catch e
+        e isa InterruptException && rethrow()
+        push!(ctx.rdiag, DiagEntry(WARNING, item, "markdown render failed: $(e)"))
+        _esc(s)
+    end
+    # 3. Re-inject the protected fragments.
+    for (k, frag) in enumerate(subs)
+        html = replace(html, _tok(k) => frag)
+    end
+    return block ? html : _unwrap_p(html)
 end
 
-function _eq_sub(matched, eqs, i)
+# Markdown -> HTML. Lets the (rare) parse error propagate; `_render_text` turns it into a diagnostic.
+function _markdown(s::AbstractString)
+    return rstrip(Markdown.html(Markdown.parse(s)))
+end
+
+# Drop the single `<p>…</p>` wrapper markdown adds, for inline contexts (captions).
+function _unwrap_p(html::AbstractString)
+    if startswith(html, "<p>") && endswith(html, "</p>") && count("<p>", html) == 1
+        return chopsuffix(chopprefix(html, "<p>"), "</p>")
+    end
+    return html
+end
+
+function _eq_html(matched, eqs, i)
     m = match(_EQ_RE, matched)
     math = m.captures[2]
     i[] += 1
@@ -185,23 +232,24 @@ function _eq_sub(matched, eqs, i)
         "<span class=\"pinax-eq\" id=\"",
         anchor,
         "\">\$\$ ",
-        math,
+        _esc(math),
         " \\tag{",
         num,
         "} \$\$</span>",
     )
 end
 
-function _ref_sub(matched, ctx::EmitCtx, item)
+function _ref_html(matched, ctx::EmitCtx, item::String)
     m = match(_REF_RE, matched)
-    text = m.captures[1]                       # [text](@ref :id) form; already escaped by _esc
+    text = m.captures[1]
     id = m.captures[2] !== nothing ? m.captures[2] : m.captures[3]
     anchor = get(ctx.ids, Symbol(id), nothing)
     if anchor === nothing
         push!(ctx.rdiag, DiagEntry(WARNING, item, "@ref to unknown id :$(id)"))
         return "[?]"
     end
-    label = (text !== nothing && !isempty(text)) ? text : get(ctx.nums, anchor, "[ref]")
+    label =
+        (text !== nothing && !isempty(text)) ? _esc(text) : get(ctx.nums, anchor, "[ref]")
     return string("<a href=\"#", anchor, "\">", label, "</a>")
 end
 
@@ -427,7 +475,8 @@ function _emit_figure(fig::Figure, ctx::EmitCtx)
         end
     end
     num = get(ctx.nums, fig.anchor, "")
-    cap = isempty(fig.caption) ? "" : _render_text(fig.caption, fig.anchor, ctx)
+    cap =
+        isempty(fig.caption) ? "" : _render_text(fig.caption, fig.anchor, ctx; block=false)
     caphtml = if isempty(num)
         cap
     elseif isempty(cap)
