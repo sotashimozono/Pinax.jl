@@ -1,11 +1,23 @@
 [assets_figures_attractors_lorenz_lorenz_fig1]
-key = "17869841057206308291"
+key = "14237431409837004698"
 assets = ["assets/figures/attractors/lorenz/lorenz_fig1.svg"]
 
+[assets_figures_attractors_rossler_rossler_fig2]
+key = "6364719583459948062"
+assets = ["assets/figures/attractors/rossler/rossler_fig2.svg"]
+
 [assets_figures_attractors_lorenz_lorenz_fig2]
-key = "10525908136158179217"
+key = "4522161573980967656"
 assets = ["assets/figures/attractors/lorenz/lorenz_fig2.svg"]
 
 [assets_figures_attractors_rossler_rossler_fig1]
-key = "6781465049766531561"
+key = "11334858558729932577"
 assets = ["assets/figures/attractors/rossler/rossler_fig1.svg"]
+
+[assets_figures_attractors_lorenz_lorenz_fig3]
+key = "7560561049442107703"
+assets = ["assets/figures/attractors/lorenz/lorenz_fig3.svg"]
+
+[assets_figures_attractors_rossler_rossler_fig3]
+key = "6222128633635792471"
+assets = ["assets/figures/attractors/rossler/rossler_fig3.svg"]
