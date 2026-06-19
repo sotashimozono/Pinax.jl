@@ -42,6 +42,7 @@ const _GALLERY_CSS = """
   .pinax-meta{color:#666;margin:-.4rem 0 1rem;font-size:.95rem}
   .nfig{color:#888;font-weight:normal;font-size:.85em}
   nav .nfig{color:#888}
+  .bibliography li{margin:.3rem 0;font-size:.92rem}
 </style>
 """
 
@@ -75,6 +76,8 @@ struct EmitCtx
     nums::Dict{String,String}                  # node/eq anchor -> display number ("Fig. 3", "(2)")
     ids::Dict{Symbol,String}                   # label id -> anchor (sections, figures, equations)
     eqseq::Dict{String,Vector{Tuple{String,Int}}}  # node anchor -> ordered [(eq anchor, eq number)]
+    bib::Dict{Symbol,BibEntry}                 # @bibliography sources, parsed
+    citenums::Dict{Symbol,Int}                 # cite key -> [n] (first-appearance order)
 end
 
 # Display-equation block: an optional preceding @label(:id), then $$ ... $$ (newlines allowed).
@@ -82,6 +85,9 @@ const _EQ_RE = r"(?:@label\(:(\w+)\)\s*)?\$\$\s*(.+?)\s*\$\$"s
 
 # Resolve @ref forms: `@ref(:id)` and `[text](@ref :id)`.
 const _REF_RE = r"\[([^\]]*)\]\(@ref\s+:(\w+)\)|@ref\(:(\w+)\)"
+
+# Resolve @cite forms: `@cite(:key)` and `[text](@cite key)` (colon optional in the link form).
+const _CITE_RE = r"\[([^\]]*)\]\(@cite\s+:?(\w+)\)|@cite\(:(\w+)\)"
 
 # Build the counters NamedTuple handed to the numberer.
 function _counters(secn, fign, subfig, eqn)
@@ -193,6 +199,7 @@ function _render_text(source::AbstractString, item::String, ctx::EmitCtx; block:
     s = replace(source, _EQ_RE => m -> tok!(_eq_html(m, eqs, i)))
     s = replace(s, _INLINE_EQ_RE => m -> tok!(_esc(m)))
     s = replace(s, _REF_RE => m -> tok!(_ref_html(m, ctx, item)))
+    s = replace(s, _CITE_RE => m -> tok!(_cite_html(m, ctx, item)))
     s = replace(s, r"@label\(:\w+\)\s*" => "")
     # 2. Render the surviving prose as markdown (raw HTML is escaped -> safe). A parse failure is
     #    non-fatal: fall back to escaped text and record a diagnostic (notes 09).
@@ -253,6 +260,63 @@ function _ref_html(matched, ctx::EmitCtx, item::String)
     return string("<a href=\"#", anchor, "\">", label, "</a>")
 end
 
+# Resolve `@cite(:key)` / `[text](@cite key)` to `[n]` linking to the References entry. An unknown
+# key (absent from the bibliography) becomes `[?]` + a diagnostic (non-fatal).
+function _cite_html(matched, ctx::EmitCtx, item::String)
+    m = match(_CITE_RE, matched)
+    text = m.captures[1]
+    key = Symbol(m.captures[2] !== nothing ? m.captures[2] : m.captures[3])
+    num = get(ctx.citenums, key, nothing)
+    if num === nothing
+        push!(ctx.rdiag, DiagEntry(WARNING, item, "@cite to unknown key :$(key)"))
+        return "[?]"
+    end
+    label = (text !== nothing && !isempty(text)) ? _esc(text) : string("[", num, "]")
+    return string("<a href=\"#ref-", _anchor(key), "\">", label, "</a>")
+end
+
+# Parse the @bibliography .bib source(s); a missing or unparseable file becomes a diagnostic.
+function _load_bib(paths, rdiag::Vector{DiagEntry})
+    bib = Dict{Symbol,BibEntry}()
+    for p in paths
+        if !isfile(p)
+            push!(
+                rdiag,
+                DiagEntry(WARNING, "bibliography", "@bibliography file not found: $(p)"),
+            )
+            continue
+        end
+        try
+            merge!(bib, parse_bib(p))
+        catch e
+            e isa InterruptException && rethrow()
+            push!(rdiag, DiagEntry(WARNING, "bibliography", "failed to parse $(p): $(e)"))
+        end
+    end
+    return bib
+end
+
+# Assign `[n]` to each cited key present in the bibliography, in document order of first appearance
+# (scanning descs then captions). Returns (key -> n, ordered keys for the References list).
+function _gallery_citations(doc::Document, bib::Dict{Symbol,BibEntry})
+    citenums = Dict{Symbol,Int}()
+    order = Symbol[]
+    for pg in doc.pages, sec in pg.sections
+        srcs = String[_descsrc(sec.desc)]
+        for f in sec.figures
+            push!(srcs, f.caption)
+        end
+        for src in srcs, m in eachmatch(_CITE_RE, src)
+            key = Symbol(m.captures[2] !== nothing ? m.captures[2] : m.captures[3])
+            if haskey(bib, key) && !haskey(citenums, key)
+                push!(order, key)
+                citenums[key] = length(order)
+            end
+        end
+    end
+    return citenums, order
+end
+
 # ---------- emit (the theme-dispatched entry point) ----------
 
 "Emit the doc tree to a single HTML file. Doubles as pass 3 (materialize + draw) (notes 02/06)."
@@ -273,7 +337,19 @@ function emit_document(
             ),
         )
     end
-    ctx = EmitCtx(String(outdir), io, rdiag, cache, nums, merge(base_ids, ids_eq), eqseq)
+    bib = _load_bib(doc.meta.bib_sources, rdiag)
+    citenums, citeorder = _gallery_citations(doc, bib)
+    ctx = EmitCtx(
+        String(outdir),
+        io,
+        rdiag,
+        cache,
+        nums,
+        merge(base_ids, ids_eq),
+        eqseq,
+        bib,
+        citenums,
+    )
     title = isempty(doc.meta.title) ? "Pinax gallery" : doc.meta.title
     print(io, "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">")
     print(io, "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">")
@@ -290,7 +366,7 @@ function emit_document(
         "</div>",
     )
 
-    _emit_index(theme, doc, io)
+    _emit_index(theme, doc, io; has_bib=(!isempty(citeorder)))
     for pg in doc.pages
         println(
             io,
@@ -305,6 +381,7 @@ function emit_document(
         end
         println(io, "</section>")
     end
+    _emit_bibliography(bib, citeorder, io)
     _emit_diagnostics(doc, ctx.rdiag, io)
 
     print(io, _KATEX_FOOT)
@@ -321,7 +398,7 @@ end
 
 # index (table of contents): v1 shows names + links (:toc level), each with its figure count.
 # :cards/:rich come later.
-function _emit_index(::GalleryTheme, doc::Document, io)
+function _emit_index(::GalleryTheme, doc::Document, io; has_bib::Bool=false)
     println(io, "<nav><strong>Contents</strong>")
     for pg in doc.pages
         println(io, "<a href=\"#", pg.anchor, "\">", _esc(pg.title), "</a>")
@@ -339,6 +416,7 @@ function _emit_index(::GalleryTheme, doc::Document, io)
             )
         end
     end
+    has_bib && println(io, "<a href=\"#bibliography\">References</a>")
     return println(io, "</nav>")
 end
 
@@ -486,6 +564,40 @@ function _emit_figure(fig::Figure, ctx::EmitCtx)
     end
     isempty(caphtml) || println(io, "<figcaption>", caphtml, "</figcaption>")
     return println(io, "</figure>")
+end
+
+# References section (notes 03): cited entries in citation order, each anchored (`ref-<key>`) so a
+# `@cite` link resolves to it; the entry hyperlinks to its DOI / URL / arXiv id when present.
+function _emit_bibliography(bib::Dict{Symbol,BibEntry}, citeorder::Vector{Symbol}, io)
+    isempty(citeorder) && return nothing
+    println(
+        io, "<section class=\"bibliography\" id=\"bibliography\"><h2>References</h2><ol>"
+    )
+    for key in citeorder
+        e = bib[key]
+        link = bib_link(e)
+        linkhtml = if link === nothing
+            ""
+        else
+            string(
+                " <a href=\"",
+                _esc(link),
+                "\" target=\"_blank\" rel=\"noopener\">",
+                bib_link_label(link),
+                "</a>",
+            )
+        end
+        println(
+            io,
+            "<li id=\"ref-",
+            _anchor(key),
+            "\">",
+            _esc(format_bib_entry(e)),
+            linkhtml,
+            "</li>",
+        )
+    end
+    return println(io, "</ol></section>")
 end
 
 # Diagnostics page (notes 09, minimal): build-phase (doc.diag) + this render's failures (rdiag),
