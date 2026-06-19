@@ -1,6 +1,6 @@
 # serve.jl — a tiny static-file HTTP server to preview a rendered gallery (Sockets stdlib only).
 #
-# `Pinax.serve("out/site")` serves the directory at http://127.0.0.1:8000 so you open a link and view
+# `Pinax.serve("out/site")` serves the directory at http://localhost:8000 so you open a link and view
 # the gallery in a browser. Over http:// the PDF `<iframe>`s and the comment layer behave better than
 # over `file://`, and the URL can be port-forwarded to share with an advisor. Blocks until Ctrl-C;
 # `blocking=false` returns a handle (`(; server, url, port, task)`) for tests / programmatic use.
@@ -132,7 +132,7 @@ function _listen_any(addr, port)
 end
 
 """
-    serve(dir="out"; host="127.0.0.1", port=8000, blocking=true) -> nothing | handle
+    serve(dir="out"; host="localhost", port=8000, blocking=true) -> nothing | handle
 
 Serve the rendered gallery in `dir` over HTTP so you can open the printed link in a browser. Picks
 the next free port from `port` if it is busy. Blocks until interrupted (Ctrl-C); with
@@ -140,7 +140,7 @@ the next free port from `port` if it is busy. Blocks until interrupted (Ctrl-C);
 """
 function serve(
     dir::AbstractString="out";
-    host::AbstractString="127.0.0.1",
+    host::AbstractString="localhost",
     port::Integer=8000,
     blocking::Bool=true,
 )
