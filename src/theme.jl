@@ -43,6 +43,12 @@ const _GALLERY_CSS = """
   .nfig{color:#888;font-weight:normal;font-size:.85em}
   nav .nfig{color:#888}
   .bibliography li{margin:.3rem 0;font-size:.92rem}
+  .pinax-bm-on{color:#e3b341}
+  .pinax-comments{margin:.6rem 0;border-left:3px solid #cbd5e1;padding-left:.8rem}
+  .pinax-cmt{margin:.4rem 0;font-size:.92rem}
+  .pinax-cmt .author{font-weight:600;color:#0366d6}
+  .pinax-cmt p:first-child{margin-top:0;display:inline}
+  .pinax-cmt p:last-child{margin-bottom:0}
 </style>
 """
 
@@ -78,6 +84,8 @@ struct EmitCtx
     eqseq::Dict{String,Vector{Tuple{String,Int}}}  # node anchor -> ordered [(eq anchor, eq number)]
     bib::Dict{Symbol,BibEntry}                 # @bibliography sources, parsed
     citenums::Dict{Symbol,Int}                 # cite key -> [n] (first-appearance order)
+    comments::Dict{Symbol,Vector{Comment}}     # section anchor -> comment turns (notes 01 §4)
+    bookmarks::Set{Symbol}                     # bookmarked section anchors
 end
 
 # Display-equation block: an optional preceding @label(:id), then $$ ... $$ (newlines allowed).
@@ -321,7 +329,11 @@ end
 
 "Emit the doc tree to a single HTML file. Doubles as pass 3 (materialize + draw) (notes 02/06)."
 function emit_document(
-    theme::GalleryTheme, doc::Document, outdir::AbstractString, cache::RenderCache
+    theme::GalleryTheme,
+    doc::Document,
+    outdir::AbstractString,
+    cache::RenderCache;
+    comments_file::AbstractString=joinpath(outdir, "comments.toml"),
 )
     io = IOBuffer()
     nums, ids_eq, eqseq = _gallery_numbers(doc)
@@ -339,6 +351,7 @@ function emit_document(
     end
     bib = _load_bib(doc.meta.bib_sources, rdiag)
     citenums, citeorder = _gallery_citations(doc, bib)
+    comments, bookmarks = read_comments(comments_file)
     ctx = EmitCtx(
         String(outdir),
         io,
@@ -349,6 +362,8 @@ function emit_document(
         eqseq,
         bib,
         citenums,
+        comments,
+        bookmarks,
     )
     title = isempty(doc.meta.title) ? "Pinax gallery" : doc.meta.title
     print(io, "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">")
@@ -422,11 +437,16 @@ end
 
 function _emit_section(theme, sec::Section, pg::Page, ctx::EmitCtx)
     io = ctx.io
+    bookmarked = Symbol(sec.anchor) in ctx.bookmarks
     num = get(ctx.nums, sec.anchor, "")
     heading = isempty(num) ? _esc(sec.title) : string(_esc(num), ". ", _esc(sec.title))
     n = length(sec.figures)
     n > 0 && (heading *= string(" <span class=\"nfig\">(", n, ")</span>"))
-    println(io, "<section class=\"section\" id=\"", sec.anchor, "\"><h2>", heading, "</h2>")
+    bookmarked && (heading *= " <span class=\"pinax-bm-on\" title=\"bookmarked\">★</span>")
+    cls = bookmarked ? "section bookmarked" : "section"
+    println(
+        io, "<section class=\"", cls, "\" id=\"", sec.anchor, "\"><h2>", heading, "</h2>"
+    )
     if sec.desc !== nothing
         println(
             io,
@@ -448,7 +468,33 @@ function _emit_section(theme, sec::Section, pg::Page, ctx::EmitCtx)
     else
         _emit_figures(sec.figures, sec, pg, theme, ctx)
     end
+    _emit_comments(sec.anchor, ctx)
     return println(io, "</section>")
+end
+
+# Render the id-keyed comment turns for a node (a figure or a section) inline, co-located with their
+# target so the binding is visually unambiguous (notes 01 §4): the communication layer over the
+# figures (me / advisor / LLM). Author + markdown body, rendered server-side (raw HTML escaped).
+function _emit_comments(anchor::String, ctx::EmitCtx)
+    turns = get(ctx.comments, Symbol(anchor), Comment[])
+    isempty(turns) && return nothing
+    io = ctx.io
+    println(io, "<div class=\"pinax-comments\">")
+    for c in turns
+        body = try
+            _markdown(c.text)
+        catch e
+            e isa InterruptException && rethrow()
+            _esc(c.text)
+        end
+        author = if isempty(c.author)
+            ""
+        else
+            string("<span class=\"author\">", _esc(c.author), "</span> ")
+        end
+        println(io, "<div class=\"pinax-cmt\">", author, body, "</div>")
+    end
+    return println(io, "</div>")
 end
 
 # Emit one grid of figures (materialize each: streaming + cache).
@@ -563,6 +609,7 @@ function _emit_figure(fig::Figure, ctx::EmitCtx)
         string("<b>", _esc(num), ".</b> ", cap)
     end
     isempty(caphtml) || println(io, "<figcaption>", caphtml, "</figcaption>")
+    _emit_comments(fig.anchor, ctx)   # co-located: a figure's comments live in its card
     return println(io, "</figure>")
 end
 
