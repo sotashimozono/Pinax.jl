@@ -6,22 +6,26 @@
 # outputs are tracked in a manifest under `out/`; assets it produced but this render did not are
 # deleted (orphan cleanup).
 #
-# Limitation: for a pre-made file figure the source path lives inside `code`, so if the file's
-# CONTENTS change but the manuscript does not, the change is not detected — pass `force=true`
-# (or edit the manuscript). Data-content fingerprinting via DataVault comes with the
-# stack-integration slice.
+# Data-content tracking: pass a DataVault `vault` to `render` and the key also folds in a fingerprint
+# of each `params::DataKey` figure's `.done` marker, so recomputing the data re-materializes it (see
+# `_data_fingerprint`). Without a vault, a pre-made file figure whose CONTENTS change but whose
+# manuscript does not is still not detected — pass `force=true` (or edit the manuscript).
 
 const MANIFEST_FILE = ".pinax-manifest.toml"
 
-"Per-render cache state: the previous manifest (read from disk) and the one being built."
+"Per-render cache state: the previous manifest (read from disk) and the one being built. `vault` (if
+set) lets the cache key track the figure's DataVault data, not just its code+params."
 mutable struct RenderCache
     outdir::String
     force::Bool
+    vault::Any              # DataVault.Vault | Nothing — for data-content fingerprinting
     old::Dict{String,Any}   # fig-path-key => Dict("key"=>cachekey, "assets"=>[rel paths])
     new::Dict{String,Any}
 end
-function RenderCache(outdir::AbstractString, force::Bool)
-    return RenderCache(String(outdir), force, _read_manifest(outdir), Dict{String,Any}())
+function RenderCache(outdir::AbstractString, force::Bool, vault=nothing)
+    return RenderCache(
+        String(outdir), force, vault, _read_manifest(outdir), Dict{String,Any}()
+    )
 end
 
 # Stable identity for the figure's params: ParamIO's order-/version-independent `canonical`
@@ -35,8 +39,32 @@ function _params_id(p)
     end
 end
 
-function _cache_key(fig::Figure, fmts)
-    return string(hash((fig.code, _params_id(fig.params), Tuple(fmts))))
+# Per-key data fingerprint: the content of DataVault's `.done` marker, which is rewritten whenever
+# the data is (re)computed. So changing the underlying data changes the key and the figure
+# re-materializes — the cache tracks data, not just code+params (notes 10; fixes the false-hit gap).
+# Guarded: degrades to "" (code+params only, the prior behavior) without a vault, for a non-DataKey,
+# or if DataVault's internal layout changes.
+function _data_fingerprint(vault, params)
+    vault === nothing && return ""
+    params isa ParamIO.DataKey || return ""
+    try
+        df = DataVault._done_file(vault, params)
+        return isfile(df) ? string(hash(read(df, String))) : ""
+    catch e
+        e isa InterruptException && rethrow()
+        return ""
+    end
+end
+
+function _cache_key(fig::Figure, fmts, vault)
+    return string(
+        hash((
+            fig.code,
+            _params_id(fig.params),
+            Tuple(fmts),
+            _data_fingerprint(vault, fig.params),
+        )),
+    )
 end
 
 # Manifest key: the figure's output base path (unique per page/section/figure), TOML-safe.
@@ -67,7 +95,7 @@ is NOT called. On a miss, materialize for real and record the result in the new 
 rethrow whatever `_materialize` throws (the caller turns it into a diagnostic).
 """
 function materialize!(fig::Figure, base, fmts, cache::RenderCache)
-    key = _cache_key(fig, fmts)
+    key = _cache_key(fig, fmts, cache.vault)
     od = cache.outdir
     mkey = _manifest_key(base, od)
     if !cache.force

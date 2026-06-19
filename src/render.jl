@@ -37,6 +37,11 @@ written by the CLI / browser export / LLM loop, never overwritten here.
 
 `theme` selects the renderer: a `Theme` instance, a registered `Symbol`, or a path to a user
 theme file (see `theme.jl`). `nothing` (default) uses the document's `@pinaxsetup theme=…`.
+
+`vault` is an optional `DataVault.Vault` (notes 05): when given, (1) the cache key tracks each
+`params::DataKey` figure's data via its `.done` marker, so recomputing the data re-materializes the
+figure (not just code/param changes), and (2) figure provenance is recorded with
+`DataVault.record_figure` under `study` (defaults to the vault's run).
 """
 function render(
     doc::Union{Document,Nothing}=current_document();
@@ -44,17 +49,32 @@ function render(
     theme=nothing,
     force::Bool=false,
     comments_file::AbstractString=joinpath(out, "comments.toml"),
+    vault=nothing,
+    study=nothing,
 )
     doc === nothing &&
         error("Pinax: no document to render. Use `@page …` first, or pass a Document.")
     resolve!(doc)
     mkpath(out)
-    cache = RenderCache(out, force)
+    cache = RenderCache(out, force, vault)
     rtheme = _resolve_theme(theme === nothing ? doc.meta.theme : theme)
     # invokelatest so a theme just defined/loaded at runtime (e.g. a path-loaded user theme) is seen.
     path = Base.invokelatest(
         emit_document, rtheme, doc, out, cache; comments_file=comments_file
     )
     _finalize_cache!(cache)
+    vault === nothing || _record_provenance(vault, study)
     return path
+end
+
+# Record figure provenance via DataVault (study-level meta.toml). Non-fatal.
+function _record_provenance(vault, study)
+    try
+        s = study === nothing ? vault.run : string(study)
+        DataVault.record_figure(vault; study=s)
+    catch e
+        e isa InterruptException && rethrow()
+        @warn "Pinax: DataVault.record_figure failed" exception = e
+    end
+    return nothing
 end
