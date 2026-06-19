@@ -1,7 +1,7 @@
 using Pinax
 using Test
 
-const SIDE = Ref(0)   # @figure 遅延性の確認用
+const SIDE = Ref(0)   # for checking @figure deferral
 
 @testset "document model (structure pass)" begin
     @testset "tree shape" begin
@@ -80,15 +80,15 @@ const SIDE = Ref(0)   # @figure 遅延性の確認用
         @page :p "P" begin
             @section :s "S" begin
                 @figure 1 caption = "kw"
-                @caption md"override"      # 後勝ち
-                @figure 2 caption = "only" # @caption 無し → caption= が残る
+                @caption md"override"      # wins
+                @figure 2 caption = "only" # no @caption -> caption= stays
             end
         end
         figs = Pinax.current_document().pages[1].sections[1].figures
         @test figs[1].caption == "override"
         @test figs[2].caption == "only"
 
-        # 図が無い節での @caption は致命にせず WARNING
+        # @caption in a section with no figure is non-fatal -> WARNING
         Pinax.reset!()
         @page :p "P" begin
             @section :s "S" begin
@@ -155,7 +155,7 @@ const SIDE = Ref(0)   # @figure 遅延性の確認用
         @test m.numbering === :page
         @test m.index === :rich
 
-        # theme 固有 kw(css/js/features)は structure 層では無視 = エラーにしない
+        # theme-specific kw (css/js/features) are ignored in the structure layer (not an error)
         @pinaxsetup theme = :gallery css = ["x.css"] js = ["y.js"] features = (:comments,)
         @test Pinax.current_document().meta.theme === :gallery
 
@@ -189,7 +189,7 @@ const SIDE = Ref(0)   # @figure 遅延性の確認用
         end
         @test length(doc.pages) == 1
         @test doc.pages[1].id === :scoped
-        @test Pinax.current_document() === outer   # グローバルは復帰
+        @test Pinax.current_document() === outer   # global state restored
     end
 
     @testset "misuse errors" begin

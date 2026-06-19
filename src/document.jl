@@ -1,37 +1,38 @@
-# document.jl — 文書モデル + 構造マクロ(notes 02)。
+# document.jl — document model + structure macros (notes 02).
 #
-# render 3パスのうち pass 1(structure)を担う。マクロは doc tree(placeholder)を組むだけで、
-# `@figure` の式は **eval せず** 遅延生成器 `gen` として保持する(materialize は pass 3)。
+# Implements render pass 1 (structure): the macros only assemble the doc tree
+# (placeholders). The `@figure` expression is NOT evaluated here — it is captured
+# as the deferred generator `gen` (materialize happens in pass 3).
 
-# ============================================================ 値型
+# ============================================================ value types
 
-"markdown + LaTeX の source(未レンダ; theme が描画)。"
+"Markdown + LaTeX source (unrendered; the theme draws it)."
 struct Desc
     source::String
 end
 
-"参照先 figure を指す軽量ハンドル(thumbnail 等)。"
+"Lightweight handle pointing at a figure (used by thumbnails, etc.)."
 struct FigRef
     id::Symbol
 end
 
-"診断の重大度(notes 09)。"
+"Diagnostic severity (notes 09)."
 @enum Severity ERROR WARNING INFO
 
-"診断 1 件。item は紐づく page/section/figure の anchor。"
+"One diagnostic. `item` is the anchor of the related page/section/figure."
 struct DiagEntry
     severity::Severity
     item::String
     message::String
 end
 
-"render 中に集めた error/warning(→ 診断ページ, notes 09)。"
+"error/warning entries collected during render (-> diagnostics page, notes 09)."
 struct Diagnostics
     entries::Vector{DiagEntry}
 end
 Diagnostics() = Diagnostics(DiagEntry[])
 
-"文書設定(TeX の \\documentclass+preamble 相当)。"
+"Document settings (analogous to TeX \\documentclass + preamble)."
 mutable struct DocMeta
     title::String
     theme::Symbol
@@ -39,8 +40,8 @@ mutable struct DocMeta
     format::Vector{Symbol}        # [:svg, :pdf]
     bib_sources::Vector{String}
     debug::Bool
-    index::Union{Symbol,Nothing}  # :toc|:cards|:rich 上書き(nothing=theme 既定)
-    numbering::Symbol             # CSS counter スコープ :global|:page
+    index::Union{Symbol,Nothing}  # :toc|:cards|:rich override (nothing = theme default)
+    numbering::Symbol             # CSS counter scope :global|:page
 end
 function DocMeta(;
     title="",
@@ -64,47 +65,47 @@ function DocMeta(;
     )
 end
 
-"図 1 枚(placeholder)。`gen` は遅延、`code` は変更検知用の式 source(notes 10)。"
+"A single figure (placeholder). `gen` is deferred; `code` is the expression source for change detection (notes 10)."
 mutable struct Figure
     id::Symbol
     anchor::String
     caption::String
-    params::Any           # ParamIO.DataKey | Nothing — 血統 + cache 素
-    gen::Function         # () -> plot(...)(structure では呼ばない)
-    code::String          # @figure 式の source
-    thumbnail::Bool       # thumbnail=true マーカー
+    params::Any           # ParamIO.DataKey | Nothing — lineage + cache key material
+    gen::Function         # () -> plot(...) (never called during structure)
+    code::String          # @figure expression source
+    thumbnail::Bool       # thumbnail=true marker
     assets::Vector{String}
 end
 
-"節(図の束 + 説明)。"
+"A section (a group of figures + a description)."
 mutable struct Section
     id::Symbol
     title::String
     anchor::String
-    facet::Any                       # by= の param 軸(String|Tuple|Nothing)
+    facet::Any                       # by= param axis (String|Tuple|Nothing)
     desc::Union{Desc,Nothing}
-    summary::Union{String,Nothing}   # index :rich 用
-    thumbnail::Union{FigRef,Nothing} # section 粒度の main figure
-    layout::Union{Symbol,Nothing}    # :wide|:grid|:single(theme ヒント)
+    summary::Union{String,Nothing}   # for index :rich
+    thumbnail::Union{FigRef,Nothing} # section-level main figure
+    layout::Union{Symbol,Nothing}    # :wide|:grid|:single (theme hint)
     figures::Vector{Figure}
 end
 
-"ページ(独立 HTML + 共有 nav)。"
+"A page (standalone HTML + shared nav)."
 mutable struct Page
     id::Symbol
     title::String
     anchor::String
-    thumbnail::Union{FigRef,Nothing} # 明示 @thumbnail
+    thumbnail::Union{FigRef,Nothing} # explicit @thumbnail
     no_thumbnail::Bool
     sections::Vector{Section}
 end
 
-"暗黙の最上位(統括)。順序 = ツリー位置、番号は持たない(採番は theme)。"
+"Implicit top level (the catalogue). Order = tree position; numbers are not stored (numbering is the theme's job)."
 mutable struct Document
     meta::DocMeta
     pages::Vector{Page}
-    refs::Dict{Symbol,Any}        # label → node(resolve で埋める)
-    bib::Dict{Symbol,Any}         # @cite 解決表(後で)
+    refs::Dict{Symbol,Any}        # label -> node (filled in by resolve)
+    bib::Dict{Symbol,Any}         # @cite resolution table (later)
     diag::Diagnostics
     newcommands::Dict{String,String}
 end
@@ -119,9 +120,9 @@ function Document(meta::DocMeta=DocMeta())
     )
 end
 
-# ============================================================ 構築コンテキスト
+# ============================================================ build context
 
-"暗黙グローバル document の構築状態(current page/section)。"
+"Build state of the implicit global document (current page/section)."
 mutable struct BuildContext
     document::Union{Document,Nothing}
     page::Union{Page,Nothing}
@@ -133,7 +134,7 @@ current_document() = CTX.document
 current_page() = CTX.page
 current_section() = CTX.section
 
-"暗黙 document をリセット(新規・空)。preamble の `@pinaxsetup` がこれを呼ぶ。"
+"Reset the implicit document (fresh, empty). The preamble `@pinaxsetup` calls this."
 function reset!(; kwargs...)
     kw = Dict{Symbol,Any}(kwargs)
     meta = DocMeta(;
@@ -144,7 +145,7 @@ function reset!(; kwargs...)
         debug=get(kw, :debug, false),
         index=get(kw, :index, nothing),
         numbering=get(kw, :numbering, :global),
-    )  # css/js/features は theme 層が解釈(structure 増分では無視)
+    )  # css/js/features are interpreted by the theme layer (ignored in this structure slice)
     CTX.document = Document(meta)
     CTX.page = nothing
     CTX.section = nothing
@@ -153,7 +154,7 @@ end
 
 _ensure_document!() = (CTX.document === nothing && reset!(); CTX.document)
 
-"スコープ document を組む: `doc = document() do … end`(テスト隔離用)。"
+"Build a scoped document: `doc = document() do … end` (for test isolation)."
 function document(f)
     saved = (CTX.document, CTX.page, CTX.section)
     CTX.document = Document()
@@ -162,25 +163,32 @@ function document(f)
     local doc
     try
         f()
-        doc = CTX.document        # f 内で @pinaxsetup が reset! しても拾えるよう f 後に取得
+        doc = CTX.document        # capture after f, so a @pinaxsetup reset! inside f is still picked up
     finally
         CTX.document, CTX.page, CTX.section = saved
     end
     return doc
 end
 
-# ============================================================ ヘルパ
+# ============================================================ helpers
 
-_anchor(id::Symbol) = string(id)   # v1: id をそのまま anchor(安定 id 前提)
+# Anchor used both in HTML attributes and as a filesystem path component, so restrict it to a safe charset.
+_anchor(id::Symbol) = replace(string(id), r"[^A-Za-z0-9_-]" => "_")
 _auto_fig_id(sec::Section) = Symbol(string(sec.id), "_fig", length(sec.figures) + 1)
 
 function _diag!(sev::Severity, item, msg)
     doc = CTX.document
-    doc === nothing || push!(doc.diag.entries, DiagEntry(sev, string(item), msg))
+    if doc === nothing
+        @warn "Pinax diagnostic dropped (no active document)" severity = sev item = string(
+            item
+        ) message = msg
+    else
+        push!(doc.diag.entries, DiagEntry(sev, string(item), msg))
+    end
     return nothing
 end
 
-# key=val の Expr 群 → Expr(:kw,…)(値は esc)。マクロ内専用。
+# key=val Exprs -> Expr(:kw, …) (values escaped). Macro-internal.
 function _kwspecs(args)
     return Expr[
         if (a isa Expr && a.head === :(=))
@@ -191,7 +199,7 @@ function _kwspecs(args)
     ]
 end
 
-# 関数呼び出し Expr を組む。kwspecs が空なら `;` を付けない(空 Expr(:parameters) は invalid syntax)。
+# Build a call Expr. With no kwspecs, omit the `;` (an empty Expr(:parameters) is invalid syntax).
 function _call(f, posargs, kwspecs)
     return if isempty(kwspecs)
         Expr(:call, f, posargs...)
@@ -200,14 +208,14 @@ function _call(f, posargs, kwspecs)
     end
 end
 
-# ============================================================ preamble マクロ
+# ============================================================ preamble macros
 
-"文書設定 + 暗黙 document のリセット。`@pinaxsetup theme=… index=… numbering=… debug=…`"
+"Document settings + reset of the implicit document. `@pinaxsetup theme=… index=… numbering=… debug=…`"
 macro pinaxsetup(args...)
     return _call(:reset!, (), _kwspecs(args))
 end
 
-"診断モード。`@debug_mode true`"
+"Diagnostics mode. `@debug_mode true`"
 macro debug_mode(x)
     return quote
         _ensure_document!().meta.debug = $(esc(x))
@@ -215,7 +223,7 @@ macro debug_mode(x)
     end
 end
 
-"`@cite` 解決元 .bib を宣言。`@bibliography \"refs/a.bib\" …`"
+"Declare the .bib source(s) used to resolve `@cite`. `@bibliography \"refs/a.bib\" …`"
 macro bibliography(paths...)
     ps = map(esc, paths)
     return quote
@@ -224,7 +232,7 @@ macro bibliography(paths...)
     end
 end
 
-"記法マクロ。`@newcommand \"\\E\" raw\"\\langle H\\rangle\"`"
+"Notation macro. `@newcommand \"\\E\" raw\"\\langle H\\rangle\"`"
 macro newcommand(name, def)
     return quote
         _ensure_document!().newcommands[$(esc(name))] = $(esc(def))
@@ -232,9 +240,9 @@ macro newcommand(name, def)
     end
 end
 
-# ============================================================ 構造マクロ
+# ============================================================ structure macros
 
-"ページ。`@page :id \"Title\" begin … end`"
+"A page. `@page :id \"Title\" begin … end`"
 macro page(id, title, body)
     return quote
         _enter_page!($(esc(id)), $(esc(title)))
@@ -257,7 +265,7 @@ function _enter_page!(id::Symbol, title)
 end
 _exit_page!() = (CTX.page=nothing; CTX.section=nothing)
 
-"節。`@section :id \"Title\" [by=…] [summary=…] [layout=…] begin … end`"
+"A section. `@section :id \"Title\" [by=…] [summary=…] [layout=…] begin … end`"
 macro section(args...)
     length(args) >= 3 || error("@section needs :id, \"title\", and a begin…end body")
     id, title, body = args[1], args[2], args[end]
@@ -293,7 +301,7 @@ function _enter_section!(id::Symbol, title; by=nothing, summary=nothing, layout=
 end
 _exit_section!() = (CTX.section = nothing)
 
-"プロットを登録。式は **遅延**。`@figure expr [params=…] [caption=…] [id=…] [thumbnail=…]` / `@figure [kw] begin … end`"
+"Register a plot; the expression is DEFERRED. `@figure expr [params=…] [caption=…] [id=…] [thumbnail=…]` / `@figure [kw] begin … end`"
 macro figure(args...)
     isempty(args) && error("@figure needs a plot expression")
     expr = nothing
@@ -328,7 +336,7 @@ function _push_figure!(; gen, code, params=nothing, caption="", id=nothing, thum
     return fig
 end
 
-"直前の `@figure` に caption を付与(`\\caption` 相当)。`caption=` 併用時は後勝ち。"
+"Attach a caption to the preceding `@figure` (like `\\caption`); it overwrites any `caption=` set there, since it runs afterward."
 macro caption(x)
     return quote
         _set_caption!($(esc(x)))
@@ -348,7 +356,7 @@ function _set_caption!(s)
     return nothing
 end
 
-"節の説明(markdown + LaTeX source)。`@desc md\"…\"`"
+"Section description (markdown + LaTeX source). `@desc md\"…\"`"
 macro desc(x)
     return quote
         _set_desc!($(esc(x)))
@@ -361,7 +369,7 @@ function _set_desc!(s)
     return nothing
 end
 
-"page の main figure を指定。`@thumbnail :figid`(既定は省略 = top 図, notes 02 resolve)。"
+"Set the page main figure. `@thumbnail :figid` (priority: explicit `@thumbnail` > a `thumbnail=true` `@figure` > the top figure; notes 02 resolve)."
 macro thumbnail(x)
     return quote
         _set_thumbnail!($(esc(x)))
@@ -382,7 +390,7 @@ function _set_thumbnail!(x)
     return nothing
 end
 
-"この page は index に main figure を出さない。"
+"This page contributes no main figure to the index."
 macro no_thumbnail()
     return quote
         pg = CTX.page
@@ -392,14 +400,14 @@ macro no_thumbnail()
     end
 end
 
-"raw 文字列(\$…\$ を温存)。`@desc md\"…\"` 等で使う。"
+"Raw string (preserves `\$…\$`). Used by `@desc md\"…\"` etc."
 macro md_str(s)
     return s
 end
 
-# ============================================================ resolve(最小: thumbnail)
+# ============================================================ resolve (minimal: thumbnail)
 
-"page の main figure を解決: 明示 `@thumbnail` > `thumbnail=true` マーカー > top(先頭)図(notes 02)。"
+"Resolve a page's main figure: explicit `@thumbnail` > `thumbnail=true` marker > top (first) figure (notes 02)."
 function resolved_thumbnail(pg::Page)
     pg.no_thumbnail && return nothing
     pg.thumbnail === nothing || return pg.thumbnail
@@ -412,7 +420,7 @@ function resolved_thumbnail(pg::Page)
     return nothing
 end
 
-# ============================================================ show(ergonomics)
+# ============================================================ show (ergonomics)
 
 function Base.show(io::IO, d::Document)
     return print(

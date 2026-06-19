@@ -3,12 +3,15 @@ module Pinax
 using ParamIO
 using DataVault
 
-# 設計仕様は notes/(00–10)を参照。
-# 実装はインクリメンタル: 文書モデル + 構造マクロ(本ファイル群)→ resolve → render → cache → theme …
+# Design spec lives in notes/ (00–10).
+# Implemented incrementally: document model + structure macros -> resolve -> render -> cache -> theme …
 
-include("document.jl")
+include("document.jl")   # document model + structure macros (pass 1)
+include("backends.jl")   # figure backend abstraction (pinax_save / is_figure)
+include("theme.jl")      # theme = renderer (GalleryTheme)
+include("render.jl")     # render driver (pass 2 resolve + pass 3 materialize/emit)
 
-# 構造マクロ(原稿 DSL)
+# structure macros (the manuscript DSL)
 export @pinaxsetup,
     @debug_mode,
     @bibliography,
@@ -21,5 +24,8 @@ export @pinaxsetup,
     @thumbnail,
     @no_thumbnail,
     @md_str
+
+# render / theme / backend contract
+export render, Theme, GalleryTheme, pinax_save, is_figure
 
 end # module Pinax
