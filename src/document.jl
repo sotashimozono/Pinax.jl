@@ -356,6 +356,11 @@ end
 function _enter_section!(id::Symbol, title; by=nothing, summary=nothing, layout=nothing)
     pg = CTX.page
     pg === nothing && error("@section outside of a @page")
+    layout === nothing ||
+        layout in (:grid, :single, :wide) ||
+        error(
+            "Pinax: @section layout= must be :grid, :single, or :wide (got $(repr(layout))).",
+        )
     sec = Section(
         id,
         string(title),

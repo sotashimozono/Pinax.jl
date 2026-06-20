@@ -88,6 +88,8 @@ const _GALLERY_CSS = """
   section.section{background:#fff;border:1px solid #e2e5e9;border-radius:8px;padding:.85rem 1.15rem;margin:0 0 1.4rem;box-shadow:0 1px 2px rgba(27,31,36,.04)}
   section.section>h2{margin-top:0}
   .figgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1rem}
+  .figgrid-single{grid-template-columns:minmax(0,560px);justify-content:center}
+  .figgrid-wide{grid-template-columns:1fr}
   figure{margin:0;border:1px solid #e2e5e9;border-radius:8px;padding:.5rem;background:#fdfdfe}
   figure img{width:100%;height:auto}
   figure iframe.pinax-pdf{width:100%;height:460px;border:1px solid #eee;border-radius:4px;background:#fff}
@@ -841,10 +843,18 @@ function _emit_comments(anchor::String, ctx::EmitCtx)
     return println(io, "</div>")
 end
 
+# Map a section's `layout=` hint to the figure-grid container class: :grid (default) is the auto-fit
+# multi-column grid; :single is one width-capped, centered column; :wide is one full-width column.
+function _figgrid_class(layout)
+    layout === :single && return "figgrid figgrid-single"
+    layout === :wide && return "figgrid figgrid-wide"
+    return "figgrid"
+end
+
 # Emit one grid of figures (materialize each: streaming + cache).
 function _emit_figures(figs, sec::Section, pg::Page, theme, ctx::EmitCtx)
     io = ctx.io
-    println(io, "<div class=\"figgrid\">")
+    println(io, "<div class=\"", _figgrid_class(sec.layout), "\">")
     fmts = figure_formats(theme)
     for fig in figs
         base = joinpath(ctx.outdir, "assets", "figures", pg.anchor, sec.anchor, fig.anchor)
