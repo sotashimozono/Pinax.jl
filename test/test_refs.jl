@@ -92,7 +92,11 @@ using Test
                 @figure svg
             end
         end
-        html = read(Pinax.render(; out=sitedir("perpage")), String)
+        dir = dirname(Pinax.render(; out=sitedir("perpage")))   # multi-page -> one file per page
+        html = join(
+            read(f, String) for
+            f in filter(f -> endswith(f, ".html"), readdir(dir; join=true))
+        )
         @test count("Fig. 1", html) == 2
         @test count("Sec. 1", html) == 2
     end
@@ -164,7 +168,11 @@ using Test
                 @figure svg
             end
         end
-        html = read(Pinax.render(; out=sitedir("partnum")), String)
+        dir = dirname(Pinax.render(; out=sitedir("partnum")))   # multi-page -> one file per page
+        html = join(
+            read(f, String) for
+            f in filter(f -> endswith(f, ".html"), readdir(dir; join=true))
+        )
         @test occursin("EQ1", html)
         @test occursin("EQ2", html)
         @test occursin("GQ1", html)    # section counter reset per page + page-derived prefix

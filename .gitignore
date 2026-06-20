@@ -1,7 +1,7 @@
 docs/build/
 docs/src/assets/favicon.ico
 docs/src/assets/logo.png
-docs/src/examples/
+docs/src/examples.md
 Manifest.toml
 notes/
 out/

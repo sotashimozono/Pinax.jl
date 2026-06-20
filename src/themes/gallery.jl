@@ -106,6 +106,18 @@ const _GALLERY_CSS = """
   .pinax-cmt .author{font-weight:600;color:#0366d6}
   .pinax-cmt p:first-child{margin-top:0;display:inline}
   .pinax-cmt p:last-child{margin-bottom:0}
+  .pinax-top{margin:0 0 1rem;font-size:.95rem}
+  .pinax-top a{color:#0366d6;text-decoration:none}
+  .pinax-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.2rem;margin:1.2rem 0}
+  .pinax-card{display:flex;flex-direction:column;border:1px solid #e2e5e9;border-radius:10px;overflow:hidden;background:#fff;text-decoration:none;color:inherit;box-shadow:0 1px 2px rgba(27,31,36,.04);transition:box-shadow .15s,transform .15s}
+  .pinax-card:hover{box-shadow:0 4px 14px rgba(27,31,36,.12);transform:translateY(-2px)}
+  .card-thumb{aspect-ratio:4/3;background:#f6f8fa;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .card-thumb img{width:100%;height:100%;object-fit:contain}
+  .card-thumb-empty{min-height:150px}
+  .card-body{padding:.7rem .9rem}
+  .card-title{font-weight:600;font-size:1.05rem}
+  .card-summary{color:#555;font-size:.9rem;margin-top:.2rem}
+  .card-meta{color:#8b949e;font-size:.82rem;margin-top:.45rem}
 </style>
 """
 
@@ -450,7 +462,125 @@ end
 
 # ---------- emit (the theme-dispatched entry point) ----------
 
-"Emit the doc tree to a single HTML file. Doubles as pass 3 (materialize + draw) (notes 02/06)."
+# Resolve a page's thumbnail figure for the index cards (the model picks the FigRef:
+# explicit @thumbnail > a thumbnail=true @figure > the page's first figure > none).
+function _page_thumb(pg::Page)
+    ref = resolved_thumbnail(pg)
+    ref === nothing && return nothing
+    for sec in pg.sections, f in sec.figures
+        f.id === ref.id && return f
+    end
+    return nothing
+end
+
+# A thumbnail <img> source: a figure's first raster/vector asset, relative to `outdir`.
+function _thumb_src(fig::Figure, outdir)
+    for a in fig.assets
+        _ext(a) in ("svg", "png", "jpg", "jpeg") &&
+            return replace(relpath(a, outdir), '\\' => '/')
+    end
+    return nothing
+end
+
+# Shared <head> … <body> opener for every emitted file.
+function _emit_head(io, title, doc, katex_mode, interactive, rdiag)
+    print(io, "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">")
+    print(io, "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">")
+    print(io, "<title>", _esc(title), "</title>", _GALLERY_CSS, _katex_head(katex_mode))
+    interactive && print(io, "<style>", _asset("pinax.css"), "</style>")
+    _emit_overlay(io, doc.meta.css, "style", rdiag)   # user CSS overlay (notes 06 §5)
+    return print(io, "</head><body>\n")
+end
+
+# Shared scripts + </body></html> closer.
+function _emit_foot(io, doc, katex_mode, interactive, rdiag)
+    interactive && print(io, "<script>", _asset("pinax.js"), "</script>")
+    _emit_overlay(io, doc.meta.js, "script", rdiag)   # user JS overlay (notes 06 §5)
+    print(io, _katex_foot(doc.newcommands, katex_mode))   # @newcommand -> KaTeX macros (notes 08 §2)
+    return println(io, "</body></html>")
+end
+
+# A page's own Contents nav (its sections) followed by the sections themselves.
+function _emit_page_body(theme, pg::Page, ctx::EmitCtx)
+    io = ctx.io
+    if !isempty(pg.sections)
+        println(io, "<nav><strong>Contents</strong>")
+        for sec in pg.sections
+            n = length(sec.figures)
+            cnt = n > 0 ? string(" <span class=\"nfig\">(", n, ")</span>") : ""
+            println(io, "<a href=\"#", sec.anchor, "\">", _esc(sec.title), cnt, "</a>")
+        end
+        println(io, "</nav>")
+    end
+    for sec in pg.sections
+        _emit_section(theme, sec, pg, ctx)
+    end
+    return nothing
+end
+
+# Single-page table-of-contents nav: page links + indented section links.
+function _emit_toc_nav(doc::Document, io; has_bib::Bool=false)
+    println(io, "<nav><strong>Contents</strong>")
+    for pg in doc.pages
+        println(io, "<a href=\"#", pg.anchor, "\">", _esc(pg.title), "</a>")
+        for sec in pg.sections
+            n = length(sec.figures)
+            cnt = n > 0 ? string(" <span class=\"nfig\">(", n, ")</span>") : ""
+            println(
+                io,
+                "<a href=\"#",
+                sec.anchor,
+                "\" style=\"margin-left:1.2rem\">",
+                _esc(sec.title),
+                cnt,
+                "</a>",
+            )
+        end
+    end
+    has_bib && println(io, "<a href=\"#bibliography\">References</a>")
+    return println(io, "</nav>")
+end
+
+# The index: one card per page (thumbnail + title + counts) linking to `<page>.html`.
+function _emit_cards(doc::Document, io, outdir)
+    println(io, "<div class=\"pinax-cards\">")
+    for pg in doc.pages
+        nfig = sum(length(s.figures) for s in pg.sections; init=0)
+        nsec = length(pg.sections)
+        tf = _page_thumb(pg)
+        src = tf === nothing ? nothing : _thumb_src(tf, outdir)
+        print(io, "<a class=\"pinax-card\" href=\"", pg.anchor, ".html\">")
+        if src === nothing
+            print(io, "<div class=\"card-thumb card-thumb-empty\"></div>")
+        else
+            print(
+                io, "<div class=\"card-thumb\"><img src=\"", _esc(src), "\" alt=\"\"></div>"
+            )
+        end
+        print(
+            io,
+            "<div class=\"card-body\"><div class=\"card-title\">",
+            _esc(pg.title),
+            "</div>",
+        )
+        print(
+            io,
+            "<div class=\"card-meta\">",
+            nsec,
+            nsec == 1 ? " section · " : " sections · ",
+            nfig,
+            nfig == 1 ? " figure" : " figures",
+            "</div></div></a>",
+        )
+    end
+    return println(io, "</div>")
+end
+
+"""
+Emit the doc tree (also pass 3: materialize + draw). A single `@page` renders to one self-contained
+`index.html`; multiple `@page`s render to one file per page (`<page>.html`) plus an `index.html` of
+thumbnail cards linking to them (notes 02/06).
+"""
 function emit_document(
     theme::GalleryTheme,
     doc::Document,
@@ -458,7 +588,6 @@ function emit_document(
     cache::RenderCache;
     comments_file::AbstractString=joinpath(outdir, "comments.toml"),
 )
-    io = IOBuffer()
     nums, ids_eq, eqseq = _gallery_numbers(doc)
     rdiag = DiagEntry[]
     base_ids = _id2anchor(doc)
@@ -479,13 +608,16 @@ function emit_document(
     interactive = any(in(features), (:comments, :bookmarks, :export))
     katex_mode = doc.meta.katex
     katex_mode === :local && _copy_katex(outdir)   # vendor math assets for offline viewing
-    ctx = EmitCtx(
+    merged_ids = merge(base_ids, ids_eq)
+    mkpath(outdir)
+    title = isempty(doc.meta.title) ? "Pinax gallery" : doc.meta.title
+    mkctx(io) = EmitCtx(
         String(outdir),
         io,
         rdiag,
         cache,
         nums,
-        merge(base_ids, ids_eq),
+        merged_ids,
         eqseq,
         bib,
         citenums,
@@ -493,46 +625,87 @@ function emit_document(
         bookmarks,
         features,
     )
-    title = isempty(doc.meta.title) ? "Pinax gallery" : doc.meta.title
-    print(io, "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\">")
-    print(io, "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">")
-    print(io, "<title>", _esc(title), "</title>", _GALLERY_CSS, _katex_head(katex_mode))
-    interactive && print(io, "<style>", _asset("pinax.css"), "</style>")
-    _emit_overlay(io, doc.meta.css, "style", rdiag)   # user CSS overlay (notes 06 §5)
-    print(io, "</head><body>\n")
+
+    if length(doc.pages) <= 1
+        # One page (or none): a single self-contained file.
+        io = IOBuffer()
+        ctx = mkctx(io)
+        _emit_head(io, title, doc, katex_mode, interactive, rdiag)
+        println(io, "<h1>", _esc(title), "</h1>")
+        ntotal = _total_figures(doc)
+        println(
+            io,
+            "<div class=\"pinax-meta\">",
+            ntotal,
+            ntotal == 1 ? " figure" : " figures",
+            "</div>",
+        )
+        interactive && _emit_committed_json(io, comments, bookmarks, features)
+        _emit_toc_nav(doc, io; has_bib=(!isempty(citeorder)))
+        for pg in doc.pages
+            println(
+                io,
+                "<section class=\"page\" id=\"",
+                pg.anchor,
+                "\"><h1>",
+                _esc(pg.title),
+                "</h1>",
+            )
+            for sec in pg.sections
+                _emit_section(theme, sec, pg, ctx)
+            end
+            println(io, "</section>")
+        end
+        _emit_bibliography(bib, citeorder, io)
+        _emit_diagnostics(doc, rdiag, io)
+        _emit_foot(io, doc, katex_mode, interactive, rdiag)
+        path = joinpath(outdir, "index.html")
+        write(path, String(take!(io)))
+        return path
+    end
+
+    # Multiple pages: one file per page, then an index of thumbnail cards.
+    for pg in doc.pages
+        io = IOBuffer()
+        ctx = mkctx(io)
+        _emit_head(io, string(pg.title, " · ", title), doc, katex_mode, interactive, rdiag)
+        println(
+            io,
+            "<nav class=\"pinax-top\"><a href=\"index.html\">← ",
+            _esc(title),
+            "</a></nav>",
+        )
+        println(io, "<h1>", _esc(pg.title), "</h1>")
+        n = sum(length(s.figures) for s in pg.sections; init=0)
+        println(
+            io, "<div class=\"pinax-meta\">", n, n == 1 ? " figure" : " figures", "</div>"
+        )
+        interactive && _emit_committed_json(io, comments, bookmarks, features)
+        println(io, "<section class=\"page\" id=\"", pg.anchor, "\">")
+        _emit_page_body(theme, pg, ctx)
+        println(io, "</section>")
+        _emit_bibliography(bib, citeorder, io)
+        _emit_foot(io, doc, katex_mode, interactive, rdiag)
+        write(joinpath(outdir, pg.anchor * ".html"), String(take!(io)))
+    end
+
+    io = IOBuffer()
+    _emit_head(io, title, doc, katex_mode, false, rdiag)
     println(io, "<h1>", _esc(title), "</h1>")
     ntotal = _total_figures(doc)
+    npg = length(doc.pages)
     println(
         io,
         "<div class=\"pinax-meta\">",
+        npg,
+        " pages · ",
         ntotal,
         ntotal == 1 ? " figure" : " figures",
         "</div>",
     )
-    interactive && _emit_committed_json(io, comments, bookmarks, features)
-
-    _emit_index(theme, doc, io; has_bib=(!isempty(citeorder)))
-    for pg in doc.pages
-        println(
-            io,
-            "<section class=\"page\" id=\"",
-            pg.anchor,
-            "\"><h1>",
-            _esc(pg.title),
-            "</h1>",
-        )
-        for sec in pg.sections
-            _emit_section(theme, sec, pg, ctx)
-        end
-        println(io, "</section>")
-    end
-    _emit_bibliography(bib, citeorder, io)
-    _emit_diagnostics(doc, ctx.rdiag, io)
-
-    interactive && print(io, "<script>", _asset("pinax.js"), "</script>")
-    _emit_overlay(io, doc.meta.js, "script", rdiag)   # user JS overlay (notes 06 §5)
-    print(io, _katex_foot(doc.newcommands, katex_mode))   # @newcommand -> KaTeX macros (notes 08 §2)
-    println(io, "</body></html>")
+    _emit_cards(doc, io, outdir)
+    _emit_diagnostics(doc, rdiag, io)
+    _emit_foot(io, doc, katex_mode, false, rdiag)
     path = joinpath(outdir, "index.html")
     write(path, String(take!(io)))
     return path
@@ -541,30 +714,6 @@ end
 # Total figure count across the document (shown in the header, e.g. "547 figures").
 function _total_figures(doc::Document)
     return sum(length(sec.figures) for pg in doc.pages for sec in pg.sections; init=0)
-end
-
-# index (table of contents): v1 shows names + links (:toc level), each with its figure count.
-# :cards/:rich come later.
-function _emit_index(::GalleryTheme, doc::Document, io; has_bib::Bool=false)
-    println(io, "<nav><strong>Contents</strong>")
-    for pg in doc.pages
-        println(io, "<a href=\"#", pg.anchor, "\">", _esc(pg.title), "</a>")
-        for sec in pg.sections
-            n = length(sec.figures)
-            count = n > 0 ? string(" <span class=\"nfig\">(", n, ")</span>") : ""
-            println(
-                io,
-                "<a href=\"#",
-                sec.anchor,
-                "\" style=\"margin-left:1.2rem\">",
-                _esc(sec.title),
-                count,
-                "</a>",
-            )
-        end
-    end
-    has_bib && println(io, "<a href=\"#bibliography\">References</a>")
-    return println(io, "</nav>")
 end
 
 function _emit_section(theme, sec::Section, pg::Page, ctx::EmitCtx)
