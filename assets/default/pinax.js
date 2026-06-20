@@ -276,6 +276,16 @@
     });
     bar.appendChild(clear);
 
+    if (has("comments") || has("export")) {
+      // Static gallery, no backend: a viewer's comments live only in their own browser until they
+      // Export comments.toml (which the author re-renders to bake them into the committed layer).
+      var note = document.createElement("span");
+      note.className = "pinax-note";
+      note.textContent =
+        "Comments are saved only in this browser — Export to keep or share them.";
+      bar.appendChild(note);
+    }
+
     statusEl = document.createElement("span");
     statusEl.className = "pinax-status";
     bar.appendChild(statusEl);

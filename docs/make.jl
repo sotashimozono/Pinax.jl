@@ -56,7 +56,12 @@ makedocs(;
         assets=["assets/favicon.ico", "assets/custom.css"],
     ),
     modules=[Pinax],
-    pages=["Home" => "index.md", "Examples" => "examples.md", "API Reference" => "api.md"],
+    pages=[
+        "Home" => "index.md",
+        "Examples" => "examples.md",
+        "Comments" => "comments.md",
+        "API Reference" => "api.md",
+    ],
 )
 
 # Compile the gallery by RUNNING the script with the build directory as the working directory, so

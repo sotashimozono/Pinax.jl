@@ -21,6 +21,8 @@ using Test
         @test occursin("\"features\":[", html)
         @test occursin("function openEditor", html)       # pinax.js inlined (single self-contained file)
         @test occursin(".pinax-editor", html)             # pinax.css inlined
+        # the local-only note ships, so a reviewer of a deployed gallery is told comments are local
+        @test occursin("Comments are saved only in this browser", html)
     end
 
     @testset "features=() disables the interactive layer" begin
