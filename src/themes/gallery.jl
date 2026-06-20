@@ -926,7 +926,9 @@ function _emit_figure(fig::Figure, ctx::EmitCtx)
     for a in fig.assets
         rel = replace(relpath(a, ctx.outdir), '\\' => '/')   # forward slashes for URLs (Windows-safe)
         ext = _ext(a)
-        if ext in ("svg", "png")
+        if ext in ("svg", "png", "gif", "webp", "jpg", "jpeg", "apng", "avif")
+            # Raster + animated raster (gif/apng/webp) render inline as <img> — the browser plays the
+            # animation. A file-path @figure ("…/anim.gif") is the usual way to embed a precomputed GIF.
             println(io, "<img src=\"", _esc(rel), "\" alt=\"", _esc(string(fig.id)), "\">")
         elseif ext == "pdf"
             # Embed PDFs via the browser's native viewer (notes 04 §3: "pdf -> iframe"), with an
