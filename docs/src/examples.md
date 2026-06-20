@@ -1,41 +1,53 @@
 # Examples
 
-This section is a small catalogue of galleries built with Pinax. It governs the example pages that
-follow: each one runs a real computation and then follows the **same Pinax workflow** —
+This section is a small catalogue of galleries built with Pinax. Every example follows the **same
+Pinax workflow** — compute something, describe a manuscript with `@page` / `@section` / `@figure`,
+then `render` it into a self-contained gallery you can open and share.
 
-1. compute something (integrate an ODE, grow an L-system, run a Monte Carlo sweep),
-2. describe a manuscript with `@page` / `@section` / `@figure` / `@desc`,
-3. `render` it into a **self-contained gallery** you can open and share.
+## Map of contents
 
-So the example pages double as copy-paste templates: read one for the source and the walkthrough,
-then open its compiled gallery to see what Pinax produces.
-
-## The galleries
-
-### 1 · Chaotic attractors
-
-Lorenz & Rössler as 3-D attractors plus 2-D projections — a multi-section gallery with KaTeX math.
-[Source & walkthrough](examples/attractors.md).
+A table of contents across **every compiled gallery** — like a LaTeX `\tableofcontents`, but
+spanning all the rendered galleries. Click a section to jump straight into it; click a gallery title
+to open the whole thing.
 
 ```@raw html
-<p style="margin:.2rem 0 1.4rem"><a href="galleries/attractors/"><b>▶ Open the compiled gallery</b></a></p>
+<style>
+  .pinax-toc, .pinax-toc ol { list-style: none; }
+  .pinax-toc { counter-reset: g; padding-left: 0; line-height: 1.7; }
+  .pinax-toc > li { counter-increment: g; margin-top: .5rem; font-weight: 600; }
+  .pinax-toc > li::before { content: counter(g) ".  "; color: #57606a; }
+  .pinax-toc > li > ol { counter-reset: s; padding-left: 1.6rem; }
+  .pinax-toc > li > ol > li { counter-increment: s; font-weight: 400; }
+  .pinax-toc > li > ol > li::before { content: counter(g) "." counter(s) "   "; color: #8b949e; }
+  .pinax-toc a { text-decoration: none; }
+</style>
+<ol class="pinax-toc">
+  <li><a href="galleries/attractors/">Chaotic attractors</a>
+    <ol>
+      <li><a href="galleries/attractors/#lorenz">Lorenz</a></li>
+      <li><a href="galleries/attractors/#rossler">Rössler</a></li>
+    </ol>
+  </li>
+  <li><a href="galleries/lsystems/">L-system fractals</a>
+    <ol>
+      <li><a href="galleries/lsystems/#koch">Koch &amp; Sierpiński</a></li>
+      <li><a href="galleries/lsystems/#curves">Dragons, space-filling &amp; plants</a></li>
+    </ol>
+  </li>
+  <li><a href="galleries/ising/">Ising model (Monte Carlo)</a>
+    <ol>
+      <li><a href="galleries/ising/#snapshots">Spin configurations</a></li>
+      <li><a href="galleries/ising/#magnetization">Magnetization curve</a></li>
+    </ol>
+  </li>
+</ol>
 ```
 
-### 2 · L-system fractals
+## Walkthroughs
 
-Koch, Sierpiński, the Heighway dragon, a Hilbert space-filling curve and a branching plant, grown
-by substitution and drawn by turtle geometry.
-[Source & walkthrough](examples/lsystems.md).
+Each example page shows the source and a step-by-step walkthrough, and links to its compiled
+gallery:
 
-```@raw html
-<p style="margin:.2rem 0 1.4rem"><a href="galleries/lsystems/"><b>▶ Open the compiled gallery</b></a></p>
-```
-
-### 3 · Ising model (Monte Carlo)
-
-A 2-D Metropolis simulation: spin snapshots across the transition plus the magnetization curve.
-[Source & walkthrough](examples/ising.md).
-
-```@raw html
-<p style="margin:.2rem 0 1.4rem"><a href="galleries/ising/"><b>▶ Open the compiled gallery</b></a></p>
-```
+- [1 · Chaotic attractors](examples/attractors.md) — [DynamicalModels.jl](https://github.com/sotashimozono/DynamicalModels.jl)
+- [2 · L-system fractals](examples/lsystems.md) — [LSystems.jl](https://github.com/sotashimozono/LSystems.jl)
+- [3 · Ising model (Monte Carlo)](examples/ising.md) — self-contained

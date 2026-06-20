@@ -34,6 +34,7 @@ KaTeX; `serve("site")` previews it over HTTP.
 
 ## Where to go next
 
-- **[Examples](examples.md)** — the index of worked-example galleries. Each is built *live* as a
-  Documenter `@example` and rendered into a self-contained Pinax gallery you can open.
+- **[Examples](examples.md)** — a **map of contents** across every compiled gallery (a LaTeX-style
+  table of contents that spans them all), plus a source walkthrough for each. Every gallery is built
+  *live* as a Documenter `@example` and rendered by Pinax.
 - **[API Reference](api.md)** — every exported macro and function.
