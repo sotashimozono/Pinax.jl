@@ -1,0 +1,61 @@
+name: Build media
+
+# Run the heavy gallery compute (the 2-D Ising Monte Carlo) and publish the resulting DataVault store
+# + spin gif to the orphan `media` branch. The docs build then restores them (see docs/make.jl)
+# instead of re-running the Monte Carlo on every build. The compute is incremental: the previous
+# media is restored first, so DataVault recomputes only the keys whose data is missing/changed.
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - docs/literate/gallery.jl
+
+permissions:
+  contents: write
+
+jobs:
+  build-media:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: julia-actions/setup-julia@v3
+        with:
+          version: '1'
+      - uses: julia-actions/cache@v2
+
+      - name: Restore previous media (incremental — DataVault skips already-done keys)
+        run: |
+          mkdir -p mediabuild
+          if git fetch --depth=1 origin media 2>/dev/null; then
+            git --work-tree=mediabuild checkout FETCH_HEAD -- ising_data gallery_media 2>/dev/null || true
+            git reset -q
+            echo "restored previous media"
+          else
+            echo "no media branch yet — full compute"
+          fi
+
+      - name: Compute (Ising Monte Carlo → DataVault + spin gif)
+        env:
+          GKSwstype: "100"   # headless GR
+        run: |
+          julia --project=docs -e 'using Pkg; Pkg.instantiate()'
+          julia --project=docs -e '
+            ENV["GKSwstype"] = "100"
+            cd("mediabuild") do
+              Base.include(Module(:G), joinpath(ENV["GITHUB_WORKSPACE"], "docs", "literate", "gallery.jl"))
+            end'
+
+      - name: Collect the heavy artifacts (vault data + gif only)
+        run: |
+          rm -rf media_out && mkdir -p media_out
+          cp -r mediabuild/ising_data media_out/
+          cp -r mediabuild/gallery_media media_out/
+
+      - name: Publish to the media branch
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: media
+          publish_dir: ./media_out
+          force_orphan: true

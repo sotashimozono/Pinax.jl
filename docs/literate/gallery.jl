@@ -109,20 +109,22 @@ Ms = [DataVault.load(vault, k)["M"] for k in done]
 key_tc = done[argmin(abs.(Ts .- Tc))]
 
 isinggif = joinpath("gallery_media", "ising_spins.gif")
-mkpath(dirname(isinggif))
-isinganim = @animate for f in DataVault.load(vault, key_tc)["frames"]
-    heatmap(
-        f;
-        c=:grays,
-        clims=(-1, 1),
-        axis=false,
-        ticks=false,
-        legend=false,
-        aspect_ratio=1,
-        size=(360, 360),
-    )
+if !isfile(isinggif)   # restored from the `media` branch in CI; rendered on the fly otherwise
+    mkpath(dirname(isinggif))
+    isinganim = @animate for f in DataVault.load(vault, key_tc)["frames"]
+        heatmap(
+            f;
+            c=:grays,
+            clims=(-1, 1),
+            axis=false,
+            ticks=false,
+            legend=false,
+            aspect_ratio=1,
+            size=(360, 360),
+        )
+    end
+    gif(isinganim, isinggif; fps=12)
 end
-gif(isinganim, isinggif; fps=12)
 
 # ## The manuscript: one `@page` per example
 Pinax.reset!(; title="Pinax example gallery")
