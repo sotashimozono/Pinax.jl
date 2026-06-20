@@ -1,6 +1,6 @@
 name = "Pinax"
 uuid = "e782a80a-1ac9-479e-ba2b-0f3433ef5b4f"
-version = "0.22.0"
+version = "0.23.0"
 authors = ["sota shimozono <shimozono-sota631@g.ecc.u-tokyo.ac.jp>"]
 
 [deps]
