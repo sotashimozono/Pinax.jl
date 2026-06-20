@@ -67,14 +67,7 @@ function render(
     return path
 end
 
-# Record figure provenance via DataVault (study-level meta.toml). Non-fatal.
-function _record_provenance(vault, study)
-    try
-        s = study === nothing ? vault.run : string(study)
-        DataVault.record_figure(vault; study=s)
-    catch e
-        e isa InterruptException && rethrow()
-        @warn "Pinax: DataVault.record_figure failed" exception = e
-    end
-    return nothing
-end
+# Record figure provenance. The PinaxDataVaultExt extension specializes this on a DataVault.Vault
+# (study-level meta.toml, non-fatal); the core is a no-op. The caller only invokes it when a vault
+# was passed, so the core method is effectively unreachable without the extension.
+_record_provenance(vault, study) = nothing

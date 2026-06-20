@@ -224,19 +224,17 @@ _auto_fig_id(sec::Section) = Symbol(string(sec.id), "_fig", length(sec.figures) 
 # moving a figure to a different line does not spuriously invalidate its cache entry (notes 10).
 _code_str(expr) = string(expr isa Expr ? Base.remove_linenums!(deepcopy(expr)) : expr)
 
-# A stable, param-derived figure id when params is a ParamIO.DataKey (so a sweep keeps each
-# figure's id across reordering); otherwise the explicit id, otherwise a positional fallback.
+# A filesystem-safe, param-derived tag for a figure id, or `nothing`. The PinaxParamIOExt extension
+# specializes this on a ParamIO.DataKey (so a sweep keeps each figure's id across reordering); the
+# core has no param scheme and returns `nothing`.
+_param_tag(params) = nothing
+
+# Figure id: an explicit `id` wins; else a param-derived tag (via the extension); else positional.
 function _fig_id(sec::Section, id, params)
     id === nothing || return id
-    if params isa ParamIO.DataKey
-        try
-            tag = replace(ParamIO.canonical(params), r"[^A-Za-z0-9_-]" => "_")
-            return Symbol(string(sec.id), "_", tag)
-        catch
-            # canonical can throw on hand-built keys with reserved delimiters; fall back.
-        end
-    end
-    return _auto_fig_id(sec)
+    tag = _param_tag(params)
+    tag === nothing && return _auto_fig_id(sec)
+    return Symbol(string(sec.id), "_", tag)
 end
 
 function _diag!(sev::Severity, item, msg)
