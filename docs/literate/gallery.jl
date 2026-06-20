@@ -8,7 +8,7 @@
 # Sources: [DynamicalModels.jl](https://github.com/sotashimozono/DynamicalModels.jl),
 # [LSystems.jl](https://github.com/sotashimozono/LSystems.jl), and a self-contained Ising model.
 
-using Pinax, DynamicalModels, LSystems, Plots, Random
+using Pinax, DynamicalModels, LSystems, Plots, Random, DataVault, Statistics
 
 # ## Example 1 — chaotic attractors (DynamicalModels.jl)
 t = collect(0.0:0.02:80.0)
@@ -39,49 +39,90 @@ function lsys(name, iter; kw...)
     )
 end
 
-# ## Example 3 — 2-D Ising Monte Carlo (self-contained)
-function sweep!(s, β)
+# ## Example 3 — 2-D Ising Monte Carlo, stored in a DataVault
+# The temperature sweep is computed once into a DataVault (data + `.done` markers + `log.toml`
+# discovery); the figures are read back from the vault, and `render(; vault)` makes the cache
+# data-aware. Re-running recomputes only the keys still marked `:pending`.
+function ising_sweep!(s, β)
     L = size(s, 1)
     @inbounds for _ in 1:(L * L)
-        i = rand(1:L)
-        j = rand(1:L)
+        i, j = rand(1:L), rand(1:L)
         nb =
-            s[mod1(i-1, L), j] +
-            s[mod1(i+1, L), j] +
-            s[i, mod1(j-1, L)] +
-            s[i, mod1(j+1, L)]
+            s[mod1(i - 1, L), j] +
+            s[mod1(i + 1, L), j] +
+            s[i, mod1(j - 1, L)] +
+            s[i, mod1(j + 1, L)]
         dE = 2 * s[i, j] * nb
         (dE <= 0 || rand() < exp(-β * dE)) && (s[i, j] = -s[i, j])
     end
     return s
 end
-function run_ising(L, T; equil, measure)
-    s = rand((Int8(-1), Int8(1)), L, L)
-    β = 1 / T
-    for _ in 1:equil
-        sweep!(s, β)
+function run_ising(T; L=32, sweeps=500)
+    s = fill(Int8(1), L, L)                       # ordered start → a clean M(T)
+    β, Ms, frames = 1 / T, Float64[], Matrix{Int8}[]
+    for k in 1:sweeps
+        ising_sweep!(s, β)
+        k > sweeps ÷ 2 && push!(Ms, abs(sum(Int, s)) / (L * L))   # measure over the second half
+        k % 8 == 0 && push!(frames, copy(s))                      # snapshot for the gif
     end
-    m = 0.0
-    for _ in 1:measure
-        sweep!(s, β)
-        m += abs(sum(Int, s)) / (L * L)
-    end
-    return s, m / measure
+    return (; M=mean(Ms), frames=frames)
 end
+
 Random.seed!(20240620)
-function snap(T)
-    return heatmap(
-        run_ising(64, T; equil=600, measure=1)[1];
-        aspect_ratio=:equal,
+Tc = 2 / log(1 + sqrt(2))
+
+# a tiny config drives the sweep: T names the on-disk directory
+isingcfg = joinpath(tempdir(), "ising.toml")
+write(
+    isingcfg,
+    """
+    [study]
+    project_name  = "ising2d"
+    total_samples = 1
+    outdir        = "ising_data"
+
+    [datavault]
+    path_keys = ["system.T"]
+
+    [[paramsets]]
+
+    [paramsets.system]
+    T = [1.6, 2.0, 2.27, 2.5, 3.2]
+    """,
+)
+
+vault = DataVault.Vault(isingcfg; run="mc")
+for key in DataVault.keys(vault; status=:pending)
+    T = Float64(key.params["system.T"])
+    DataVault.mark_running!(vault, key)
+    r = run_ising(T)
+    DataVault.save!(
+        vault, key, Dict{String,Any}("T" => T, "M" => r.M, "frames" => r.frames)
+    )
+    DataVault.mark_done!(vault, key; tag_value=r.M)
+end
+
+# read the sweep back from the vault to build the figures
+done = sort(DataVault.keys(vault; status=:done); by=k -> Float64(k.params["system.T"]))
+Ts = [DataVault.load(vault, k)["T"] for k in done]
+Ms = [DataVault.load(vault, k)["M"] for k in done]
+key_tc = done[argmin(abs.(Ts .- Tc))]
+
+isinggif = joinpath("gallery_media", "ising_spins.gif")
+mkpath(dirname(isinggif))
+isinganim = @animate for f in DataVault.load(vault, key_tc)["frames"]
+    heatmap(
+        f;
         c=:grays,
+        clims=(-1, 1),
         axis=false,
         ticks=false,
-        colorbar=false,
+        legend=false,
+        aspect_ratio=1,
         size=(360, 360),
-        title="T = $T",
     )
 end
-Tc = 2 / log(1 + sqrt(2))
+gif(isinganim, isinggif; fps=12)
 
 # ## The manuscript: one `@page` per example
 Pinax.reset!(; title="Pinax example gallery")
@@ -129,36 +170,31 @@ end
     end
 end
 
-@page :ising "Ising model (Monte Carlo)" begin
-    @section :snapshots "Spin configurations" begin
-        @desc md"Equilibrated $64\times64$ states across $T_c\approx2.269$: ordered, critical, disordered."
-        @figure snap(1.5)
-        @caption md"$T<T_c$ — ordered"
-        @figure snap(2.27)
-        @caption md"$T\approx T_c$ — critical"
-        @figure snap(3.5)
-        @caption md"$T>T_c$ — disordered"
-    end
-    @section :magnetization "Magnetization curve" begin
-        @desc md"Order parameter $\langle\lvert m\rvert\rangle(T)$ with the Onsager $T_c$ marked."
+@page :ising "Ising model (Monte Carlo, via DataVault)" begin
+    @section :magnetization "Magnetization vs temperature" begin
+        @desc md"Order parameter read back from the vault: $\langle\lvert m\rvert\rangle$ collapses through the Onsager $T_c\approx2.269$ (dashed)."
         @figure begin
-            Ts = collect(1.0:0.2:3.6)
-            Ms = [run_ising(40, T; equil=400, measure=500)[2] for T in Ts]
             plot(
                 Ts,
                 Ms;
                 marker=:circle,
                 lw=1.5,
-                label="⟨|m|⟩",
+                legend=false,
                 xlabel="T",
                 ylabel="⟨|m|⟩",
                 size=(560, 380),
             )
-            vline!([Tc]; ls=:dash, lc=:red, label="Tc ≈ 2.269")
+            vline!([Tc]; ls=:dash, lc=:red)
         end
-        @caption md"$\langle\lvert m\rvert\rangle$ vs $T$"
+        @caption md"each point is one DataVault key (one temperature)"
+    end
+    @section :dynamics "Spin dynamics near Tc" layout = :wide begin
+        @desc md"The raw spin snapshots stored in the vault, played back as an animation."
+        @figure isinggif params = key_tc
+        @caption md"spin lattice near $T_c$ — data-aware (re-rendered only if this key's vault data changes)"
     end
 end
 
-# Render: a multi-page document → a thumbnail index + one page per `@page`.
-Pinax.render(; out="gallery")
+# Render: a multi-page document → a thumbnail index + one page per `@page`. Passing the `vault` makes
+# the cache data-aware (re-materialize a figure when its vault data changes) and records provenance.
+Pinax.render(; out="gallery", vault=vault, study="mc")
