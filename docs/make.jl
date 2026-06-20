@@ -68,6 +68,17 @@ makedocs(;
 # `render(out="gallery")` writes build/gallery/ (a multi-page gallery: index.html of thumbnail cards
 # plus one HTML page per @page) for deploy. A fresh module keeps its definitions out of Main.
 let build = joinpath(@__DIR__, "build")
+    # Pull the precomputed heavy media (the Ising DataVault store + spin gif) off the `media` branch
+    # so the gallery compile reuses it instead of re-running the Monte Carlo (the build-media workflow
+    # keeps `media` up to date). Absent — e.g. media not built yet — the gallery computes it inline.
+    try
+        run(`git fetch --depth=1 origin media`)
+        run(`git --work-tree=$build checkout FETCH_HEAD -- ising_data gallery_media`)
+        run(`git reset -q`)   # keep the restored files in build/, drop them from the index
+        @info "restored Ising media from the `media` branch"
+    catch
+        @info "no `media` branch — the gallery will compute the Ising example inline"
+    end
     cd(build) do
         return Base.include(Module(:PinaxGallery), GALLERY_JL)
     end

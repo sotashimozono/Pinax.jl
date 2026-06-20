@@ -1,0 +1,15 @@
+[study]
+project_name  = "ising2d"
+total_samples = 1
+outdir        = "out"
+
+[datavault]
+# T names the on-disk directory; N / sweeps are fixed scalars
+path_keys = ["system.T"]
+
+[[paramsets]]
+
+[paramsets.system]
+T      = [1.6, 2.0, 2.27, 2.5, 3.2]   # around the 2D Ising Tc ≈ 2.269
+N      = 32                            # lattice size (fixed)
+sweeps = 500                           # Monte Carlo sweeps (fixed)
