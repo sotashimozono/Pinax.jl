@@ -1,0 +1,57 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pinax example gallery</title><style>
+  body{font-family:system-ui,sans-serif;max-width:1180px;margin:2rem auto;padding:0 1rem;line-height:1.5;background:#fafafa;color:#24292f}
+  h1,h2{border-bottom:1px solid #eee;padding-bottom:.2rem}
+  nav{background:#fafafa;border:1px solid #eee;border-radius:8px;padding:.6rem .9rem;margin:1rem 0}
+  nav a{display:block;text-decoration:none;color:#0366d6}
+  .desc{background:#f6f8fa;padding:.6rem .8rem;border-radius:6px;margin:.6rem 0}
+  .desc p:first-child{margin-top:0}.desc p:last-child{margin-bottom:0}
+  .desc table{border-collapse:collapse;margin:.5rem 0}
+  .desc th,.desc td{border:1px solid #ccd;padding:.15rem .5rem;font-size:.9rem}
+  section.section{background:#fff;border:1px solid #e2e5e9;border-radius:8px;padding:.85rem 1.15rem;margin:0 0 1.4rem;box-shadow:0 1px 2px rgba(27,31,36,.04)}
+  section.section>h2{margin-top:0}
+  .figgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1rem}
+  figure{margin:0;border:1px solid #e2e5e9;border-radius:8px;padding:.5rem;background:#fdfdfe}
+  figure img{width:100%;height:auto}
+  figure iframe.pinax-pdf{width:100%;height:460px;border:1px solid #eee;border-radius:4px;background:#fff}
+  a.pinax-open{display:inline-block;font-size:.85rem;margin-top:.3rem;color:#0366d6;text-decoration:none}
+  figcaption{font-size:.9rem;color:#444;margin-top:.4rem}
+  .diag{border-left:4px solid #d33;padding-left:.8rem}
+  .pinax-eq{display:block}
+  h3.facet{color:#555;margin:1rem 0 .3rem;font-size:1.05rem;font-weight:600}
+  .pinax-meta{color:#666;margin:-.4rem 0 1rem;font-size:.95rem}
+  .nfig{color:#888;font-weight:normal;font-size:.85em}
+  nav .nfig{color:#888}
+  .bibliography li{margin:.3rem 0;font-size:.92rem}
+  .pinax-bm-on{color:#e3b341}
+  .pinax-comments{margin:.6rem 0;border-left:3px solid #cbd5e1;padding-left:.8rem}
+  .pinax-cmt{margin:.4rem 0;font-size:.92rem}
+  .pinax-cmt .author{font-weight:600;color:#0366d6}
+  .pinax-cmt p:first-child{margin-top:0;display:inline}
+  .pinax-cmt p:last-child{margin-bottom:0}
+  .pinax-top{margin:0 0 1rem;font-size:.95rem}
+  .pinax-top a{color:#0366d6;text-decoration:none}
+  .pinax-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1.2rem;margin:1.2rem 0}
+  .pinax-card{display:flex;flex-direction:column;border:1px solid #e2e5e9;border-radius:10px;overflow:hidden;background:#fff;text-decoration:none;color:inherit;box-shadow:0 1px 2px rgba(27,31,36,.04);transition:box-shadow .15s,transform .15s}
+  .pinax-card:hover{box-shadow:0 4px 14px rgba(27,31,36,.12);transform:translateY(-2px)}
+  .card-thumb{aspect-ratio:4/3;background:#f6f8fa;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .card-thumb img{width:100%;height:100%;object-fit:contain}
+  .card-thumb-empty{min-height:150px}
+  .card-body{padding:.7rem .9rem}
+  .card-title{font-weight:600;font-size:1.05rem}
+  .card-summary{color:#555;font-size:.9rem;margin-top:.2rem}
+  .card-sections{margin-top:.5rem;font-size:.85rem;color:#57606a}
+  .card-sections .sec-item{padding:.1rem 0}
+  .card-sections .sec-name{font-weight:600;color:#444}
+  .card-meta{color:#8b949e;font-size:.82rem;margin-top:.45rem}
+  .pinax-toc{list-style:none;padding:0;margin:1.2rem 0}
+  .pinax-toc>li{padding:.5rem 0;border-bottom:1px solid #eaecef}
+  .pinax-toc a{font-weight:600;color:#0366d6;text-decoration:none}
+  .pinax-toc .toc-summary{color:#555;font-weight:400}
+  .pinax-toc .toc-meta{color:#8b949e;font-size:.85rem}
+</style>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"></head><body>
+<h1>Pinax example gallery</h1>
+<div class="pinax-meta">3 pages · 15 figures</div>
+<div class="pinax-cards">
+<a class="pinax-card" href="attractors.html"><div class="card-thumb"><img src="assets/figures/attractors/lorenz/lorenz_fig1.svg" alt=""></div><div class="card-body"><div class="card-title">Chaotic attractors</div><div class="card-meta">2 sections · 5 figures</div></div></a><a class="pinax-card" href="fractals.html"><div class="card-thumb"><img src="assets/figures/fractals/koch/koch_fig1.svg" alt=""></div><div class="card-body"><div class="card-title">L-system fractals</div><div class="card-meta">2 sections · 6 figures</div></div></a><a class="pinax-card" href="ising.html"><div class="card-thumb"><img src="assets/figures/ising/snapshots/snapshots_fig1.svg" alt=""></div><div class="card-body"><div class="card-title">Ising model (Monte Carlo)</div><div class="card-meta">2 sections · 4 figures</div></div></a></div>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script><script>window.addEventListener("load",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],macros:{},throwOnError:false});});</script></body></html>
