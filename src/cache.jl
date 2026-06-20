@@ -28,33 +28,17 @@ function RenderCache(outdir::AbstractString, force::Bool, vault=nothing)
     )
 end
 
-# Stable identity for the figure's params: ParamIO's order-/version-independent `canonical`
-# for a DataKey (so equal params in any insertion order yield the same key), else `repr`.
-function _params_id(p)
-    p isa ParamIO.DataKey || return repr(p)
-    try
-        return ParamIO.canonical(p)
-    catch
-        return repr(p)
-    end
-end
+# Stable identity for the figure's params. The PinaxParamIOExt extension specializes this on a
+# ParamIO.DataKey (ParamIO's order-/version-independent `canonical`, so equal params in any insertion
+# order yield the same key); the core falls back to `repr`.
+_params_id(p) = repr(p)
 
 # Per-key data fingerprint: the content of DataVault's `.done` marker, which is rewritten whenever
-# the data is (re)computed. So changing the underlying data changes the key and the figure
-# re-materializes — the cache tracks data, not just code+params (notes 10; fixes the false-hit gap).
-# Guarded: degrades to "" (code+params only, the prior behavior) without a vault, for a non-DataKey,
-# or if DataVault's internal layout changes.
-function _data_fingerprint(vault, params)
-    vault === nothing && return ""
-    params isa ParamIO.DataKey || return ""
-    try
-        df = DataVault._done_file(vault, params)
-        return isfile(df) ? string(hash(read(df, String))) : ""
-    catch e
-        e isa InterruptException && rethrow()
-        return ""
-    end
-end
+# the data is (re)computed, so changing the underlying data changes the key and the figure
+# re-materializes (notes 10; fixes the false-hit gap). The PinaxDataVaultExt extension specializes
+# this on a (DataVault.Vault, ParamIO.DataKey); the core contributes "" (code+params only) — without
+# the extension, without a vault, or for a non-DataKey, the prior behavior.
+_data_fingerprint(vault, params) = ""
 
 function _cache_key(fig::Figure, fmts, vault)
     return string(

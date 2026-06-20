@@ -866,11 +866,10 @@ function _emit_figures(figs, sec::Section, pg::Page, theme, ctx::EmitCtx)
     return println(io, "</div>")
 end
 
-# Extract param axis `facet` from a figure's params (a ParamIO.DataKey), or `missing` if absent.
-# Used by `_facet_groups` for `by=` faceting (notes 05).
-function _facet_value(p, facet)
-    return (p isa ParamIO.DataKey && haskey(p.params, facet)) ? p.params[facet] : missing
-end
+# Extract param axis `facet` from a figure's params, or `missing` if absent. Used by `_facet_groups`
+# for `by=` faceting (notes 05). The PinaxParamIOExt extension specializes this on a ParamIO.DataKey;
+# the core has no param axes to read and returns `missing` (faceting is then a no-op).
+_facet_value(p, facet) = missing
 
 # Sort key for facet values: numbers first (by value, NaN last), then strings, then missing.
 function _facetsort(x)

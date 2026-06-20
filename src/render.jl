@@ -38,10 +38,11 @@ written by the CLI / browser export / LLM loop, never overwritten here.
 `theme` selects the renderer: a `Theme` instance, a registered `Symbol`, or a path to a user
 theme file (see `theme.jl`). `nothing` (default) uses the document's `@pinaxsetup theme=…`.
 
-`vault` is an optional `DataVault.Vault` (notes 05): when given, (1) the cache key tracks each
-`params::DataKey` figure's data via its `.done` marker, so recomputing the data re-materializes the
-figure (not just code/param changes), and (2) figure provenance is recorded with
-`DataVault.record_figure` under `study` (defaults to the vault's run).
+`vault` is an optional `DataVault.Vault` (notes 10; needs `using DataVault`, which loads the
+PinaxDataVaultExt extension): when given, (1) the cache key tracks each `params::DataKey` figure's
+data via its `.done` marker, so recomputing the data re-materializes the figure (not just code/param
+changes), and (2) figure provenance is recorded with `DataVault.record_figure` under `study`
+(defaults to the vault's run).
 """
 function render(
     doc::Union{Document,Nothing}=current_document();
@@ -67,14 +68,9 @@ function render(
     return path
 end
 
-# Record figure provenance via DataVault (study-level meta.toml). Non-fatal.
-function _record_provenance(vault, study)
-    try
-        s = study === nothing ? vault.run : string(study)
-        DataVault.record_figure(vault; study=s)
-    catch e
-        e isa InterruptException && rethrow()
-        @warn "Pinax: DataVault.record_figure failed" exception = e
-    end
-    return nothing
-end
+# Record figure provenance. The PinaxDataVaultExt extension specializes this on a DataVault.Vault
+# (study-level meta.toml, non-fatal); the core is a no-op. The caller only invokes it for a non-nothing
+# vault, and a DataVault.Vault means DataVault is loaded (so the extension is too) — hence in practice
+# the ext method handles every real vault. The core no-op is the graceful fallback if some non-Vault
+# value is passed as `vault` without DataVault loaded: provenance is silently skipped, not an error.
+_record_provenance(vault, study) = nothing

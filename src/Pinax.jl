@@ -1,7 +1,5 @@
 module Pinax
 
-using ParamIO
-using DataVault
 using TOML
 using Markdown: Markdown
 using Bibliography: Bibliography
