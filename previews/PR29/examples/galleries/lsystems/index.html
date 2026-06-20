@@ -1,4 +1,4 @@
-<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>DynamicalModels.jl — chaotic attractors (Pinax demo)</title><style>
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>L-system fractals (Pinax demo)</title><style>
   body{font-family:system-ui,sans-serif;max-width:1180px;margin:2rem auto;padding:0 1rem;line-height:1.5;background:#fafafa;color:#24292f}
   h1,h2{border-bottom:1px solid #eee;padding-bottom:.2rem}
   nav{background:#fafafa;border:1px solid #eee;border-radius:8px;padding:.6rem .9rem;margin:1rem 0}
@@ -155,46 +155,46 @@ body.pinax-filter section.section:not(.bookmarked) {
   display: none;
 }
 </style></head><body>
-<h1>DynamicalModels.jl — chaotic attractors (Pinax demo)</h1>
+<h1>L-system fractals (Pinax demo)</h1>
 <div class="pinax-meta">6 figures</div>
 <script type="application/json" id="pinax-committed">{"comments":{},"bookmarks":{},"features":["comments","bookmarks","export"]}</script>
 <nav><strong>Contents</strong>
-<a href="#attractors">Chaotic attractors</a>
-<a href="#lorenz" style="margin-left:1.2rem">Lorenz <span class="nfig">(3)</span></a>
-<a href="#rossler" style="margin-left:1.2rem">Rössler <span class="nfig">(3)</span></a>
+<a href="#fractals">L-system fractals</a>
+<a href="#koch" style="margin-left:1.2rem">Koch &amp; Sierpiński <span class="nfig">(3)</span></a>
+<a href="#curves" style="margin-left:1.2rem">Dragons, space-filling &amp; plants <span class="nfig">(3)</span></a>
 </nav>
-<section class="page" id="attractors"><h1>Chaotic attractors</h1>
-<section class="section" id="lorenz"><h2>Sec. 1. Lorenz <span class="nfig">(3)</span></h2>
-<div class="desc"><p>The <strong>Lorenz</strong> system $\dot x=\sigma(y-x),\ \dot y=x(\rho-z)-y,\ \dot z=xy-\beta z$ with $\sigma=10,\ \rho=28,\ \beta=8/3$ — the classic butterfly attractor.</p></div>
+<section class="page" id="fractals"><h1>L-system fractals</h1>
+<section class="section" id="koch"><h2>Sec. 1. Koch &amp; Sierpiński <span class="nfig">(3)</span></h2>
+<div class="desc"><p>Boundary fractals from simple edge-replacement rules. The Koch curve has Hausdorff dimension $D=\log 4/\log 3\approx1.26$; the Sierpiński gasket, $D=\log 3/\log 2\approx1.58$.</p></div>
 <div class="figgrid">
-<figure id="lorenz_fig1">
-<img src="assets/figures/attractors/lorenz/lorenz_fig1.svg" alt="lorenz_fig1">
-<figcaption><b>Fig. 1.</b> 3-D attractor</figcaption>
+<figure id="koch_fig1">
+<img src="assets/figures/fractals/koch/koch_fig1.svg" alt="koch_fig1">
+<figcaption><b>Fig. 1.</b> Koch curve &#40;4 iterations&#41;</figcaption>
 </figure>
-<figure id="lorenz_fig2">
-<img src="assets/figures/attractors/lorenz/lorenz_fig2.svg" alt="lorenz_fig2">
-<figcaption><b>Fig. 2.</b> $x$–$z$ projection</figcaption>
+<figure id="koch_fig2">
+<img src="assets/figures/fractals/koch/koch_fig2.svg" alt="koch_fig2">
+<figcaption><b>Fig. 2.</b> Koch snowflake &#40;4 iterations&#41;</figcaption>
 </figure>
-<figure id="lorenz_fig3">
-<img src="assets/figures/attractors/lorenz/lorenz_fig3.svg" alt="lorenz_fig3">
-<figcaption><b>Fig. 3.</b> $x$–$y$ projection</figcaption>
+<figure id="koch_fig3">
+<img src="assets/figures/fractals/koch/koch_fig3.svg" alt="koch_fig3">
+<figcaption><b>Fig. 3.</b> Sierpiński gasket &#40;6 iterations&#41;</figcaption>
 </figure>
 </div>
 </section>
-<section class="section" id="rossler"><h2>Sec. 2. Rössler <span class="nfig">(3)</span></h2>
-<div class="desc"><p>The <strong>Rössler</strong> system $\dot x=-y-z,\ \dot y=x+ay,\ \dot z=b+z(x-c)$ with $a=b=0.2,\ c=5.7$.</p></div>
+<section class="section" id="curves"><h2>Sec. 2. Dragons, space-filling &amp; plants <span class="nfig">(3)</span></h2>
+<div class="desc"><p>A self-similar dragon, a space-filling curve that visits every cell of a grid as the iteration count grows, and a bracketed system whose $[\,\ldots\,]$ push/pop the turtle state to make a branching plant.</p></div>
 <div class="figgrid">
-<figure id="rossler_fig1">
-<img src="assets/figures/attractors/rossler/rossler_fig1.svg" alt="rossler_fig1">
-<figcaption><b>Fig. 4.</b> 3-D attractor</figcaption>
+<figure id="curves_fig1">
+<img src="assets/figures/fractals/curves/curves_fig1.svg" alt="curves_fig1">
+<figcaption><b>Fig. 4.</b> Heighway dragon &#40;11 iterations&#41;</figcaption>
 </figure>
-<figure id="rossler_fig2">
-<img src="assets/figures/attractors/rossler/rossler_fig2.svg" alt="rossler_fig2">
-<figcaption><b>Fig. 5.</b> $x$–$y$ projection</figcaption>
+<figure id="curves_fig2">
+<img src="assets/figures/fractals/curves/curves_fig2.svg" alt="curves_fig2">
+<figcaption><b>Fig. 5.</b> Hilbert space-filling curve &#40;5 iterations&#41;</figcaption>
 </figure>
-<figure id="rossler_fig3">
-<img src="assets/figures/attractors/rossler/rossler_fig3.svg" alt="rossler_fig3">
-<figcaption><b>Fig. 6.</b> $y$–$z$ projection</figcaption>
+<figure id="curves_fig3">
+<img src="assets/figures/fractals/curves/curves_fig3.svg" alt="curves_fig3">
+<figcaption><b>Fig. 6.</b> Ternary branching plant &#40;6 iterations&#41;</figcaption>
 </figure>
 </div>
 </section>

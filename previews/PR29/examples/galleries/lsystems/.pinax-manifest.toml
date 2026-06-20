@@ -1,0 +1,23 @@
+[assets_figures_fractals_curves_curves_fig3]
+key = "13525342466466088935"
+assets = ["assets/figures/fractals/curves/curves_fig3.svg"]
+
+[assets_figures_fractals_curves_curves_fig1]
+key = "11229655035480015512"
+assets = ["assets/figures/fractals/curves/curves_fig1.svg"]
+
+[assets_figures_fractals_curves_curves_fig2]
+key = "17759767035754928287"
+assets = ["assets/figures/fractals/curves/curves_fig2.svg"]
+
+[assets_figures_fractals_koch_koch_fig1]
+key = "5854365264458024906"
+assets = ["assets/figures/fractals/koch/koch_fig1.svg"]
+
+[assets_figures_fractals_koch_koch_fig2]
+key = "11603439894471585180"
+assets = ["assets/figures/fractals/koch/koch_fig2.svg"]
+
+[assets_figures_fractals_koch_koch_fig3]
+key = "1299160967485051384"
+assets = ["assets/figures/fractals/koch/koch_fig3.svg"]
