@@ -1,0 +1,28 @@
+[provenance]
+julia_version = "1.12.6"
+hostname = "runnervm7b5n9"
+
+[meta]
+created_at = "2026-06-20T15:10:38"
+datavault_git_hash = "unknown"
+datavault_version = "0.7.0"
+log_toml_version = 1
+
+[run]
+name = "mc"
+
+[layout]
+bin_dir = "bin/ising2d/mc"
+status_dir = "status/ising2d/mc"
+config_snapshot = "data/ising2d/mc/config_snapshot.toml"
+data_dir = "data/ising2d/mc"
+ledger = "data/ising2d/mc/ledger.csv"
+
+[study]
+config = "/tmp/ising.toml"
+project_name = "ising2d"
+
+[path]
+keys = ["system.T"]
+formatter = "ParamIO.format_path"
+scheme = "default"
