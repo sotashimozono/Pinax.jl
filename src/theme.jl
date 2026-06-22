@@ -73,3 +73,4 @@ end
 
 include("themes/gallery.jl")   # default theme (registers :gallery)
 include("themes/latex.jl")     # LaTeX/PDF theme (registers :latex); reuses gallery helpers
+include("themes/agent.jl")     # agent/MCP backend (registers :agent); structured data, not HTML
