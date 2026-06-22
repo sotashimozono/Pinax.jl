@@ -18,6 +18,7 @@ import {
 import { readFileSync } from "node:fs";
 import { extname } from "node:path";
 import type { Atlas } from "./atlas.js";
+import type { CommentStore } from "./comments.js";
 
 const MIME: Record<string, string> = {
   ".svg": "image/svg+xml",
@@ -34,9 +35,16 @@ const mimeFor = (p: string): string => MIME[extname(p).toLowerCase()] ?? "applic
 const isTextual = (m: string): boolean =>
   m.startsWith("text/") || m === "image/svg+xml" || m === "application/json";
 
-export function createServer(atlas: Atlas, info?: { name?: string; version?: string }): Server {
+export interface ServerOptions {
+  name?: string;
+  version?: string;
+  /** When set, the write tools (add_comment / set_bookmark) are exposed. */
+  store?: CommentStore;
+}
+
+export function createServer(atlas: Atlas, opts: ServerOptions = {}): Server {
   const server = new Server(
-    { name: info?.name ?? "pinax-mcp", version: info?.version ?? "0.1.0" },
+    { name: opts.name ?? "pinax-mcp", version: opts.version ?? "0.1.0" },
     { capabilities: { resources: {}, tools: {} } },
   );
 
@@ -103,6 +111,35 @@ export function createServer(atlas: Atlas, info?: { name?: string; version?: str
 
   // ---- tools --------------------------------------------------------------------------------
 
+  // The write tools mutate the comment store, so they are exposed only when one is configured.
+  const writeTools = [
+    {
+      name: "add_comment",
+      description:
+        "Append a comment to a unit (by id) in the Pinax comment store (comments.toml). The agent end of the comment loop: the note is written durably; re-render the document to bake it into the gallery / agent.json.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          id: { type: "string", description: "the unit id to comment on" },
+          text: { type: "string", description: "the comment body (markdown)" },
+          author: { type: "string", description: "who is commenting (default 'llm')" },
+        },
+        required: ["id", "text"],
+        additionalProperties: false,
+      },
+    },
+    {
+      name: "set_bookmark",
+      description: "Mark or unmark a unit (by id) as bookmarked in the comment store.",
+      inputSchema: {
+        type: "object",
+        properties: { id: { type: "string" }, on: { type: "boolean", description: "default true" } },
+        required: ["id"],
+        additionalProperties: false,
+      },
+    },
+  ];
+
   server.setRequestHandler(ListToolsRequestSchema, async () => ({
     tools: [
       {
@@ -133,6 +170,7 @@ export function createServer(atlas: Atlas, info?: { name?: string; version?: str
           additionalProperties: false,
         },
       },
+      ...(opts.store ? writeTools : []),
     ],
   }));
 
@@ -155,6 +193,28 @@ export function createServer(atlas: Atlas, info?: { name?: string; version?: str
           hits.map((h) => `[${h.kind} ${h.id}] ${h.label}\n  ${h.field}: ${h.snippet}`).join("\n"),
         );
       }
+      if (name === "add_comment") {
+        if (!opts.store) return err("add_comment is disabled: start the server with --comments <path>");
+        const a = (args as Record<string, unknown>) ?? {};
+        const id = String(a.id ?? "");
+        const text = String(a.text ?? "");
+        if (!id || !text) return err("add_comment requires 'id' and 'text'");
+        if (!atlas.unit(id)) return err(`no unit with id '${id}' in this document`);
+        const turns = opts.store.addComment(id, text, String(a.author ?? "llm"));
+        return ok(
+          `comment added to '${id}' (now ${turns.length} turn(s)). Re-render the document to bake it into the gallery / agent.json.`,
+        );
+      }
+      if (name === "set_bookmark") {
+        if (!opts.store) return err("set_bookmark is disabled: start the server with --comments <path>");
+        const a = (args as Record<string, unknown>) ?? {};
+        const id = String(a.id ?? "");
+        if (!id) return err("set_bookmark requires 'id'");
+        if (!atlas.unit(id)) return err(`no unit with id '${id}' in this document`);
+        const on = a.on === undefined ? true : Boolean(a.on);
+        opts.store.setBookmark(id, on);
+        return ok(`bookmark for '${id}' set to ${on}.`);
+      }
       return err(`unknown tool: ${name}`);
     } catch (e) {
       return err(`error: ${(e as Error).message}`);
@@ -165,7 +225,7 @@ export function createServer(atlas: Atlas, info?: { name?: string; version?: str
 }
 
 /** Connect a server over stdio (the standard MCP transport for a local subprocess). */
-export async function serveStdio(atlas: Atlas, info?: { name?: string; version?: string }): Promise<void> {
-  const server = createServer(atlas, info);
+export async function serveStdio(atlas: Atlas, opts: ServerOptions = {}): Promise<void> {
+  const server = createServer(atlas, opts);
   await server.connect(new StdioServerTransport());
 }

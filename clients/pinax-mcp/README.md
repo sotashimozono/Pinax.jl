@@ -28,6 +28,8 @@ atlas.figureAssets("energy_fig1"); // absolute paths to the rendered assets
 ```sh
 npm install && npm run build
 node dist/src/index.js --agent path/to/render-out
+# add --comments to enable the write-back (add_comment) tool:
+node dist/src/index.js --agent path/to/render-out --comments path/to/comments.toml
 ```
 
 Register it with an MCP client (Claude Desktop, etc.):
@@ -53,6 +55,16 @@ Register it with an MCP client (Claude Desktop, etc.):
 | tool `outline()` | the document tree, token-lean |
 | tool `get_unit(id)` | one unit; a figure → its verification substrate |
 | tool `search(query)` | substring search → matching unit ids + snippet |
+| tool `add_comment(id, text, author?)` | append a comment to the store — **only with `--comments`** |
+| tool `set_bookmark(id, on?)` | bookmark a unit — **only with `--comments`** |
+
+### Closing the comment loop
+
+With `--comments <comments.toml>`, the agent can write back: `add_comment` appends an
+id-keyed turn to the Pinax comment store, byte-compatible with `Pinax.read_comments` /
+`Pinax.add_comment`. Re-render the document and the comment is baked into the gallery and the
+next `agent.json` — so an LLM's review flows back into the human artifact. Without `--comments`
+the server is strictly read-only.
 
 ## Develop
 
