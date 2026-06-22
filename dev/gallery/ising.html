@@ -21,6 +21,7 @@
   .pinax-eq{display:block}
   h3.facet{color:#555;margin:1rem 0 .3rem;font-size:1.05rem;font-weight:600}
   .pinax-meta{color:#666;margin:-.4rem 0 1rem;font-size:.95rem}
+  .pinax-subtitle{color:#57606a;font-size:.95rem;margin:-.2rem 0 .8rem;font-weight:500}
   .nfig{color:#888;font-weight:normal;font-size:.85em}
   nav .nfig{color:#888}
   .bibliography li{margin:.3rem 0;font-size:.92rem}
@@ -38,6 +39,7 @@
   .card-thumb{aspect-ratio:4/3;background:#f6f8fa;display:flex;align-items:center;justify-content:center;overflow:hidden}
   .card-thumb img{width:100%;height:100%;object-fit:contain}
   .card-thumb-empty{min-height:150px}
+  .card-thumb-pdf{width:100%;height:100%;border:0;background:#fff;pointer-events:none}
   .card-body{padding:.7rem .9rem}
   .card-title{font-weight:600;font-size:1.05rem}
   .card-summary{color:#555;font-size:.9rem;margin-top:.2rem}
@@ -50,6 +52,14 @@
   .pinax-toc a{font-weight:600;color:#0366d6;text-decoration:none}
   .pinax-toc .toc-summary{color:#555;font-weight:400}
   .pinax-toc .toc-meta{color:#8b949e;font-size:.85rem}
+  details.pinax-group{margin:1rem 0;border:1px solid #e2e5e9;border-radius:8px;background:#fff;padding:.2rem .6rem}
+  details.pinax-group>summary{font-weight:700;font-size:1.1rem;cursor:pointer;padding:.5rem .2rem;list-style-position:inside}
+  details.pinax-group[open]>summary{border-bottom:1px solid #eee;margin-bottom:.4rem}
+  details.pinax-group .grp-count{color:#8b949e;font-weight:400;font-size:.85rem}
+  .part-desc{color:#444;font-size:.93rem;line-height:1.55;margin:.1rem .2rem .7rem;max-width:70ch}
+  .part-desc p{margin:.3rem 0}
+  nav details.pinax-group{margin:.3rem 0;padding:.1rem .5rem;background:#fafafa}
+  nav details.pinax-group>summary{font-size:.98rem;padding:.25rem .2rem}
 </style>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><style>/* pinax.css — styling for the interactive comment layer (notes 01 §4).
    Inlined into the gallery by the GalleryTheme when interactive features are enabled. */
