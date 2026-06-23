@@ -80,3 +80,52 @@ using ParamIO: ParamIO
         @test occursin("git_hash", read(meta, String))
     end
 end
+
+# `report(vault, recipe)` — the vault → doc bridge. Discovers :done keys, loads each Dict,
+# hands the (key, dict) pairs to a project recipe, renders gallery + agent.json. Driver generic.
+@testset "report(vault, recipe): vault → gallery + agent.json" begin
+    tmp = mktempdir()
+    cfg = joinpath(tmp, "config.toml")
+    write(
+        cfg,
+        """
+ [study]
+ project_name = "sweep"
+ total_samples = 1
+ outdir = "$(joinpath(tmp, "vault"))"
+ [datavault]
+ path_keys = ["system.N"]
+ [[paramsets]]
+ [paramsets.system]
+ N = [8, 16, 24]
+ """,
+    )
+    spec = ParamIO.load(cfg)
+    vault = DataVault.Vault(cfg; run="phase1")
+    for key in ParamIO.expand(spec)            # 3 keys; save a scalar result each
+        n = key.params["system.N"]
+        DataVault.save!(vault, key, Dict("N" => n, "val" => float(n)^2))
+        DataVault.mark_done!(vault, key)
+    end
+
+    # generic helper aggregates val(N) across the swept axis; recipe builds a @table (no plot backend)
+    recipe = function (pairs)
+        Ns, vals = Pinax.sweep_mean(pairs, "val", "system.N")
+        @page :sweep "val(N)" begin
+            @desc md"auto report from the vault"
+            @table (N=Ns, val=vals) caption = "val vs swept N"
+        end
+    end
+    res = Pinax.report(vault, recipe; title="Sweep report", out=joinpath(tmp, "rep"))
+    @test res.n == 3                                            # discovered all 3 :done keys
+    @test isfile(res.gallery)                                   # human gallery
+    @test isfile(res.agent)                                     # agent.json
+    @test occursin("\"val\"", read(res.agent, String))         # the table reached agent.json
+    @test occursin("64", read(res.agent, String))              # val(8)=64 present (native rows)
+    md = read(joinpath(dirname(res.agent), "agent.md"), String)
+    @test occursin("| N | val |", md)                          # LLM-readable table inline
+
+    # core method without DataVault loaded would error; here the ext is loaded, so the typed
+    # method wins. A non-vault first arg still hits the core fallback error:
+    @test_throws ErrorException Pinax.report(42, recipe; title="x", out=joinpath(tmp, "z"))
+end

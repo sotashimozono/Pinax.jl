@@ -37,6 +37,8 @@ export @pinaxsetup,
 
 # render / theme / backend contract
 export render,
+    report,
+    sweep_mean,
     contents,
     Theme,
     GalleryBase,
