@@ -33,4 +33,25 @@ function Pinax._record_provenance(vault::DataVault.Vault, study)
     return nothing
 end
 
+# vault → doc bridge. Discover the vault's completed keys, load each result Dict, let the
+# project `recipe` build the doc, render the human gallery + the agent.json with the vault
+# wired in (so figure cache tracks `.done` fingerprints and provenance is recorded). The
+# driver is project-independent; only `recipe(pairs)` is project-specific.
+function Pinax.report(
+    vault::DataVault.Vault,
+    recipe::Function;
+    title::AbstractString,
+    out::AbstractString,
+    study=nothing,
+    kwargs...,
+)
+    pairs = [(k, DataVault.load(vault, k)) for k in DataVault.keys(vault; status=:done)]
+    isempty(pairs) && error("Pinax.report: no :done keys in vault (run=$(vault.run)).")
+    Pinax.reset!(; title=String(title))
+    recipe(pairs)
+    gallery = Pinax.render(; out="$(out)_html", theme=:gallery, vault, study, kwargs...)
+    agent = Pinax.render(; out="$(out)_agent", theme=:agent, vault, study, kwargs...)
+    return (; gallery, agent, n=length(pairs))
+end
+
 end # module PinaxDataVaultExt

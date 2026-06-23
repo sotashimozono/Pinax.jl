@@ -71,6 +71,42 @@ function render(
     return path
 end
 
+"""
+    report(vault, recipe; title, out, study=nothing, kwargs...) -> (; gallery, agent, n)
+
+Bridge a DataVault `vault` to rendered artifacts. Discovers the vault's completed keys,
+loads each result `Dict`, hands the `(key, dict)` pairs to the project-supplied `recipe`
+(which builds the doc with `@page`/`@figure`/`@table`), then renders the human gallery
+**and** the agent.json with the vault wired in (data-fingerprint cache tracking +
+provenance). The driver — discover, load, render, lineage — is project-independent; only
+`recipe` is project-specific. Requires `using DataVault` (which also loads ParamIO); the
+core method errors with a hint when the extension is not loaded.
+"""
+function report(vault, recipe::Function; kwargs...)
+    return error(
+        "Pinax.report needs DataVault loaded — `using DataVault` (it also pulls in ParamIO). " *
+        "It turns a vault's completed keys into a gallery + agent.json via your recipe.",
+    )
+end
+
+"""
+    sweep_mean(pairs, quantity, axis) -> (xs, means)
+
+Helper for `report` recipes: the mean of a scalar `quantity` in each result `Dict`,
+grouped by the swept dotted param `axis` (e.g. `"system.r"`). The generic "scalar vs
+swept parameter" reduction, useful for any sweep; the plot and labels stay the recipe's
+job. Pure; needs no DataVault.
+"""
+function sweep_mean(pairs, quantity::AbstractString, axis::AbstractString)
+    g = Dict{Any,Vector{Float64}}()
+    for (k, d) in pairs
+        haskey(d, quantity) || continue
+        push!(get!(g, k.params[axis], Float64[]), Float64(d[quantity]))
+    end
+    xs = sort(collect(keys(g)))
+    return xs, [(v=g[x]; sum(v) / length(v)) for x in xs]
+end
+
 # Record figure provenance. The PinaxDataVaultExt extension specializes this on a DataVault.Vault
 # (study-level meta.toml, non-fatal); the core is a no-op. The caller only invokes it for a non-nothing
 # vault, and a DataVault.Vault means DataVault is loaded (so the extension is too) — hence in practice
