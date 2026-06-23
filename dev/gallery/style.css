@@ -11,11 +11,6 @@ body{font-family:system-ui,sans-serif;max-width:1180px;margin:2rem auto;padding:
   .figgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1rem}
   .figgrid-single{grid-template-columns:minmax(0,560px);justify-content:center}
   .figgrid-wide{grid-template-columns:1fr}
-  figure.pinax-table{overflow-x:auto}
-  .pinax-table table{border-collapse:collapse;width:100%;font-size:.9em}
-  .pinax-table th,.pinax-table td{border:1px solid #e2e5e9;padding:.25rem .5rem;text-align:left}
-  .pinax-table thead th{background:#f4f6f8;font-weight:600}
-  .pinax-table tbody tr:nth-child(even){background:#fafbfc}
   figure{margin:0;border:1px solid #e2e5e9;border-radius:8px;padding:.5rem;background:#fdfdfe}
   figure img{width:100%;height:auto}
   figure iframe.pinax-pdf{width:100%;height:460px;border:1px solid #eee;border-radius:4px;background:#fff}
