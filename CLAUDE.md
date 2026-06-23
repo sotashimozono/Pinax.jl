@@ -6,6 +6,22 @@ workflow: turn results — including a finished `DataVault` sweep, via `report` 
 gallery** *and* an **LLM-readable `agent.json`**. The LLM-facing seam of the whole pipeline is
 `agent.json` (data, not pixels). See [`../CLAUDE.md`](../CLAUDE.md) for the compute stack.
 
+## The two faces — human vs LLM (the point of the agent backend)
+
+The same doc has **two representations, chosen by who reads it** — neither is a downgrade:
+
+- **Human → the gallery (pixels).** A plot is the *right* human view: you read a curve's shape and
+  scan a dozen panels at a glance. `:gallery` (interactive HTML) and `:latex` (print) are the human
+  faces.
+- **LLM → `agent.json` (data).** An LLM reasons over *numbers* far more precisely than over pixels —
+  it cannot read a value off a chart, and image tokens are costly + non-deterministic. So
+  `figure_as_table` presents each `@figure` **AS its plotted-data table**: the LLM gets the numbers
+  (cheap inline preview + full CSV via the MCP `get_figure_data`), not the image.
+
+`@table`, `@desc`/`@caption`, comments, and `status` flow to **both** faces from one source. This
+duality — *figure for humans, data for LLMs, single source* — is why the agent backend exists. Keep
+it when adding any node type: it needs a human render **and** an agent-data form.
+
 ## Role / public API — the seam
 
 - **Build a doc** (macros populate an implicit global document): `@pinaxsetup` ·
@@ -26,9 +42,8 @@ gallery** *and* an **LLM-readable `agent.json`**. The LLM-facing seam of the who
 - **`@figure`'s expression is DEFERRED** — captured, not run, until `render` (so structure is
   cheap and figures cache). The cache keys on code + `params` (+ the `.done` fingerprint when a
   `vault` is given).
-- **`agent.json` is the neutral LLM contract — it carries DATA, not pixels.** `figure_as_table`
-  (default on the agent theme) presents a `@figure` *as its plotted-data table* (inline preview +
-  full CSV via the MCP `get_figure_data`). Reason over the numbers; don't ask for the image.
+- **`agent.json` is the neutral LLM seam** (the data face above) that pinax-mcp, registries
+  (Archeion), and LLMs all read — treat its shape as a contract, not an internal detail.
 - **`status` is a maturity tag a registry interprets:** `:final` (curated) vs `:trial` (raw
   experiment notebook — what `report` auto-output usually is). Pinax only carries it.
 - **Two-env reality:** Pinax needs a plotting backend (Plots/Makie, heavy); compute needs its own
