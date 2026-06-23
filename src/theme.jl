@@ -20,6 +20,7 @@ abstract type Theme end
 output_format(::Theme) = :html            # :html | :latex
 figure_formats(::Theme) = Symbol[:svg]    # formats requested from figure objects (paths copied as-is)
 index_level(::Theme) = :cards             # default table-of-contents verbosity (:toc | :cards | :rich)
+figure_as_table(::Theme) = false          # if true, a backend presents a @figure AS its data table (LLM view)
 number(::Theme, node) = nothing           # optional numbering override (the gallery numbers server-side)
 
 # ---- per-node rendering contract (the "display UI" for each IR node; notes 11) ----

@@ -22,6 +22,7 @@ struct AgentTheme <: AgentBase end
 output_format(::AgentBase) = :agent
 figure_formats(::AgentBase) = Symbol[:svg, :table]   # svg (vision) + a CSV of the plotted data (text
 # view for LLM reconciliation); pre-made file paths copy as-is and produce no table.
+figure_as_table(::AgentBase) = true   # an LLM reads a figure's data as a table, not its pixels (Phase B)
 
 # ---------- JSON emit (the machine / MCP substrate) ----------
 
@@ -64,8 +65,32 @@ function _agent_params_json(io, params)
     return print(io, "}")
 end
 
-# One figure → its JSON object (the verification substrate: caption/code/params/assets/comments).
-function emit_figure(::AgentBase, fig, ctx)
+# A figure's plotted data as an inline table preview (header + native-typed rows + total row count),
+# parsed from its CSV — the "figure presented as a table" for an LLM (figure_as_table).
+function _emit_figure_table(io, csvpath)
+    t = _read_csv_table(csvpath)
+    t === nothing && return print(io, "null")
+    print(io, "{\"header\":[")
+    for (i, h) in enumerate(t.header)
+        i == 1 || print(io, ",")
+        print(io, _jsonstr(h))
+    end
+    print(io, "],\"rows\":[")
+    for (i, row) in enumerate(t.rows)
+        i == 1 || print(io, ",")
+        print(io, "[")
+        for (j, cell) in enumerate(row)
+            j == 1 || print(io, ",")
+            print(io, _agent_jsonval(cell))
+        end
+        print(io, "]")
+    end
+    print(io, "],\"total\":", t.total, "}")
+    return nothing
+end
+
+# One figure → its JSON object (verification substrate: caption/code/params/assets/data/table/comments).
+function emit_figure(theme::AgentBase, fig, ctx)
     io = ctx.io
     print(
         io,
@@ -98,8 +123,14 @@ function emit_figure(::AgentBase, fig, ctx)
         else
             _jsonstr(replace(relpath(datacsv, ctx.outdir), '\\' => '/'))
         end,
-        ",\"comments\":[",
+        ",\"table\":",
     )
+    if figure_as_table(theme) && datacsv !== nothing
+        _emit_figure_table(io, datacsv)
+    else
+        print(io, "null")
+    end
+    print(io, ",\"comments\":[")
     for (i, c) in enumerate(get(ctx.comments, Symbol(fig.anchor), Comment[]))
         i == 1 || print(io, ",")
         print(io, "{\"author\":", _jsonstr(c.author), ",\"text\":", _jsonstr(c.text), "}")
@@ -290,16 +321,39 @@ function _params_inline(params)
     return join(("$k=$v" for (k, v) in desc), ", ")
 end
 
-function _agent_md_fig(io, fig, outdir, comments)
+# Inline a figure's data as a markdown-table preview (figure_as_table), parsed from its CSV asset.
+function _agent_md_data_table(io, csvpath)
+    t = _read_csv_table(csvpath)
+    t === nothing && return nothing
+    println(io)
+    println(io, "| ", join(t.header, " | "), " |")
+    println(io, "|", repeat(" --- |", length(t.header)))
+    for row in t.rows
+        println(io, "| ", join((_cellstr(c) for c in row), " | "), " |")
+    end
+    length(t.rows) < t.total && println(
+        io, "_(", length(t.rows), " of ", t.total, " rows; full data in the CSV asset)_"
+    )
+    return nothing
+end
+
+function _agent_md_fig(io, fig, outdir, comments, as_table)
     println(io, "- [fig: ", fig.id, "] ", fig.caption)
     isempty(fig.code) || println(io, "  - code: `", fig.code, "`")
     fig.params === nothing || println(io, "  - data: ", _params_inline(fig.params))
     imgs = filter(a -> !endswith(lowercase(a), ".csv"), fig.assets)
     isempty(imgs) ||
         println(io, "  - asset: ", replace(relpath(imgs[1], outdir), '\\' => '/'))
+    csv = nothing
     for a in fig.assets
-        endswith(lowercase(a), ".csv") &&
-            println(io, "  - data table: ", replace(relpath(a, outdir), '\\' => '/'))
+        endswith(lowercase(a), ".csv") && (csv = a)
+    end
+    if csv !== nothing
+        if as_table
+            _agent_md_data_table(io, csv)   # present the figure AS its data table
+        else
+            println(io, "  - data table: ", replace(relpath(csv, outdir), '\\' => '/'))
+        end
     end
     for c in get(comments, Symbol(fig.anchor), Comment[])
         println(io, "  - note (", c.author, "): ", c.text)
@@ -322,10 +376,10 @@ function _agent_md_table(io, tbl)
 end
 
 # A container's figures + tables in declaration order (@raw panels are HTML, skipped in the md view).
-function _agent_md_content(io, c, outdir, comments)
+function _agent_md_content(io, c, outdir, comments, as_table)
     for (kind, item) in _content_items(c)
         if kind === :figure
-            _agent_md_fig(io, item, outdir, comments)
+            _agent_md_fig(io, item, outdir, comments, as_table)
         elseif kind === :table
             _agent_md_table(io, item)
         end
@@ -333,7 +387,7 @@ function _agent_md_content(io, c, outdir, comments)
     return nothing
 end
 
-function _agent_markdown(doc::Document, outdir, comments)
+function _agent_markdown(doc::Document, outdir, comments, as_table)
     io = IOBuffer()
     isempty(doc.meta.title) || println(io, "# ", doc.meta.title)
     curpart = :__start__
@@ -350,11 +404,11 @@ function _agent_markdown(doc::Document, outdir, comments)
         println(io, "\n### ", pg.title, "  [id: ", pg.id, "]")
         pg.summary === nothing || println(io, "_", pg.summary, "_")
         pg.desc === nothing || println(io, pg.desc.source)
-        _agent_md_content(io, pg, outdir, comments)
+        _agent_md_content(io, pg, outdir, comments, as_table)
         for sec in pg.sections
             println(io, "\n#### ", sec.title, "  [id: ", sec.id, "]")
             sec.desc === nothing || println(io, sec.desc.source)
-            _agent_md_content(io, sec, outdir, comments)
+            _agent_md_content(io, sec, outdir, comments, as_table)
         end
     end
     return String(take!(io))
@@ -374,7 +428,10 @@ function emit_document(
     mkpath(outdir)
     ctx = AgentCtx(IOBuffer(), String(outdir), comments, cache, rdiag)
     write(joinpath(outdir, "agent.json"), _agent_json(theme, doc, ctx))
-    write(joinpath(outdir, "agent.md"), _agent_markdown(doc, outdir, comments))
+    write(
+        joinpath(outdir, "agent.md"),
+        _agent_markdown(doc, outdir, comments, figure_as_table(theme)),
+    )
     # materialize failures leave a figure's `assets` empty in the JSON (the agent sees the gap);
     # no separate diagnostics file is emitted for the machine view.
     return joinpath(outdir, "agent.json")

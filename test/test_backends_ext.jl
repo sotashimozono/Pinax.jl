@@ -22,6 +22,10 @@ function Pinax._figure_table(::MockFig)
     )
 end
 
+# a theme variant that opts OUT of presenting figures as tables (figure_as_table = false)
+struct PlainAgent <: Pinax.AgentBase end
+Pinax.figure_as_table(::PlainAgent) = false
+
 _has_parse_error(ex) = ex isa Expr && (ex.head === :error || any(_has_parse_error, ex.args))
 
 @testset "backend extension contract" begin
@@ -130,6 +134,63 @@ end
         @test occursin("\"data\":\"", j)     # distinct field (not lumped into assets)
         @test occursin(".csv\"", j)          # ...pointing at the csv
         md = read(joinpath(out, "agent.md"), String)
-        @test occursin("data table:", md)
+        @test occursin("| series | x | y |", md)   # figure_as_table inlines the data (Phase B)
+    end
+
+    @testset "figure_as_table (default agent): figure carries its data table inline" begin
+        out = joinpath(tmp, "fat")
+        Pinax.reset!(; title="x")
+        @page :p "P" begin
+            @figure MockFig("z") caption = "f"
+        end
+        Pinax.render(; out=out, theme=:agent)
+        j = read(joinpath(out, "agent.json"), String)
+        @test occursin("\"table\":{\"header\":[\"series\",\"x\",\"y\"]", j)   # the figure's data table
+        @test occursin("[\"s1\",0.0,10.0]", j)                                # native-typed rows
+        @test occursin("\"total\":3", j)
+        md = read(joinpath(out, "agent.md"), String)
+        @test occursin("| series | x | y |", md)
+        @test occursin("| s1 | 0.0 | 10.0 |", md)
+    end
+
+    @testset "figure_as_table=false keeps figure as figure (csv reference, no inline table)" begin
+        out = joinpath(tmp, "plain")
+        Pinax.reset!(; title="x")
+        @page :p "P" begin
+            @figure MockFig("z") caption = "f"
+        end
+        Pinax.render(; out=out, theme=PlainAgent())
+        j = read(joinpath(out, "agent.json"), String)
+        @test occursin("\"table\":null", j)
+        md = read(joinpath(out, "agent.md"), String)
+        @test occursin("- data table:", md)            # referenced, not inlined
+        @test !occursin("| series | x | y |", md)
+    end
+
+    @testset "_read_csv_table parses quoted fields + downsamples" begin
+        csv = joinpath(tmp, "t.csv")
+        write(csv, "# meta\nseries,x,y\n\"a,b\",0.0,1.5\nc,2.0,3.0\n")
+        t = Pinax._read_csv_table(csv)
+        @test t.header == ["series", "x", "y"]
+        @test t.rows[1] == ["a,b", 0.0, 1.5]   # quoted comma; numbers re-typed
+        @test t.total == 2
+        write(csv, "series,x,y\n" * join(["r$i,$i,$i" for i in 1:100], "\n") * "\n")
+        t2 = Pinax._read_csv_table(csv; maxrows=10)
+        @test t2.total == 100 && length(t2.rows) <= 10
+    end
+
+    @testset "csv round-trip edge cases (review fix)" begin
+        @test Pinax._split_csv_line("a,b,") == ["a", "b", ""]                       # trailing empty field
+        @test Pinax._split_csv_line("a,,c") == ["a", "", "c"]                       # empty middle field
+        @test Pinax._split_csv_line("\"x,y\",z") == ["x,y", "z"]                    # quoted comma
+        @test Pinax._split_csv_line("\"say \"\"hi\"\"\",z") == ["say \"hi\"", "z"]  # escaped quote
+
+        csv = joinpath(tmp, "edge.csv")
+        write(csv, "series,x,y\n8,0.0,\n8,1.0,2.5\n")   # numeric-looking label + a blank (NaN) y cell
+        t = Pinax._read_csv_table(csv)
+        @test t.rows[1][1] === "8"        # the series LABEL stays a String (not 8.0)
+        @test t.rows[1][3] === missing    # a blank y (a dropped NaN) -> missing, not ""
+        @test t.rows[2][3] === 2.5        # a real number is still re-typed
+        @test !occursin('\n', Pinax._csv_field("a\nb"))   # writer flattens newlines (no line-spanning field)
     end
 end
