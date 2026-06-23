@@ -1,0 +1,56 @@
+{
+  "name": "pinax-mcp",
+  "version": "0.2.0",
+  "description": "General-purpose library + MCP server over any Pinax agent.json artifact.",
+  "type": "module",
+  "bin": {
+    "pinax-mcp": "dist/src/index.js"
+  },
+  "exports": {
+    ".": "./dist/src/atlas.js"
+  },
+  "files": [
+    "dist/src",
+    "README.md",
+    "LICENSE"
+  ],
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "pinax",
+    "julia",
+    "agent",
+    "llm"
+  ],
+  "homepage": "https://github.com/sotashimozono/Pinax.jl/tree/main/clients/pinax-mcp#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sotashimozono/Pinax.jl.git",
+    "directory": "clients/pinax-mcp"
+  },
+  "bugs": {
+    "url": "https://github.com/sotashimozono/Pinax.jl/issues"
+  },
+  "author": "sota shimozono",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepare": "tsc",
+    "test": "tsc && node --test dist/test/*.test.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.0",
+    "smol-toml": "^1.3.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "typescript": "^5.5.0"
+  }
+}

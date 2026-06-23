@@ -14,6 +14,10 @@
 this repository is made for template folder for developing julia project.  
 some of convenient features are available, but you need to fix to your current calculations.
 
+## MCP server — `clients/pinax-mcp`
+
+`render(theme=:agent)` emits an `agent.json` an LLM can read. **[`clients/pinax-mcp`](clients/pinax-mcp)** is a Node MCP server over that artifact: it serves every unit (figure / table / section / …) by id, presents a figure as its data table, and runs in any MCP client (`npx pinax-mcp --agent <render-out>`). See its [README](clients/pinax-mcp/README.md).
+
 ## TODO LIST
 
 1. **GitHub Repository Settings**

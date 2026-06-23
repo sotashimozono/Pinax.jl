@@ -1,0 +1,5 @@
+# pinax figure data — xlabel=T ylabel=M
+series,x,y
+N=8,0.1,0.99
+N=8,0.2,0.8
+N=8,0.3,0.55

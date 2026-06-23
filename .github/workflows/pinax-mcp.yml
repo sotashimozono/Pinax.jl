@@ -1,0 +1,29 @@
+name: pinax-mcp (Node)
+
+# Node CI for the clients/pinax-mcp MCP server. Path-filtered so it runs only when that
+# subpackage changes — the Julia workflows are unaffected by Node-only changes (and vice versa).
+on:
+  push:
+    branches: [main]
+    paths: ["clients/pinax-mcp/**"]
+  pull_request:
+    paths: ["clients/pinax-mcp/**"]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: clients/pinax-mcp
+    strategy:
+      matrix:
+        node: [20, 22]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+          cache-dependency-path: clients/pinax-mcp/package-lock.json
+      - run: npm ci
+      - run: npm test
