@@ -71,13 +71,41 @@ end
 _csv_num(v::Real) = isfinite(v) ? string(v) : ""   # NaN/Inf -> blank cell
 _csv_num(v) = _csv_field(v)                         # categorical x (strings/dates)
 
-# Long-format CSV (series,x,y). Each series is uniformly downsampled to <= `maxrows` points (a header
-# comment records the reduction) so a dense plot stays cheap to read.
+# Choose <= `budget` indices of `ys` that PRESERVE SHAPE: per contiguous bucket keep the min-y and
+# max-y points (plus the two endpoints), so peaks/troughs survive — unlike a uniform stride, which can
+# step straight over a sharp feature. The LLM reads this data, so a dropped peak is a wrong read.
+# Non-finite / non-numeric y degrades to the bucket's first point (≈ uniform).
+function _pick_indices(ys, budget::Int)
+    n = length(ys)
+    n <= budget && return collect(1:n)
+    nb = max(1, budget ÷ 2)                        # 2 points/bucket (its min and its max)
+    keep = Set{Int}((1, n))                        # always keep the endpoints
+    asnum(v) = (v isa Real && isfinite(v)) ? Float64(v) : nothing
+    for k in 1:nb
+        lo = 1 + ((k - 1) * n) ÷ nb
+        hi = (k * n) ÷ nb
+        lo > hi && continue
+        imin = imax = lo
+        vmin = vmax = nothing
+        for i in lo:hi
+            v = asnum(ys[i])
+            v === nothing && continue
+            (vmin === nothing || v < vmin) && (vmin=v; imin=i)
+            (vmax === nothing || v > vmax) && (vmax=v; imax=i)
+        end
+        push!(keep, imin, imax)
+    end
+    return sort!(collect(keep))
+end
+
+# Long-format CSV (series,x,y). Each series is **shape-preservingly** downsampled to <= `maxrows`
+# points (min/max per bucket — peaks survive) so a dense plot stays cheap AND faithful to read.
 function _print_csv_table(io, tbl, maxrows::Int)
     xl = get(tbl, :xlabel, "")
     yl = get(tbl, :ylabel, "")
     reduced = any(s -> min(length(s.x), length(s.y)) > maxrows, tbl.series)
-    note = reduced ? " (downsampled: uniform stride, <= $(maxrows) pts/series)" : ""
+    note =
+        reduced ? " (downsampled: shape-preserving min/max, <= $(maxrows) pts/series)" : ""
     println(
         io,
         "# pinax figure data — xlabel=",
@@ -89,8 +117,7 @@ function _print_csv_table(io, tbl, maxrows::Int)
     println(io, "series,x,y")
     for s in tbl.series
         n = min(length(s.x), length(s.y))
-        step = n > maxrows ? cld(n, maxrows) : 1
-        for i in 1:step:n
+        for i in _pick_indices(view(s.y, 1:n), maxrows)
             println(io, _csv_field(s.label), ",", _csv_num(s.x[i]), ",", _csv_num(s.y[i]))
         end
     end
@@ -151,13 +178,37 @@ function _read_csv_table(path; maxrows::Int=20)
     # blank cell (a NaN/Inf the writer dropped) becomes `missing` (-> JSON null), not the string "".
     cell(j, s) = j == 1 ? s : (isempty(s) ? missing : something(tryparse(Float64, s), s))
     header = _split_csv_line(lines[1])
-    body = @view lines[2:end]
-    total = length(body)
-    sel = total > maxrows ? body[1:cld(total, maxrows):total] : body
-    rows = Vector{Any}[
-        (f=_split_csv_line(l); Any[cell(j, f[j]) for j in eachindex(f)]) for l in sel
+    allrows = Vector{Any}[
+        (f=_split_csv_line(l); Any[cell(j, f[j]) for j in eachindex(f)]) for
+        l in @view lines[2:end]
     ]
-    return (header=header, rows=rows, total=total)
+    return (header=header, rows=_downsample_rows(allrows, maxrows), total=length(allrows))
+end
+
+# Downsample long-format (label,x,y) rows to <= `budget`, shape-preservingly PER SERIES (so a peak in
+# any one series survives). Groups by the series label (col 1) and keeps min/max-per-bucket on y (col 3).
+function _downsample_rows(rows, budget::Int)
+    length(rows) <= budget && return rows
+    groups = Dict{Any,Vector{Int}}()
+    order = Any[]
+    for (i, r) in enumerate(rows)
+        haskey(groups, r[1]) || push!(order, r[1])
+        push!(get!(groups, r[1], Int[]), i)
+    end
+    nseries = length(order)
+    # more series than the budget can afford min+max for → per-series shape preservation is moot;
+    # fall back to a uniform stride over all rows so the <= budget bound still holds.
+    2 * nseries > budget && return rows[1:cld(length(rows), budget):length(rows)]
+    per = max(2, budget ÷ nseries)
+    keep = Int[]
+    for lbl in order
+        gidx = groups[lbl]
+        for p in _pick_indices(Any[rows[i][3] for i in gidx], per)
+            push!(keep, gidx[p])
+        end
+    end
+    sort!(unique!(keep))
+    return rows[keep]
 end
 
 # Normalize a `@figure … data=` NamedTuple into a list of `(; label, x, y)` series. Accepts the
@@ -181,7 +232,7 @@ end
 
 # Eager `data=` → the same `(header, rows, total)` long-format the agent backend gets from a
 # materialized CSV — but WITHOUT building the plot (no plotting backend needed). Numeric `x`/`y`
-# stay native (the agent JSON emits typed rows); `rows` is uniformly downsampled to <= `maxrows`.
+# stay native (the agent JSON emits typed rows); `rows` is shape-preservingly downsampled to <= `maxrows`.
 function _table_from_data(data; maxrows::Int=20)
     rows = Vector{Any}[]
     for s in _series_of(data)
@@ -190,9 +241,11 @@ function _table_from_data(data; maxrows::Int=20)
             push!(rows, Any[s.label, s.x[i], s.y[i]])
         end
     end
-    total = length(rows)
-    sel = total > maxrows ? rows[1:cld(total, maxrows):total] : rows
-    return (header=["series", "x", "y"], rows=sel, total=total)
+    return (
+        header=["series", "x", "y"],
+        rows=_downsample_rows(rows, maxrows),
+        total=length(rows),
+    )
 end
 
 """

@@ -119,10 +119,11 @@ end
             ylabel="y",
             series=[(; label="a", x=collect(0.0:9.0), y=collect(0.0:9.0))],
         )
-        Pinax._print_csv_table(io, tbl, 3)   # 10 pts, cap 3 -> stride cld(10,3)=4 -> i=1,5,9
-        s = String(take!(io))
+        Pinax._print_csv_table(io, tbl, 3)   # 10 pts, budget 3, shape-preserving: keep min+max (the
+        s = String(take!(io))                #   endpoints for a monotonic series) -> 2 rows
         @test occursin("downsampled", s)
-        @test count("a,", s) == 3
+        @test count("a,", s) == 2
+        @test occursin("a,0.0,0.0", s) && occursin("a,9.0,9.0", s)   # the extrema are kept
     end
 
     @testset "agent backend emits the data table as a distinct `data` field" begin
@@ -227,4 +228,35 @@ end
     end
     j2 = read(Pinax.render(; out=joinpath(tmp, "a2"), theme=:agent), String)
     @test occursin("[\"a\",0,2]", j2) && occursin("[\"b\",1,5]", j2)
+end
+
+# gap ②: the figure-as-table downsample must PRESERVE SHAPE — a lone sharp peak survives the ≤20-row
+# preview (a uniform stride would step right over it, giving the LLM a wrong read of the data).
+@testset "shape-preserving downsample keeps peaks (gap ②)" begin
+    ys = [i == 373 ? 999.0 : 1.0 for i in 1:500]      # one sharp peak among 500 flat points
+    idx = Pinax._pick_indices(ys, 20)
+    @test 373 in idx                                   # the peak's index is kept
+    @test 1 in idx && 500 in idx                       # endpoints kept
+    @test length(idx) <= 22                            # ~budget (+ up to 2 endpoints)
+
+    # end-to-end through a data= figure (no backend) → agent.json must carry the peak value
+    Pinax.reset!(; title="peak")
+    @page :p "P" begin
+        @figure error("no gen") data = (x=collect(1.0:500), y=ys)
+    end
+    j = read(Pinax.render(; out=joinpath(mktempdir(), "a"), theme=:agent), String)
+    @test occursin("999.0", j)                         # uniform stride (every 25th) would drop index 373
+
+    # multi-series: each series keeps its OWN peak
+    Pinax.reset!(; title="peak2")
+    @page :q "Q" begin
+        @figure error("ng") data = (
+            series=[
+                (; label="a", x=collect(1.0:200), y=[i == 50 ? 88.0 : 0.0 for i in 1:200]),
+                (; label="b", x=collect(1.0:200), y=[i == 150 ? 77.0 : 0.0 for i in 1:200]),
+            ],
+        )
+    end
+    j2 = read(Pinax.render(; out=joinpath(mktempdir(), "b"), theme=:agent), String)
+    @test occursin("88.0", j2) && occursin("77.0", j2)
 end
