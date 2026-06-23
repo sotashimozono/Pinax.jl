@@ -20,7 +20,8 @@ abstract type AgentBase <: Theme end
 struct AgentTheme <: AgentBase end
 
 output_format(::AgentBase) = :agent
-figure_formats(::AgentBase) = Symbol[:svg]   # generated figures → svg; pre-made file paths copy as-is
+figure_formats(::AgentBase) = Symbol[:svg, :table]   # svg (vision) + a CSV of the plotted data (text
+# view for LLM reconciliation); pre-made file paths copy as-is and produce no table.
 
 # ---------- JSON emit (the machine / MCP substrate) ----------
 
@@ -74,12 +75,28 @@ function emit_figure(::AgentBase, fig, ctx)
         ",\"params\":",
     )
     _agent_params_json(io, fig.params)
+    # split the rendered images from the plotted-data CSV (the `:table` pseudo-format): images are the
+    # vision channel, `data` is the cheap text channel an LLM reads to reconcile a claim against numbers.
     print(io, ",\"assets\":[")
-    for (i, a) in enumerate(fig.assets)
+    datacsv = nothing
+    imgs = String[]
+    for a in fig.assets
+        endswith(lowercase(a), ".csv") ? (datacsv = a) : push!(imgs, a)
+    end
+    for (i, a) in enumerate(imgs)
         i == 1 || print(io, ",")
         print(io, _jsonstr(replace(relpath(a, ctx.outdir), '\\' => '/')))
     end
-    print(io, "],\"comments\":[")
+    print(
+        io,
+        "],\"data\":",
+        if datacsv === nothing
+            "null"
+        else
+            _jsonstr(replace(relpath(datacsv, ctx.outdir), '\\' => '/'))
+        end,
+        ",\"comments\":[",
+    )
     for (i, c) in enumerate(get(ctx.comments, Symbol(fig.anchor), Comment[]))
         i == 1 || print(io, ",")
         print(io, "{\"author\":", _jsonstr(c.author), ",\"text\":", _jsonstr(c.text), "}")
@@ -202,8 +219,13 @@ function _agent_md_figs(io, figs, outdir, comments)
         println(io, "- [fig: ", fig.id, "] ", fig.caption)
         isempty(fig.code) || println(io, "  - code: `", fig.code, "`")
         fig.params === nothing || println(io, "  - data: ", _params_inline(fig.params))
-        isempty(fig.assets) ||
-            println(io, "  - asset: ", replace(relpath(fig.assets[1], outdir), '\\' => '/'))
+        imgs = filter(a -> !endswith(lowercase(a), ".csv"), fig.assets)
+        isempty(imgs) ||
+            println(io, "  - asset: ", replace(relpath(imgs[1], outdir), '\\' => '/'))
+        for a in fig.assets
+            endswith(lowercase(a), ".csv") &&
+                println(io, "  - data table: ", replace(relpath(a, outdir), '\\' => '/'))
+        end
         for c in get(comments, Symbol(fig.anchor), Comment[])
             println(io, "  - note (", c.author, "): ", c.text)
         end
