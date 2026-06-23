@@ -67,8 +67,11 @@ end
 
 # A figure's plotted data as an inline table preview (header + native-typed rows + total row count),
 # parsed from its CSV — the "figure presented as a table" for an LLM (figure_as_table).
-function _emit_figure_table(io, csvpath)
-    t = _read_csv_table(csvpath)
+_emit_figure_table(io, csvpath) = _emit_table_obj(io, _read_csv_table(csvpath))
+
+# Emit a `(header, rows, total)` table object as JSON (the CSV path and the eager-`data=` path
+# share this). `nothing` -> JSON null.
+function _emit_table_obj(io, t)
     t === nothing && return print(io, "null")
     print(io, "{\"header\":[")
     for (i, h) in enumerate(t.header)
@@ -125,7 +128,9 @@ function emit_figure(theme::AgentBase, fig, ctx)
         end,
         ",\"table\":",
     )
-    if figure_as_table(theme) && datacsv !== nothing
+    if figure_as_table(theme) && fig.data !== nothing
+        _emit_table_obj(io, _table_from_data(fig.data))   # from eager data — no plot built
+    elseif figure_as_table(theme) && datacsv !== nothing
         _emit_figure_table(io, datacsv)
     else
         print(io, "null")
@@ -210,6 +215,10 @@ end
 function _agent_figs!(theme::AgentBase, figs, assetdir, ctx)
     fmts = figure_formats(theme)
     for fig in figs
+        # A figure carrying eager `data=` needs no materialize — its table comes from the data, so
+        # `gen()` (and thus the plotting backend) is never touched. This is what makes agent.json
+        # producible Plots/Makie-free.
+        fig.data === nothing || continue
         try
             materialize!(fig, joinpath(assetdir, fig.anchor), fmts, ctx.cache)
         catch e
@@ -323,9 +332,10 @@ function _params_inline(params)
     return join(("$k=$v" for (k, v) in desc), ", ")
 end
 
-# Inline a figure's data as a markdown-table preview (figure_as_table), parsed from its CSV asset.
-function _agent_md_data_table(io, csvpath)
-    t = _read_csv_table(csvpath)
+# Inline a figure's data as a markdown-table preview (figure_as_table), from its CSV asset or its
+# eager `data=` (the latter needs no plot materialized).
+_agent_md_data_table(io, csvpath) = _agent_md_table_obj(io, _read_csv_table(csvpath))
+function _agent_md_table_obj(io, t)
     t === nothing && return nothing
     println(io)
     println(io, "| ", join(t.header, " | "), " |")
@@ -350,10 +360,15 @@ function _agent_md_fig(io, fig, outdir, comments, as_table)
     for a in fig.assets
         endswith(lowercase(a), ".csv") && (csv = a)
     end
-    if csv !== nothing
+    tbl = if fig.data !== nothing
+        _table_from_data(fig.data)
+    else
+        (csv !== nothing ? _read_csv_table(csv) : nothing)
+    end
+    if tbl !== nothing
         if as_table
-            _agent_md_data_table(io, csv)   # present the figure AS its data table
-        else
+            _agent_md_table_obj(io, tbl)   # present the figure AS its data table
+        elseif csv !== nothing
             println(io, "  - data table: ", replace(relpath(csv, outdir), '\\' => '/'))
         end
     end

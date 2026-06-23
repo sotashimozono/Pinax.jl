@@ -110,6 +110,9 @@ mutable struct Figure
     code::String          # @figure expression source
     thumbnail::Bool       # thumbnail=true marker
     assets::Vector{String}
+    data::Any             # eager plotted-data (`@figure … data=(; x, y[, series])`) | nothing.
+    # When set, the agent backend emits the figure's data table from THIS — no `gen()`, hence no
+    # plotting backend — so the LLM artifact (agent.json) is producible Plots/Makie-free.
 end
 
 """
@@ -513,7 +516,7 @@ macro figure(args...)
         if a isa Expr &&
             a.head === :(=) &&
             a.args[1] isa Symbol &&
-            a.args[1] in (:params, :caption, :id, :thumbnail)
+            a.args[1] in (:params, :caption, :id, :thumbnail, :data)
             push!(kws, a)
         elseif expr === nothing
             expr = a
@@ -534,11 +537,15 @@ end
 # Returns `nothing` if neither is open.
 _current_container() = CTX.section !== nothing ? CTX.section : CTX.page
 
-function _push_figure!(; gen, code, params=nothing, caption="", id=nothing, thumbnail=false)
+function _push_figure!(;
+    gen, code, params=nothing, caption="", id=nothing, thumbnail=false, data=nothing
+)
     c = _current_container()
     c === nothing && error("@figure outside of a @section or @page")
     fid = _fig_id(c, id, params)
-    fig = Figure(fid, _anchor(fid), string(caption), params, gen, code, thumbnail, String[])
+    fig = Figure(
+        fid, _anchor(fid), string(caption), params, gen, code, thumbnail, String[], data
+    )
     push!(c.figures, fig)
     push!(c.content, :figure => length(c.figures))
     return fig

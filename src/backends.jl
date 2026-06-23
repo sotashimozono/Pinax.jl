@@ -160,6 +160,41 @@ function _read_csv_table(path; maxrows::Int=20)
     return (header=header, rows=rows, total=total)
 end
 
+# Normalize a `@figure … data=` NamedTuple into a list of `(; label, x, y)` series. Accepts the
+# `_figure_table` shape `(; series=[(; label, x, y)], …)` or a convenience `(; x, y[, label])`.
+function _series_of(data)
+    if hasproperty(data, :series)
+        out = NamedTuple[]
+        for (i, s) in enumerate(data.series)
+            lbl = hasproperty(s, :label) ? string(s.label) : "y$(i)"
+            push!(out, (; label=lbl, x=s.x, y=s.y))
+        end
+        return out
+    elseif hasproperty(data, :x) && hasproperty(data, :y)
+        lbl = hasproperty(data, :label) ? string(data.label) : "y"
+        return [(; label=lbl, x=data.x, y=data.y)]
+    end
+    return error(
+        "Pinax: @figure data= needs `series=[(; label, x, y)]` or `(; x, y[, label])`."
+    )
+end
+
+# Eager `data=` → the same `(header, rows, total)` long-format the agent backend gets from a
+# materialized CSV — but WITHOUT building the plot (no plotting backend needed). Numeric `x`/`y`
+# stay native (the agent JSON emits typed rows); `rows` is uniformly downsampled to <= `maxrows`.
+function _table_from_data(data; maxrows::Int=20)
+    rows = Vector{Any}[]
+    for s in _series_of(data)
+        n = min(length(s.x), length(s.y))
+        for i in 1:n
+            push!(rows, Any[s.label, s.x[i], s.y[i]])
+        end
+    end
+    total = length(rows)
+    sel = total > maxrows ? rows[1:cld(total, maxrows):total] : rows
+    return (header=["series", "x", "y"], rows=sel, total=total)
+end
+
 """
     _materialize(fig, base, fmts) -> Vector{String}
 
