@@ -114,7 +114,8 @@ export class Atlas {
         if (pid) out.push(`\n## [part ${pid}] ${partOf.get(pid)?.title ?? pid}`);
       }
       const summary = page.summary ? ` — ${page.summary}` : "";
-      out.push(`\n### [page ${page.id}] ${page.title}${summary}`);
+      const status = page.status && page.status !== "final" ? ` [status: ${page.status}]` : "";
+      out.push(`\n### [page ${page.id}] ${page.title}${status}${summary}`);
       emitContent(page);
       for (const sec of page.sections) {
         out.push(`#### [section ${sec.id}] ${sec.title}`);

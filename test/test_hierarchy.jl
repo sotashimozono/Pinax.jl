@@ -176,3 +176,39 @@ using Test
         @test occursin("<div class=\"banner\">hi</div>", html)
     end
 end
+
+# `status` tags a page's maturity (`:final` shaped result vs `:trial` raw experiment attempt). Pages
+# inherit the enclosing `@part`'s status default unless they override it; the agent backend exposes
+# it as `"status"` (RAG/registry filtering) and the gallery badges non-`:final` pages.
+@testset "page status: trial vs final" begin
+    tmp = mktempdir()
+    Pinax.reset!(; title="status")
+    @part :proc "Trials" status=:trial begin
+        @page :log "Log" begin
+            @desc md"raw"
+        end
+        @page :keep "Keep" status=:final begin   # explicit override inside a trial part
+            @desc md"override"
+        end
+    end
+    @page :res "Result" begin
+        @desc md"curated"
+    end
+    pages = Dict(p.id => p for p in Pinax.current_document().pages)
+    @test pages[:log].status == :trial       # inherited from the part
+    @test pages[:keep].status == :final      # explicit override wins
+    @test pages[:res].status == :final       # default outside any part
+
+    ap = Pinax.render(; out=joinpath(tmp, "agent"), theme=:agent)
+    j = read(ap, String)
+    @test occursin("\"status\":\"trial\"", j)
+    @test occursin("\"status\":\"final\"", j)
+    md = read(joinpath(tmp, "agent", "agent.md"), String)
+    @test occursin("[status: trial]", md)         # trial page marked
+    @test !occursin("[status: final]", md)        # default not noised up
+
+    idx = read(
+        joinpath(Pinax.render(; out=joinpath(tmp, "site")) |> dirname, "index.html"), String
+    )
+    @test occursin("card-status", idx)            # gallery badges the trial page
+end

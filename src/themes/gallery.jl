@@ -133,6 +133,7 @@ const _GALLERY_CSS = """
   .card-thumb-pdf{width:100%;height:100%;border:0;background:#fff;pointer-events:none}
   .card-body{padding:.7rem .9rem}
   .card-title{font-weight:600;font-size:1.05rem}
+  .card-status{display:inline-block;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.03em;color:#9a6700;background:#fff8c5;border:1px solid #eac54f;border-radius:6px;padding:0 .35rem;margin-left:.4rem;vertical-align:middle}
   .card-summary{color:#555;font-size:.9rem;margin-top:.2rem}
   .card-sections{margin-top:.5rem;font-size:.85rem;color:#57606a}
   .card-sections .sec-item{padding:.1rem 0}
@@ -792,6 +793,11 @@ function _emit_cards(doc::Document, io, outdir, bookmarks; rich::Bool=false)
             io,
             "<div class=\"card-body\"><div class=\"card-title\">",
             _esc(pg.title),
+            if pg.status === :final
+                ""
+            else
+                string(" <span class=\"card-status\">", _esc(string(pg.status)), "</span>")
+            end,
             "</div>",
         )
         pg.summary === nothing ||

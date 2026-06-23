@@ -64,6 +64,7 @@ export const PageZ = z
     id: z.string(),
     title: z.string(),
     part: z.string().nullable(),
+    status: z.string().optional(), // maturity tag: "final" (shaped/curated) vs "trial" (experiment attempt)
     summary: z.string().nullable().optional(),
     desc: z.string().nullable(),
     figures: z.array(FigureZ),

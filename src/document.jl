@@ -165,6 +165,8 @@ mutable struct Page
     layout::Union{Symbol,Nothing}    # :grid|:single|:wide hint for the page-level figure grid
     tables::Vector{Table}            # page-level @table artifacts (page-as-leaf)
     content::Vector{Pair{Symbol,Int}}  # declaration order of figures/tables/panels
+    status::Symbol                   # maturity tag a backend/registry interprets: :final (default, the
+    # shaped/curated page) vs :trial (a raw experiment attempt). Pinax only carries it.
 end
 
 "Implicit top level (the catalogue). Order = tree position; numbers are not stored (numbering is the theme's job)."
@@ -173,6 +175,7 @@ mutable struct Document
     pages::Vector{Page}
     parts::Vector{Pair{Symbol,String}}   # ordered @part registry: id => title (navigation groups)
     part_descs::Dict{Symbol,Desc}        # @part id => overview description (markdown), shown on the index
+    part_status::Dict{Symbol,Symbol}     # @part id => default status its pages inherit (e.g. :trial)
     refs::Dict{Symbol,Any}        # label -> node (filled in by resolve)
     bib::Dict{Symbol,Any}         # @cite resolution table (later)
     diag::Diagnostics
@@ -184,6 +187,7 @@ function Document(meta::DocMeta=DocMeta())
         Page[],
         Pair{Symbol,String}[],
         Dict{Symbol,Desc}(),
+        Dict{Symbol,Symbol}(),
         Dict{Symbol,Any}(),
         Dict{Symbol,Any}(),
         Diagnostics(),
@@ -362,7 +366,15 @@ end
 
 # ============================================================ structure macros
 
-"A page. `@page :id \"Title\" [summary=…] begin … end`"
+"""
+A page. `@page :id "Title" [summary=…] [layout=…] [status=…] begin … end`
+
+`status` tags the page's maturity so a backend or registry can treat trial and result differently:
+`:final` (default — the shaped/curated page) vs `:trial` (a raw experiment attempt). Pinax only carries
+the tag (any `Symbol` is accepted, e.g. `:experimental`/`:draft`); the agent backend exposes it as
+`"status"` for RAG/Archeion filtering and the gallery badges non-`:final` pages. A page inherits its
+enclosing `@part`'s status default unless it sets its own.
+"""
 macro page(args...)
     length(args) >= 3 || error("@page needs :id, \"title\", and a begin…end body")
     id, title, body = args[1], args[2], args[end]
@@ -378,13 +390,16 @@ macro page(args...)
     end
 end
 
-function _enter_page!(id::Symbol, title; summary=nothing, layout=nothing)
+function _enter_page!(id::Symbol, title; summary=nothing, layout=nothing, status=nothing)
     layout === nothing ||
         layout in (:grid, :single, :wide) ||
         error(
             "Pinax: @page layout= must be :grid, :single, or :wide (got $(repr(layout)))."
         )
     doc = _ensure_document!()
+    # status resolution: explicit @page status= wins; else inherit the open @part's
+    # default status; else :final (the ordinary shaped/curated page).
+    st = status === nothing ? get(doc.part_status, CTX.part, :final) : Symbol(status)
     pg = Page(
         id,
         string(title),
@@ -400,6 +415,7 @@ function _enter_page!(id::Symbol, title; summary=nothing, layout=nothing)
         layout,
         Table[],
         Pair{Symbol,Int}[],
+        st,
     )
     push!(doc.pages, pg)
     CTX.page = pg
@@ -413,6 +429,8 @@ A navigation group of pages (LaTeX `\\part`). `@part :id \"Title\" [desc=md\"…
 pages declared inside belong to this part and are grouped (collapsibly) under it in the index and nav.
 `desc=` is an overview shown beneath the part heading on the index (what this whole group covers).
 A part is NOT a file; each `@page` (or top-level `@section`) inside it is still its own HTML page.
+`status=` sets a default maturity (e.g. `:trial`) that the part's pages inherit — so a whole
+"Trials / experiment log" group is declared once, the shaped result living in a separate part.
 """
 macro part(args...)
     length(args) >= 3 || error("@part needs :id, \"title\", and a begin…end body")
@@ -429,11 +447,12 @@ macro part(args...)
     end
 end
 
-function _enter_part!(id::Symbol, title; desc=nothing)
+function _enter_part!(id::Symbol, title; desc=nothing, status=nothing)
     doc = _ensure_document!()
     # register (id => title) once, in declaration order, for the grouped navigation
     any(p -> first(p) === id, doc.parts) || push!(doc.parts, id => string(title))
     desc === nothing || (doc.part_descs[id] = Desc(string(desc)))
+    status === nothing || (doc.part_status[id] = Symbol(status))   # default status its pages inherit
     CTX.part = id
     CTX.page = nothing
     CTX.section = nothing

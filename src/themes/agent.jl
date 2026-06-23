@@ -263,6 +263,8 @@ function emit_page(theme::AgentBase, pg, ctx)
         _jsonstr(pg.title),
         ",\"part\":",
         pg.part === nothing ? "null" : _jsonstr(string(pg.part)),
+        ",\"status\":",
+        _jsonstr(string(pg.status)),
         ",\"summary\":",
         pg.summary === nothing ? "null" : _jsonstr(pg.summary),
         ",\"desc\":",
@@ -401,7 +403,8 @@ function _agent_markdown(doc::Document, outdir, comments, as_table)
                 d === nothing || println(io, d.source)
             end
         end
-        println(io, "\n### ", pg.title, "  [id: ", pg.id, "]")
+        badge = pg.status === :final ? "" : "  [status: $(pg.status)]"
+        println(io, "\n### ", pg.title, "  [id: ", pg.id, "]", badge)
         pg.summary === nothing || println(io, "_", pg.summary, "_")
         pg.desc === nothing || println(io, pg.desc.source)
         _agent_md_content(io, pg, outdir, comments, as_table)
