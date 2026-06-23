@@ -33,7 +33,7 @@ _has_parse_error(ex) = ex isa Expr && (ex.head === :error || any(_has_parse_erro
 
     @testset "figure object -> pinax_save per requested format" begin
         fig = Pinax.Figure(
-            :f, "f", "", nothing, () -> MockFig("z"), "code", false, String[]
+            :f, "f", "", nothing, () -> MockFig("z"), "code", false, String[], nothing
         )
         base = joinpath(tmp, "m", "f")
         out = Pinax._materialize(fig, base, [:svg, :pdf])
@@ -67,7 +67,9 @@ _has_parse_error(ex) = ex isa Expr && (ex.head === :error || any(_has_parse_erro
     end
 
     @testset "_materialize errors on a non-file, non-figure value" begin
-        fig = Pinax.Figure(:bad, "bad", "", nothing, () -> 42, "code", false, String[])
+        fig = Pinax.Figure(
+            :bad, "bad", "", nothing, () -> 42, "code", false, String[], nothing
+        )
         @test_throws ErrorException Pinax._materialize(fig, joinpath(tmp, "bad"), [:svg])
     end
 
@@ -91,7 +93,7 @@ end
 
     @testset ":table pseudo-format writes a CSV of the plotted data" begin
         fig = Pinax.Figure(
-            :f, "f", "", nothing, () -> MockFig("z"), "code", false, String[]
+            :f, "f", "", nothing, () -> MockFig("z"), "code", false, String[], nothing
         )
         base = joinpath(tmp, "f")
         out = Pinax._materialize(fig, base, [:svg, :table])
@@ -105,7 +107,7 @@ end
     @testset "a pre-made file path exposes no data (no csv)" begin
         src = joinpath(tmp, "p.svg")
         write(src, "<svg/>")
-        fig = Pinax.Figure(:g, "g", "", nothing, () -> src, "c", false, String[])
+        fig = Pinax.Figure(:g, "g", "", nothing, () -> src, "c", false, String[], nothing)
         out = Pinax._materialize(fig, joinpath(tmp, "g"), [:svg, :table])
         @test all(p -> !endswith(p, ".csv"), out)
     end
@@ -193,4 +195,36 @@ end
         @test t.rows[2][3] === 2.5        # a real number is still re-typed
         @test !occursin('\n', Pinax._csv_field("a\nb"))   # writer flattens newlines (no line-spanning field)
     end
+end
+
+# `@figure … data=` carries the plotted data eagerly, so the agent backend emits the figure-as-table
+# from it WITHOUT calling gen() — i.e. agent.json is producible with no plotting backend. We prove
+# gen is never called by making it throw; render(:agent) must still succeed.
+@testset "figure data=: agent table without building the plot (Plots-free LLM face)" begin
+    tmp = mktempdir()
+    Pinax.reset!(; title="d")
+    @page :p "P" begin
+        @figure error("gen must not run for a data= figure") data = (
+            x=[1.0, 2.0, 3.0], y=[10.0, 20.0, 30.0]
+        ) caption = "f"
+    end
+    ap = Pinax.render(; out=joinpath(tmp, "agent"), theme=:agent)   # must NOT throw (gen skipped)
+    j = read(ap, String)
+    @test occursin("\"table\":{\"header\":[\"series\",\"x\",\"y\"]", j)  # table from data=
+    @test occursin("[\"y\",1.0,10.0]", j)                                # native rows, no CSV round-trip
+    @test occursin("\"total\":3", j)
+    @test occursin("\"assets\":[]", j)                                   # never materialized → no asset
+    md = read(joinpath(tmp, "agent", "agent.md"), String)
+    @test occursin("| series | x | y |", md)                            # inline md table from data=
+    @test occursin("| y | 1.0 | 10.0 |", md)
+
+    # multi-series + the convenience reduces to the same long format
+    Pinax.reset!(; title="d2")
+    @page :q "Q" begin
+        @figure error("no gen") data = (
+            series=[(; label="a", x=[0, 1], y=[2, 3]), (; label="b", x=[0, 1], y=[4, 5])],
+        )
+    end
+    j2 = read(Pinax.render(; out=joinpath(tmp, "a2"), theme=:agent), String)
+    @test occursin("[\"a\",0,2]", j2) && occursin("[\"b\",1,5]", j2)
 end

@@ -107,6 +107,8 @@ const _GALLERY_CSS = """
   figure img{width:100%;height:auto}
   figure iframe.pinax-pdf{width:100%;height:460px;border:1px solid #eee;border-radius:4px;background:#fff}
   a.pinax-open{display:inline-block;font-size:.85rem;margin-top:.3rem;color:#0366d6;text-decoration:none}
+  a.pinax-dl{display:inline-block;font-size:.8rem;margin:.3rem .5rem 0 0;color:#0366d6;text-decoration:none;border:1px solid #d0d7de;border-radius:6px;padding:.05rem .45rem}
+  a.pinax-dl:hover{background:#f3f4f6}
   figcaption{font-size:.9rem;color:#444;margin-top:.4rem}
   .diag{border-left:4px solid #d33;padding-left:.8rem}
   .pinax-eq{display:block}
@@ -1280,6 +1282,15 @@ function emit_figure(theme::GalleryBase, fig, ctx)
             # Raster + animated raster (gif/apng/webp) render inline as <img> — the browser plays the
             # animation. A file-path @figure ("…/anim.gif") is the usual way to embed a precomputed GIF.
             println(io, "<img src=\"", _esc(rel), "\" alt=\"", _esc(string(fig.id)), "\">")
+            # a download affordance so the figure can be saved while viewing the gallery itself
+            println(
+                io,
+                "<a class=\"pinax-dl\" href=\"",
+                _esc(rel),
+                "\" download title=\"download ",
+                _esc(basename(a)),
+                "\">⤓ download</a>",
+            )
         elseif ext == "pdf"
             # Embed PDFs via the browser's native viewer (notes 04 §3: "pdf -> iframe"), with an
             # open/download fallback for browsers that block inline PDFs (e.g. some file:// setups).
@@ -1298,6 +1309,14 @@ function emit_figure(theme::GalleryBase, fig, ctx)
                 "\" target=\"_blank\" rel=\"noopener\">open ",
                 _esc(basename(a)),
                 " ↗</a>",
+            )
+            println(
+                io,
+                "<a class=\"pinax-dl\" href=\"",
+                _esc(rel),
+                "\" download title=\"download ",
+                _esc(basename(a)),
+                "\">⤓ download</a>",
             )
         else
             println(io, "<a href=\"", _esc(rel), "\">", _esc(basename(a)), "</a>")
