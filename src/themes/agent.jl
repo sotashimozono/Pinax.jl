@@ -38,9 +38,11 @@ struct AgentCtx
     rdiag::Vector{DiagEntry}
 end
 
-# A JSON scalar for a param value: numbers/bools stay native (a tool reads 16, not "16"); NaN/Inf are
-# not valid JSON numbers so they're quoted; anything else is stringified.
+# A JSON scalar for a param/cell value: numbers/bools stay native (a tool reads 16, not "16");
+# missing/nothing map to JSON null; NaN/Inf are not valid JSON numbers so they're quoted; anything
+# else is stringified.
 _agent_jsonval(::Missing) = "null"
+_agent_jsonval(::Nothing) = "null"
 _agent_jsonval(v::Bool) = v ? "true" : "false"
 _agent_jsonval(v::Integer) = string(v)
 _agent_jsonval(v::Real) = isfinite(v) ? string(v) : _jsonstr(string(v))

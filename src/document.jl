@@ -522,8 +522,8 @@ end
 
 """
 Register a table artifact — first-class tabular data (sibling to `@figure`). `data` may be a
-NamedTuple of columns `(T=…, M=…)`, a `Matrix` (with `header=`), or a `Vector` of NamedTuple rows.
-`@table data [caption=…] [id=…] [header=…] [params=…]`.
+NamedTuple of columns `(T=…, M=…)`, a `Matrix` (with `header=`), a `Vector` of NamedTuple rows, or a
+`Vector` of row-vectors/tuples (with `header=`). `@table data [caption=…] [id=…] [header=…] [params=…]`.
 """
 macro table(args...)
     isempty(args) && error("@table needs a data expression")
@@ -552,6 +552,13 @@ function _push_table!(; data, code, caption="", id=nothing, header=nothing, para
     c = _current_container()
     c === nothing && error("@table outside of a @section or @page")
     hdr, rows = _normalize_table(data, header)
+    if !isempty(hdr)   # every row must be header-wide (catches a wrong-length header= or ragged rows)
+        bad = findfirst(r -> length(r) != length(hdr), rows)
+        bad === nothing || error(
+            "Pinax: @table row $(bad) has $(length(rows[bad])) cells but the header has " *
+            "$(length(hdr)) columns — check `header=` length or ragged rows",
+        )
+    end
     tid = id === nothing ? _auto_table_id(c) : id
     tbl = Table(tid, _anchor(tid), string(caption), hdr, rows, code, params)
     push!(c.tables, tbl)

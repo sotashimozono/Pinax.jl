@@ -35,6 +35,7 @@ using ParamIO
     @test occursin("\"params\":{\"N\":24,\"g\":0.5}", j)   # structured data binding (NamedTuple axes)
     @test occursin("energy_fig1.svg", j)                   # the rendered asset path
     @test occursin("\"text\":\"converged\"", j)            # the id-keyed comment thread
+    @test occursin("\"tables\":[]", j)                     # every page/section carries a tables field
 
     md = read(joinpath(tmp, "agent", "agent.md"), String)
     @test occursin("[id: energy]", md)
