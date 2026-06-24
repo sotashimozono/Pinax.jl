@@ -186,6 +186,69 @@ function _agent_tables!(theme::AgentBase, tables, ctx)
     return nothing
 end
 
+# One @expect check -> a JSON object with native-typed numerics (a tool reads 4.6e-5, not "4.6e-5").
+function emit_check(::AgentBase, chk, ctx)
+    io = ctx.io
+    print(
+        io,
+        "{\"id\":",
+        _jsonstr(string(chk.id)),
+        ",\"label\":",
+        _jsonstr(chk.label),
+        ",\"got\":",
+        _agent_jsonval(chk.got),
+        ",\"want\":",
+        _agent_jsonval(chk.want),
+        ",\"delta\":",
+        _agent_jsonval(chk.delta),
+        ",\"tol\":",
+        _agent_jsonval(chk.tol),
+        ",\"kind\":",
+        _jsonstr(string(chk.kind)),
+        ",\"pass\":",
+        chk.pass ? "true" : "false",
+        "}",
+    )
+    return nothing
+end
+
+# The machine-readable verdict for a status=:benchmark page: a `benchmark` block (verdict/passed/total/
+# failed + each check) built from the page's checks. Emitted IN ADDITION to the normal page object —
+# additive, so existing agent.json fields are untouched.
+function _agent_benchmark!(theme::AgentBase, pg, ctx)
+    io = ctx.io
+    checks = pg.checks
+    npass = count(c -> c.pass, checks)
+    print(
+        io,
+        ",\"benchmark\":{\"kind\":\"benchmark\",\"id\":",
+        _jsonstr(string(pg.id)),
+        ",\"title\":",
+        _jsonstr(pg.title),
+        ",\"verdict\":",
+        _jsonstr(npass == length(checks) ? "PASS" : "FAIL"),
+        ",\"passed\":",
+        npass,
+        ",\"total\":",
+        length(checks),
+        ",\"failed\":[",
+    )
+    started = false
+    for c in checks
+        c.pass && continue
+        started && print(io, ",")
+        started = true
+        print(io, _jsonstr(string(c.id)))
+    end
+    print(io, "],\"checks\":[")
+    for (i, c) in enumerate(checks)
+        i == 1 || print(io, ",")
+        emit_check(theme, c, ctx)
+    end
+    print(io, "]}")
+    return nothing
+end
+
 # A page/section's content in declaration order as {kind,id} — lets a consumer reconstruct the
 # interleave of figures and tables (the typed `figures`/`tables` arrays preserve within-type order).
 function _agent_content!(c, ctx)
@@ -292,7 +355,10 @@ function emit_page(theme::AgentBase, pg, ctx)
         j == 1 || print(io, ",")
         emit_section(theme, sec, pg, ctx)
     end
-    print(io, "]}")
+    print(io, "]")
+    # a benchmark page additionally carries its machine-readable verdict block (the LLM contract).
+    pg.status === :benchmark && _agent_benchmark!(theme, pg, ctx)
+    print(io, "}")
     return nothing
 end
 
@@ -392,13 +458,41 @@ function _agent_md_table(io, tbl)
     return nothing
 end
 
-# A container's figures + tables in declaration order (@raw panels are HTML, skipped in the md view).
+# A single @expect check as a markdown list line (the LLM read view): a ✓/✗ badge + the numbers.
+function _agent_md_check(io, chk)
+    badge = chk.pass ? "PASS" : "FAIL"
+    println(
+        io,
+        "- [",
+        badge,
+        "] ",
+        chk.id,
+        " — ",
+        chk.label,
+        ": got ",
+        chk.got,
+        ", want ",
+        chk.want,
+        " (Δ ",
+        chk.delta,
+        " vs tol ",
+        chk.tol,
+        " ",
+        chk.kind,
+        ")",
+    )
+    return nothing
+end
+
+# A container's figures + tables + checks in declaration order (@raw panels are HTML, skipped in md view).
 function _agent_md_content(io, c, outdir, comments, as_table)
     for (kind, item) in _content_items(c)
         if kind === :figure
             _agent_md_fig(io, item, outdir, comments, as_table)
         elseif kind === :table
             _agent_md_table(io, item)
+        elseif kind === :check
+            _agent_md_check(io, item)
         end
     end
     return nothing
@@ -420,6 +514,13 @@ function _agent_markdown(doc::Document, outdir, comments, as_table)
         end
         badge = pg.status === :final ? "" : "  [status: $(pg.status)]"
         println(io, "\n### ", pg.title, "  [id: ", pg.id, "]", badge)
+        if pg.status === :benchmark
+            np = count(c -> c.pass, pg.checks)
+            verdict = np == length(pg.checks) ? "PASS" : "FAIL"
+            println(
+                io, "**", pg.title, "   ", np, "/", length(pg.checks), " ", verdict, "**"
+            )
+        end
         pg.summary === nothing || println(io, "_", pg.summary, "_")
         pg.desc === nothing || println(io, pg.desc.source)
         _agent_md_content(io, pg, outdir, comments, as_table)

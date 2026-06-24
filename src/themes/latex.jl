@@ -160,7 +160,8 @@ function _latex_emit_fig!(theme::LaTeXBase, fig, assetdir, ctx)
     return nothing
 end
 
-# Emit a container's figures + tables in declaration order (@raw panels are HTML, skipped in LaTeX).
+# Emit a container's figures + tables in declaration order (@raw panels are HTML, skipped in LaTeX;
+# @expect checks are rendered by the benchmark report, not inline).
 function _latex_emit_content!(theme::LaTeXBase, c, assetdir, ctx)
     for (kind, item) in _content_items(c)
         if kind === :figure
@@ -169,6 +170,52 @@ function _latex_emit_content!(theme::LaTeXBase, c, assetdir, ctx)
             emit_table(theme, item, ctx)
         end
     end
+    return nothing
+end
+
+# One @expect check -> a tabular row: id, label, got, want, Δ, tol, PASS/FAIL (cells escaped as text).
+function emit_check(::LaTeXBase, chk, ctx)
+    io = ctx.io
+    println(
+        io,
+        join(
+            (
+                _texesc(string(chk.id)),
+                _texesc(chk.label),
+                _texesc(_cellstr(chk.got)),
+                _texesc(_cellstr(chk.want)),
+                _texesc(_cellstr(chk.delta)),
+                _texesc(_cellstr(chk.tol)),
+                chk.pass ? "PASS" : "FAIL",
+            ),
+            " & ",
+        ),
+        " \\\\",
+    )
+    return nothing
+end
+
+# The test-report for a status=:benchmark page: a `tabular` of the checks + a verdict line.
+function _latex_benchmark!(theme::LaTeXBase, pg, ctx)
+    io = ctx.io
+    checks = pg.checks
+    npass = count(c -> c.pass, checks)
+    println(io, "\\begin{tabular}{lllllll}\\hline")
+    println(io, "id & label & got & want & \$\\Delta\$ & tol & result \\\\\\hline")
+    for chk in checks
+        emit_check(theme, chk, ctx)
+    end
+    println(io, "\\hline\\end{tabular}")
+    println(
+        io,
+        "\\par\\noindent\\textbf{Verdict: ",
+        npass == length(checks) ? "PASS" : "FAIL",
+        "} (",
+        npass,
+        "/",
+        length(checks),
+        ")",
+    )
     return nothing
 end
 
@@ -212,6 +259,8 @@ function emit_page(theme::LaTeXBase, pg, ctx)
     # a page = one \section; its page-level (page-as-leaf) desc + figures, then its subsections
     println(io, "\\section{", _texesc(pg.title), "}\\label{", pg.anchor, "}")
     pg.desc === nothing || println(io, emit_text(theme, pg.desc.source, pg.anchor, ctx))
+    # a benchmark page leads with its test-report (tabular of checks + verdict line)
+    pg.status === :benchmark && _latex_benchmark!(theme, pg, ctx)
     _latex_emit_content!(theme, pg, joinpath(ctx.outdir, "figures", pg.anchor), ctx)
     emit_comments(theme, pg.anchor, ctx)
     for sec in pg.sections
