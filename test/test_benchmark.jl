@@ -189,4 +189,82 @@ end
             id=:x, label="y", got=1.0, tol=1e-3
         )
     end
+
+    @testset "ill-posed checks error (the trust gate)" begin
+        # kind=:rel against a zero reference
+        Pinax.reset!(; title="t")
+        @test_throws ErrorException @benchmark :b "x" begin
+            @expect "R" "r" got = 1.0 want = 0.0 tol = 1e-3 kind = :rel
+        end
+        # non-finite got=
+        Pinax.reset!(; title="t")
+        @test_throws ErrorException @benchmark :b "x" begin
+            @expect "N" "n" got = NaN want = 1.0 tol = 1e-3
+        end
+        # non-finite (Inf) got=
+        Pinax.reset!(; title="t")
+        @test_throws ErrorException @benchmark :b "x" begin
+            @expect "I" "i" got = Inf want = 1.0 tol = 1e-3
+        end
+        # non-positive tol= (zero)
+        Pinax.reset!(; title="t")
+        @test_throws ErrorException @benchmark :b "x" begin
+            @expect "T" "t" got = 1.0 want = 1.0 tol = 0
+        end
+        # non-positive tol= (negative)
+        Pinax.reset!(; title="t")
+        @test_throws ErrorException @benchmark :b "x" begin
+            @expect "T" "t" got = 1.0 want = 1.0 tol = -1e-3
+        end
+    end
+
+    @testset "section-nested checks count toward the verdict" begin
+        tmp = mktempdir()
+        Pinax.reset!(; title="T")
+        @benchmark :b "x" begin
+            @section :s "S" begin
+                @expect "G" "g" got = 0.5 want = 0.0 tol = 1e-3   # abs FAIL
+            end
+        end
+        Pinax.render(; out=joinpath(tmp, "a"), theme=:agent)
+        aj = read(joinpath(tmp, "a", "agent.json"), String)
+        @test occursin("\"total\":1", aj)
+        @test occursin("\"verdict\":\"FAIL\"", aj)
+        @test occursin("\"failed\":[\"G\"]", aj)
+    end
+
+    @testset "special chars survive all backends (escaping)" begin
+        tmp = mktempdir()
+        Pinax.reset!(; title="T")
+        @benchmark :b "x" begin
+            @expect "E_1" "energy & \"gap\" <x>" got = 1.0 want = 1.0 tol = 1e-3
+        end
+        # agent.json keeps the label parseable: " is \"-escaped, and </>/& are \\u-escaped (the
+        # emitter \\u-escapes markup-significant chars so the JSON is safe to embed in HTML).
+        aj = read(Pinax.render(; out=joinpath(tmp, "a"), theme=:agent), String)
+        @test occursin("\\\"gap\\\"", aj)         # quotes escaped inside the JSON string
+        @test occursin("energy \\u0026 ", aj)      # & emitted as & (escaped, not bare)
+        @test occursin("\\u003cx\\u003e", aj)      # <x> emitted as <…> (escaped, not bare)
+        # gallery HTML entity-encodes the markup-significant chars
+        g = read(Pinax.render(; out=joinpath(tmp, "g"), theme=:gallery), String)
+        @test occursin("&amp;", g)
+        @test occursin("&lt;", g)
+        @test !occursin("energy & \"gap\" <x>", g)   # the bare label must NOT appear unescaped
+        # latex escapes _ and &
+        lx = read(Pinax.render(; out=joinpath(tmp, "l"), theme=:latex), String)
+        @test occursin("E\\_1", lx)
+        @test occursin("\\&", lx)
+    end
+
+    @testset "an empty benchmark is a vacuous PASS" begin
+        tmp = mktempdir()
+        Pinax.reset!(; title="T")
+        @benchmark :e "empty" begin end
+        aj = read(Pinax.render(; out=joinpath(tmp, "a"), theme=:agent), String)
+        @test occursin("\"total\":0", aj)
+        @test occursin("\"passed\":0", aj)
+        @test occursin("\"verdict\":\"PASS\"", aj)
+        @test occursin("\"failed\":[]", aj)
+        @test occursin("\"checks\":[]", aj)
+    end
 end

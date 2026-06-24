@@ -192,6 +192,21 @@ mutable struct Page
     # which each backend dispatches on to render a verdict / fixed test-report). Pinax only carries it.
 end
 
+# All checks on a benchmark page in declaration order: page-level @expect PLUS any inside a @section.
+_benchmark_checks(pg::Page) = vcat(pg.checks, (s.checks for s in pg.sections)...)
+
+# Single source of the verdict invariant — used by every backend so PASS/FAIL can never diverge.
+function _benchmark_verdict(checks)
+    passed = count(c -> c.pass, checks)
+    total = length(checks)
+    return (
+        passed=passed,
+        total=total,
+        verdict=(passed == total ? "PASS" : "FAIL"),
+        failed=[string(c.id) for c in checks if !c.pass],
+    )
+end
+
 "Implicit top level (the catalogue). Order = tree position; numbers are not stored (numbering is the theme's job)."
 mutable struct Document
     meta::DocMeta
@@ -450,7 +465,8 @@ _exit_page!() = (CTX.page=nothing; CTX.section=nothing)
 
 """
 A benchmark / test-set page. `@benchmark :id "Title" [summary=…] [layout=…] begin … end` — a `@page`
-whose `status` is fixed to `:benchmark`, holding `@expect` checks (plus optional `@desc`/`@figure`).
+whose `status` is fixed to `:benchmark`, holding `@expect` checks (plus any `@page` content:
+`@desc`/`@figure`/`@table`/`@section` — a `@section`'s `@expect`s count toward the verdict too).
 Each backend dispatches on the `:benchmark` status to render a verdict: a machine-readable `benchmark`
 block in `agent.json`, a fixed-layout test-report in the gallery, and a tabular + verdict line in
 LaTeX. Mirrors `@page` (it IS a page); `@expect` populates the page's `checks`.
@@ -647,11 +663,15 @@ function _push_table!(; data, code, caption="", id=nothing, header=nothing, para
 end
 
 """
-Register one PASS/FAIL check — a `@expect` (the atom of a `@benchmark` test set). The first two
-positionals are the check id (a `Symbol`, or a `String` coerced to one) and a human label; then
-`got=` (required) is the computed value, `want=` (default `0.0`) the reference, `tol=` (required) the
-tolerance, and `kind=` (default `:auto`) selects the deviation: `:rel` (relative) when there is a
+Register one PASS/FAIL check — a `@expect` (the atom of a `@benchmark` test set). The first two macro
+arguments (id, label) are the check id (a `Symbol`, or a `String` coerced to one) and a human label;
+then `got=` (required) is the computed value, `want=` (default `0.0`) the reference, `tol=` (required)
+the tolerance, and `kind=` (default `:auto`) selects the deviation: `:rel` (relative) when there is a
 nonzero reference, `:abs` (a residual against `want=0`). `@expect "E1" "energy density e" got=e want=e_ref tol=1e-2`.
+
+The tolerance is relative by default with a nonzero `want`, absolute for a residual (`want=0`);
+`kind=:rel` with `want=0` is an error, and a non-finite `got`/`want` or a non-positive `tol` is an
+error — a check is a trust gate, so an ill-posed assertion fails loudly rather than mis-reporting.
 """
 macro expect(args...)
     length(args) >= 2 || error("@expect needs an id and a \"label\" (plus kwargs)")
@@ -669,9 +689,20 @@ function _push_check!(; id, label, got, want=0.0, tol, kind=:auto)
     g = Float64(got)
     w = Float64(want)
     t = Float64(tol)
+    # a check is a TRUST gate — refuse an ill-posed assertion rather than benchmark a bad value.
+    isfinite(g) || error(
+        "@expect $(id): got= is not finite ($(g)) — fix the upstream computation; do not benchmark a non-finite value",
+    )
+    isfinite(w) || error("@expect $(id): want= is not finite ($(w))")
+    t > 0 || error("@expect $(id): tol= must be positive (got $(t))")
     # rel DEFAULT when there's a nonzero reference; a residual (want=0) is abs.
     k = kind === :auto ? (abs(w) > 0 ? :rel : :abs) : kind
     k in (:rel, :abs) || error("@expect kind= must be :rel or :abs")
+    k === :rel &&
+        abs(w) == 0 &&
+        error(
+            "@expect $(id): kind=:rel needs a nonzero want= (got 0) — use kind=:abs for a residual against zero",
+        )
     d = k === :rel ? abs(g - w) / abs(w) : abs(g - w)
     chk = Check(Symbol(id), string(label), g, w, d, t, k, d <= t)
     push!(c.checks, chk)

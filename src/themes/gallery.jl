@@ -1294,22 +1294,21 @@ end
 # check table (one emit_check `<tr>` per check). Identical layout for every benchmark (not configurable).
 function _emit_benchmark!(theme::GalleryBase, pg, ctx)
     io = ctx.io
-    checks = pg.checks
-    npass = count(c -> c.pass, checks)
-    pass = npass == length(checks)
+    checks = _benchmark_checks(pg)
+    v = _benchmark_verdict(checks)
     println(io, "<div class=\"pinax-benchmark\">")
     println(
         io,
         "<div class=\"pinax-verdict ",
-        pass ? "pinax-verdict-pass" : "pinax-verdict-fail",
+        v.verdict == "PASS" ? "pinax-verdict-pass" : "pinax-verdict-fail",
         "\">",
         _esc(pg.title),
         "   ",
-        npass,
+        v.passed,
         "/",
-        length(checks),
+        v.total,
         " ",
-        pass ? "PASS" : "FAIL",
+        v.verdict,
         "</div>",
     )
     println(

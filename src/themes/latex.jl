@@ -198,8 +198,8 @@ end
 # The test-report for a status=:benchmark page: a `tabular` of the checks + a verdict line.
 function _latex_benchmark!(theme::LaTeXBase, pg, ctx)
     io = ctx.io
-    checks = pg.checks
-    npass = count(c -> c.pass, checks)
+    checks = _benchmark_checks(pg)
+    v = _benchmark_verdict(checks)
     println(io, "\\begin{tabular}{lllllll}\\hline")
     println(io, "id & label & got & want & \$\\Delta\$ & tol & result \\\\\\hline")
     for chk in checks
@@ -209,11 +209,11 @@ function _latex_benchmark!(theme::LaTeXBase, pg, ctx)
     println(
         io,
         "\\par\\noindent\\textbf{Verdict: ",
-        npass == length(checks) ? "PASS" : "FAIL",
+        v.verdict,
         "} (",
-        npass,
+        v.passed,
         "/",
-        length(checks),
+        v.total,
         ")",
     )
     return nothing

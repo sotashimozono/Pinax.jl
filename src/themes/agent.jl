@@ -206,19 +206,19 @@ function emit_check(::AgentBase, chk, ctx)
         ",\"kind\":",
         _jsonstr(string(chk.kind)),
         ",\"pass\":",
-        chk.pass ? "true" : "false",
+        _agent_jsonval(chk.pass),
         "}",
     )
     return nothing
 end
 
 # The machine-readable verdict for a status=:benchmark page: a `benchmark` block (verdict/passed/total/
-# failed + each check) built from the page's checks. Emitted IN ADDITION to the normal page object —
-# additive, so existing agent.json fields are untouched.
+# failed + each check) built from the page's checks. The `benchmark` block is a NEW key on the page
+# object — strict-schema consumers (pinax-mcp) must co-evolve (see CLAUDE.md §agent.json contract).
 function _agent_benchmark!(theme::AgentBase, pg, ctx)
     io = ctx.io
-    checks = pg.checks
-    npass = count(c -> c.pass, checks)
+    checks = _benchmark_checks(pg)
+    v = _benchmark_verdict(checks)
     print(
         io,
         ",\"benchmark\":{\"kind\":\"benchmark\",\"id\":",
@@ -226,19 +226,16 @@ function _agent_benchmark!(theme::AgentBase, pg, ctx)
         ",\"title\":",
         _jsonstr(pg.title),
         ",\"verdict\":",
-        _jsonstr(npass == length(checks) ? "PASS" : "FAIL"),
+        _jsonstr(v.verdict),
         ",\"passed\":",
-        npass,
+        v.passed,
         ",\"total\":",
-        length(checks),
+        v.total,
         ",\"failed\":[",
     )
-    started = false
-    for c in checks
-        c.pass && continue
-        started && print(io, ",")
-        started = true
-        print(io, _jsonstr(string(c.id)))
+    for (i, fid) in enumerate(v.failed)
+        i == 1 || print(io, ",")
+        print(io, _jsonstr(fid))
     end
     print(io, "],\"checks\":[")
     for (i, c) in enumerate(checks)
@@ -515,11 +512,8 @@ function _agent_markdown(doc::Document, outdir, comments, as_table)
         badge = pg.status === :final ? "" : "  [status: $(pg.status)]"
         println(io, "\n### ", pg.title, "  [id: ", pg.id, "]", badge)
         if pg.status === :benchmark
-            np = count(c -> c.pass, pg.checks)
-            verdict = np == length(pg.checks) ? "PASS" : "FAIL"
-            println(
-                io, "**", pg.title, "   ", np, "/", length(pg.checks), " ", verdict, "**"
-            )
+            v = _benchmark_verdict(_benchmark_checks(pg))
+            println(io, "**", pg.title, "   ", v.passed, "/", v.total, " ", v.verdict, "**")
         end
         pg.summary === nothing || println(io, "_", pg.summary, "_")
         pg.desc === nothing || println(io, pg.desc.source)
