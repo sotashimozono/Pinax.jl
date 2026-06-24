@@ -132,6 +132,23 @@ end
 # A table cell as display text (HTML/LaTeX backends; the agent backend keeps native JSON types).
 _cellstr(x) = x === missing ? "" : string(x)
 
+"""
+A single PASS/FAIL check (a `@expect`) — one assertion of a computed value against a reference, the
+atom of a `@benchmark` test set. `delta` is the resolved deviation (relative or absolute per `kind`),
+`pass` is `delta <= tol`. Renders to a row of the gallery's fixed test-report, a LaTeX tabular row,
+and a native-typed JSON object in `agent.json` (the machine-readable verdict).
+"""
+mutable struct Check
+    id::Symbol
+    label::String
+    got::Float64
+    want::Float64
+    delta::Float64     # resolved (rel or abs) deviation
+    tol::Float64
+    kind::Symbol       # :rel or :abs (resolved; never :auto in the struct)
+    pass::Bool
+end
+
 "A section (a group of figures + a description)."
 mutable struct Section
     id::Symbol
@@ -145,7 +162,8 @@ mutable struct Section
     figures::Vector{Figure}
     panels::Vector{String}           # @raw HTML blocks (project-specific UI escape hatch, notes 06 §6)
     tables::Vector{Table}            # @table artifacts
-    content::Vector{Pair{Symbol,Int}}  # declaration order: (:figure|:table|:panel) => index into the list above
+    checks::Vector{Check}            # @expect PASS/FAIL checks (a @benchmark test set)
+    content::Vector{Pair{Symbol,Int}}  # declaration order: (:figure|:table|:panel|:check) => index into the list above
 end
 
 """
@@ -167,9 +185,11 @@ mutable struct Page
     panels::Vector{String}           # page-level @raw blocks
     layout::Union{Symbol,Nothing}    # :grid|:single|:wide hint for the page-level figure grid
     tables::Vector{Table}            # page-level @table artifacts (page-as-leaf)
-    content::Vector{Pair{Symbol,Int}}  # declaration order of figures/tables/panels
+    checks::Vector{Check}            # page-level @expect checks (a @benchmark test set)
+    content::Vector{Pair{Symbol,Int}}  # declaration order of figures/tables/panels/checks
     status::Symbol                   # maturity tag a backend/registry interprets: :final (default, the
-    # shaped/curated page) vs :trial (a raw experiment attempt). Pinax only carries it.
+    # shaped/curated page) vs :trial (a raw experiment attempt) vs :benchmark (a `@benchmark` test set,
+    # which each backend dispatches on to render a verdict / fixed test-report). Pinax only carries it.
 end
 
 "Implicit top level (the catalogue). Order = tree position; numbers are not stored (numbering is the theme's job)."
@@ -417,6 +437,7 @@ function _enter_page!(id::Symbol, title; summary=nothing, layout=nothing, status
         String[],
         layout,
         Table[],
+        Check[],
         Pair{Symbol,Int}[],
         st,
     )
@@ -426,6 +447,33 @@ function _enter_page!(id::Symbol, title; summary=nothing, layout=nothing, status
     return pg
 end
 _exit_page!() = (CTX.page=nothing; CTX.section=nothing)
+
+"""
+A benchmark / test-set page. `@benchmark :id "Title" [summary=…] [layout=…] begin … end` — a `@page`
+whose `status` is fixed to `:benchmark`, holding `@expect` checks (plus optional `@desc`/`@figure`).
+Each backend dispatches on the `:benchmark` status to render a verdict: a machine-readable `benchmark`
+block in `agent.json`, a fixed-layout test-report in the gallery, and a tabular + verdict line in
+LaTeX. Mirrors `@page` (it IS a page); `@expect` populates the page's `checks`.
+"""
+macro benchmark(args...)
+    length(args) >= 3 || error("@benchmark needs :id, \"title\", and a begin…end body")
+    id, title, body = args[1], args[2], args[end]
+    # a @benchmark is a @page pinned to status=:benchmark — append it to whatever kwargs were given
+    enter = _call(
+        :_enter_page!,
+        (esc(id), esc(title)),
+        vcat(_kwspecs(args[3:(end - 1)]), Expr(:kw, :status, QuoteNode(:benchmark))),
+    )
+    return quote
+        $enter
+        try
+            $(esc(body))
+        finally
+            _exit_page!()
+        end
+        nothing
+    end
+end
 
 """
 A navigation group of pages (LaTeX `\\part`). `@part :id \"Title\" [desc=md\"…\"] begin … end` — the
@@ -499,6 +547,7 @@ function _enter_section!(id::Symbol, title; by=nothing, summary=nothing, layout=
         Figure[],
         String[],
         Table[],
+        Check[],
         Pair{Symbol,Int}[],
     )
     push!(pg.sections, sec)
@@ -597,7 +646,40 @@ function _push_table!(; data, code, caption="", id=nothing, header=nothing, para
     return tbl
 end
 
-# The container's content (figures / tables / @raw panels) in declaration order, as (kind, item) pairs.
+"""
+Register one PASS/FAIL check — a `@expect` (the atom of a `@benchmark` test set). The first two
+positionals are the check id (a `Symbol`, or a `String` coerced to one) and a human label; then
+`got=` (required) is the computed value, `want=` (default `0.0`) the reference, `tol=` (required) the
+tolerance, and `kind=` (default `:auto`) selects the deviation: `:rel` (relative) when there is a
+nonzero reference, `:abs` (a residual against `want=0`). `@expect "E1" "energy density e" got=e want=e_ref tol=1e-2`.
+"""
+macro expect(args...)
+    length(args) >= 2 || error("@expect needs an id and a \"label\" (plus kwargs)")
+    id, label = args[1], args[2]
+    return _call(
+        :_push_check!,
+        (),
+        vcat(Expr(:kw, :id, esc(id)), Expr(:kw, :label, esc(label)), _kwspecs(args[3:end])),
+    )
+end
+
+function _push_check!(; id, label, got, want=0.0, tol, kind=:auto)
+    c = _current_container()
+    c === nothing && error("@expect outside of a @benchmark/@section/@page")
+    g = Float64(got)
+    w = Float64(want)
+    t = Float64(tol)
+    # rel DEFAULT when there's a nonzero reference; a residual (want=0) is abs.
+    k = kind === :auto ? (abs(w) > 0 ? :rel : :abs) : kind
+    k in (:rel, :abs) || error("@expect kind= must be :rel or :abs")
+    d = k === :rel ? abs(g - w) / abs(w) : abs(g - w)
+    chk = Check(Symbol(id), string(label), g, w, d, t, k, d <= t)
+    push!(c.checks, chk)
+    push!(c.content, :check => length(c.checks))
+    return chk
+end
+
+# The container's content (figures / tables / @raw panels / @expect checks) in declaration order, as (kind, item) pairs.
 function _content_items(c)
     return [(
         k,
@@ -605,6 +687,8 @@ function _content_items(c)
             c.figures[i]
         elseif k === :table
             c.tables[i]
+        elseif k === :check
+            c.checks[i]
         else
             c.panels[i]
         end,

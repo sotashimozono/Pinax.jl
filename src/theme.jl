@@ -53,6 +53,9 @@ function emit_figure end
 "Render one table artifact (an HTML/LaTeX table, or a JSON object with native-typed rows). `emit_table(theme, table, ctx)`."
 function emit_table end
 
+"Render one `@expect` check (a gallery `<tr>`, a LaTeX tabular row, or a JSON check object). `emit_check(theme, check, ctx)`."
+function emit_check end
+
 "Render a markdown+math source (a `@desc`/`@caption`). `emit_text(theme, source, item, ctx; block)`."
 function emit_text end
 
