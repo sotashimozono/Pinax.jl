@@ -139,8 +139,8 @@ end
 @benchmark :validation "Ising sanity — M(T) vs known limits" begin
     @desc md"The Monte Carlo must reproduce the textbook limits: ordered (\$|m|\to 1\$) well below \$T_c\$, disordered (finite-size residual) well above."
     @expect "M_ordered" "low-T |m| (ordered phase)" got = Ms[1] want = 1.0 tol = 0.2
-    @expect "M_disordered" "high-T |m| (finite-size residual)" got = Ms[end] want = 0.0 tol = 0.3
-    @expect "transition" "order parameter drops through Tc" got = Ms[1] - Ms[end] want = 0.8 tol = 0.45
+    @expect "M_disordered" "high-T |m| (residual)" got = Ms[end] want = 0.0 tol = 0.3
+    @expect "transition" "drops through Tc" got = Ms[1] - Ms[end] want = 0.8 tol = 0.45
 end
 
 # Render the TWO faces of the SAME doc — pixels for a human, data (+ the verdict) for an LLM.
@@ -154,6 +154,7 @@ println("  LLM   (agent):   ", agentp)
 ajfile = endswith(agentp, ".json") ? agentp : joinpath(agentp, "agent.json")
 if isfile(ajfile)
     v = match(r"\"verdict\":\"([A-Z]+)\"", read(ajfile, String))
-    v === nothing || println("  benchmark verdict (what the LLM reads, not a println): ", v.captures[1])
+    v === nothing ||
+        println("  benchmark verdict (what the LLM reads, not a println): ", v.captures[1])
 end
 println("  vault:           ", vault.outdir)
