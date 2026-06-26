@@ -1,6 +1,6 @@
 name = "Pinax"
 uuid = "e782a80a-1ac9-479e-ba2b-0f3433ef5b4f"
-version = "0.37.1"
+version = "0.37.2"
 authors = ["sota shimozono <shimozono-sota631@g.ecc.u-tokyo.ac.jp>"]
 
 [deps]
@@ -20,10 +20,6 @@ PinaxDataVaultExt = ["DataVault", "ParamIO"]
 PinaxMakieExt = "Makie"
 PinaxParamIOExt = "ParamIO"
 PinaxPlotsExt = "Plots"
-
-[sources]
-DataVault = {rev = "main", url = "https://github.com/sotashimozono/DataVault.jl"}
-ParamIO = {rev = "main", url = "https://github.com/sotashimozono/ParamIO.jl"}
 
 [compat]
 Aqua = "0.8"
