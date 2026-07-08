@@ -18,6 +18,7 @@ include("render.jl")     # render driver (pass 2 resolve + pass 3 materialize/em
 include("contents.jl")   # cross-gallery meta-index (a "map of contents" one level up)
 include("testset.jl")   # render a Julia `Test` suite as a Pinax document (Test -> @page/@section/Check)
 include("serve.jl")      # static HTTP preview server (Sockets) for the rendered gallery
+include("documenter.jl") # Documenter bridge stub (PinaxDocumenterExt embeds a gallery via @raw html)
 
 # structure macros (the manuscript DSL)
 export @pinaxsetup,
@@ -41,6 +42,7 @@ export @pinaxsetup,
 # render / theme / backend contract
 export render,
     report,
+    rendered_assets,
     sweep_mean,
     contents,
     Theme,
@@ -53,7 +55,11 @@ export render,
     register_theme!,
     pinax_save,
     is_figure,
-    serve
+    serve,
+    documenter_embed,
+    documenter_gallery,
+    documenter_stage,
+    documenter_downloads
 
 # comment store (CLI / LLM-loop substrate)
 export read_comments, add_comment, set_bookmark!
