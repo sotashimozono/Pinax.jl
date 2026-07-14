@@ -84,39 +84,6 @@ let build = joinpath(@__DIR__, "build")
     end
 end
 
-# The TEST REPORT, grafted into the docs. Documenter deploys `build/` as-is, so this lands next to
-# the manual at `<docs-url>/dev/tests/` (and `/stable/tests/`, and — because `push_preview=true` —
-# at every PR's preview URL). No separate hosting, no separate versioning: the report of a release is
-# the report that shipped with it.
-#
-# The dumps come off the `test-report` branch, which CI pushes after the suite runs — the same shape
-# as the `media` branch above. That indirection is what lets a SHARDED run work: each shard dumps its
-# own tree and renders nothing, and this single call merges them into one gallery whose pages are the
-# test files, with the shard boundary invisible.
-let build = joinpath(@__DIR__, "build")
-    try
-        dumps = mktempdir()
-        run(`git fetch --depth=1 origin test-report`)
-        run(`git --work-tree=$dumps checkout FETCH_HEAD -- .`)
-        run(`git reset -q`)
-        files = String[]
-        for (root, _, fs) in walkdir(dumps), f in fs
-            endswith(f, ".toml") && push!(files, joinpath(root, f))
-        end
-        isempty(files) && error("the test-report branch carries no dumps")
-        Pinax.render_test_report(
-            sort(files); out=joinpath(build, "tests"), title="Test report"
-        )
-        mv(joinpath(build, "tests_html"), joinpath(build, "tests"); force=true)
-        mv(joinpath(build, "tests_agent"), joinpath(build, "tests-agent"); force=true)
-        @info "grafted the test report into build/tests/ ($(length(files)) dump(s))"
-    catch e
-        # Non-fatal, exactly like the media branch: a repo that has not published a report yet (or a
-        # fork with no access) still builds its docs.
-        @info "no usable `test-report` branch — skipping the test report" e
-    end
-end
-
 deploydocs(;
     versions=["stable", "dev"],
     repo="github.com/sotashimozono/Pinax.jl.git",

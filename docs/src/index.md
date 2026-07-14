@@ -38,7 +38,3 @@ KaTeX; `serve("site")` previews it over HTTP.
   table of contents that spans them all), plus a source walkthrough for each. Every gallery is built
   *live* as a Documenter `@example` and rendered by Pinax.
 - **[API Reference](api.md)** — every exported macro and function.
-- **[Test report](../tests/)** — Pinax's own test suite, rendered by Pinax
-  ([`@pinaxtestset`](@ref)). Not a green badge but a **margin profile**: how much of its tolerance
-  budget each check actually spent. Built from the tree the suite dumps in CI, and versioned with
-  these docs — the report of a release is the report that shipped with it.

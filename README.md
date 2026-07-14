@@ -108,25 +108,10 @@ exactly as before and switching the report on cannot regress a passing suite. Ju
 inside a testset drops it (and its subtree) from the document while still running it and still
 counting it. A red suite always fails the process — a report must never turn a failing suite green.
 
-**It rides the docs deploy.** With `PINAX_TEST_DUMP` set, a run *dumps* its tree (TOML) instead of
-rendering; `docs/make.jl` renders the dumps into `build/tests/` between `makedocs` and `deploydocs`,
-so the report lands beside the manual at `<docs-url>/dev/tests/` — versioned with the docs (the
-report of a release is the report that shipped with it), and, since `push_preview=true`, on every
-PR's preview URL. No separate hosting.
-
-That indirection is what makes **sharded CI** work: each shard dumps its own tree and renders
-nothing, and one `render_test_report(dumps; out)` merges them into a single gallery whose pages are
-the test *files* — the shard boundary never appears in the output.
-
-The point is the **margin, not the verdict**. From `@test isapprox(got, want; rtol=…)` the real
-numbers are recovered, so each check reports `delta/tol`: how much of its tolerance budget it spent.
-A check sitting at 97% of its tolerance is one refactor away from red, and in a green CI badge it
-looks exactly like a rock-solid one. Here it does not — the per-file figure draws every check against
-the pass/fail boundary, and `worst margin` ranks the files by how close they came to failing. The
-same verdict lands in `agent.json` as `{verdict, passed, total, failed, checks:[{got, want, delta,
-tol, pass}]}`, so a reviewing agent reads the numbers instead of scraping a CI log.
-
-The figure is a hand-written SVG: rendering a test report pulls in **no plotting backend**.
+Sharded CI is handled by the same primitive: with `PINAX_TEST_DUMP` a run *dumps* its testset tree
+(TOML) instead of rendering, and `render_test_report(dumps; out)` merges the dumps into a single
+gallery whose pages are the test *files* — the shard boundary never appears in the output. Publishing
+that report alongside the Documenter docs is [#68](https://github.com/QAtlasHub/Pinax.jl/issues/68).
 
 ## MCP server
 
