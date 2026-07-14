@@ -79,6 +79,33 @@ verdict — flows to every face. Themes are pluggable: `render(; theme = MyTheme
 pair to a project-specific `recipe` that builds the doc, and renders both the gallery and
 `agent.json` — so the same results become a human notebook and an LLM-readable artifact in one call.
 
+## Bridging a test suite
+
+A test suite is a binary: green or red. `PinaxTestSet` turns it into a report — one line in
+`runtests.jl`, no test changes:
+
+```julia
+using Pinax
+@testset PinaxTestSet "MyPkg" out="test-report" begin
+    for f in files
+        @testset "$f" begin include(f) end   # a test FILE  → @page (status = :benchmark)
+    end                                      # a nested @testset → @section
+end                                          # each @test      → a Check
+```
+
+Julia hands a nested `@testset` its parent's type, so the whole tree is captured with nothing to
+annotate — and the set still fails the process when the suite is red.
+
+The point is the **margin, not the verdict**. From `@test isapprox(got, want; rtol=…)` the real
+numbers are recovered, so each check reports `delta/tol`: how much of its tolerance budget it spent.
+A check sitting at 97% of its tolerance is one refactor away from red, and in a green CI badge it
+looks exactly like a rock-solid one. Here it does not — the per-file figure draws every check against
+the pass/fail boundary, and `worst margin` ranks the files by how close they came to failing. The
+same verdict lands in `agent.json` as `{verdict, passed, total, failed, checks:[{got, want, delta,
+tol, pass}]}`, so a reviewing agent reads the numbers instead of scraping a CI log.
+
+The figure is a hand-written SVG: rendering a test report pulls in **no plotting backend**.
+
 ## MCP server
 
 `render(theme = :agent)` emits an `agent.json` an LLM can read. **[`clients/pinax-mcp`](clients/pinax-mcp)**
