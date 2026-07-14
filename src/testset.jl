@@ -24,38 +24,13 @@
 """
     testset_type() -> Type
 
-The testset type to hand `@testset`. **`Test.DefaultTestSet` unless `PINAX_TEST_REPORT` is set** —
-otherwise the `PinaxTestExt` type that renders the whole suite as a Pinax document.
+The testset type [`@pinaxtestset`](@ref) binds: **`Test.DefaultTestSet` unless `PINAX_TEST_REPORT` is
+set**, otherwise the `PinaxTestExt` type that renders the suite as a Pinax document.
 
-That is the entire adoption cost, and it is deliberately a no-op by default:
-
-    using Pinax, Test
-    const TS = Pinax.testset_type()
-
-    @testset TS "MyPkg" begin
-        for f in files
-            @testset "\$f" begin include(f) end   # a test FILE       → @page (status = :benchmark)
-        end                                       # a nested @testset → @section
-    end                                           # each @test        → a Check
-
-With the env var unset, `TS === Test.DefaultTestSet` and the suite behaves **exactly** as stock
-`Pkg.test()` — same output, no rendering, nothing to regress. CI turns the report on with
-
-    PINAX_TEST_REPORT=1  PINAX_TEST_OUT=test-report   # out defaults to "test-report"
-
-so *whether* to render is a CI decision, not something baked into the test code. No Pinax-specific
-option ever appears at the call site — which is also what makes the fallback safe, since
-`DefaultTestSet` would reject one.
-
-Why a `const` and not just `@testset Pinax.testset_type() …`: `@testset T` demands that `T` be a bare
-identifier naming a real `AbstractTestSet` subtype — `Test.parse_testset_args` errors "Unexpected
-argument" on any other expression, and `Test._check_testset` errors on any other value. And Julia
-does not let an extension add a name to its parent's namespace, so Pinax cannot export the type
-itself. One `const` resolves both.
-
-Julia gives a nested `@testset` the *parent's* type, so the whole tree is captured with nothing to
-annotate. Exclude a subtree with [`@pinaxignore`](@ref). The set still fails the process when the
-suite is red: a report must never turn a failing suite green.
+Reach for this directly only when you need the type itself (a custom testset wrapper, a driver of
+your own). The normal entry point is `@pinaxtestset`, which generates the binding for you — `@testset
+T` insists that `T` be a bare identifier, which is exactly what a macro can produce and a caller
+otherwise cannot get, since Julia forbids an extension from adding a name to its parent's namespace.
 """
 function testset_type()
     ext = Base.get_extension(@__MODULE__, :PinaxTestExt)
@@ -64,6 +39,48 @@ function testset_type()
         "lives in the PinaxTestExt extension.",
     )
     return ext._testset_type()
+end
+
+"""
+    @pinaxtestset "MyPkg" [options…] begin … end
+
+`@testset`, plus a rendered report when CI asks for one. The **only** change a suite ever needs:
+
+    using Pinax, Test
+
+    @pinaxtestset "MyPkg" begin
+        for f in files
+            @testset "\$f" begin include(f) end   # a test FILE       → @page (status = :benchmark)
+        end                                       # a nested @testset → @section
+    end                                           # each @test        → a Check
+
+    # CI:
+    PINAX_TEST_REPORT=1  PINAX_TEST_OUT=test-report   julia --project -e 'using Pkg; Pkg.test()'
+
+With `PINAX_TEST_REPORT` unset this expands to a plain `@testset` on `Test.DefaultTestSet` — the
+stock type, not a Pinax set that skips rendering — so a normal `Pkg.test()` behaves exactly as
+before and switching the report on cannot regress a passing suite. Every argument is forwarded to
+`@testset`, so existing options keep working.
+
+Nested testsets inherit the parent's type from Julia, so the whole tree is captured with nothing to
+annotate. Use [`@pinaxignore`](@ref) to drop a subtree from the document (it still runs, and still
+fails the suite if it is red). A red suite always fails the process: a report must never turn a
+failing suite green.
+
+Why a macro rather than a name you could pass to `@testset` yourself: `@testset T` takes only a bare
+identifier bound to a real `AbstractTestSet` subtype (`Test.parse_testset_args` rejects any other
+expression, `Test._check_testset` any other value), and Julia forbids an extension from adding a name
+to its parent's namespace — so Pinax cannot simply export the type. The macro generates the binding,
+which is the one thing that *is* allowed to be a bare identifier: a gensym.
+"""
+macro pinaxtestset(args...)
+    ts = gensym("PinaxTestSet")
+    # `Test` is resolved in the CALLER's module — Pinax does not depend on Test, and anyone writing
+    # `@pinaxtestset` necessarily has `using Test` already.
+    testset = Expr(
+        :macrocall, Expr(:., :Test, QuoteNode(Symbol("@testset"))), __source__, ts, args...
+    )
+    return esc(Expr(:block, Expr(:(=), ts, :($(testset_type)())), testset))
 end
 
 "Is the test report switched on? (`PINAX_TEST_REPORT` = 1 / true / yes / on, case-insensitive.)"

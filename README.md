@@ -82,14 +82,13 @@ pair to a project-specific `recipe` that builds the doc, and renders both the ga
 ## Bridging a test suite
 
 A test suite is a binary: green or red. The `PinaxTestExt` extension (`Test` is a weakdep, so `using
-Pinax` alone never loads it) turns one into a report — one line in `runtests.jl`, no test changes,
-and **no Pinax-specific option at the call site**:
+Pinax` alone never loads it) turns one into a report. The whole diff to `runtests.jl` is **one
+token** — no extra line, no Pinax-specific option, no test touched:
 
 ```julia
 using Pinax, Test
-const TS = Pinax.testset_type()      # Test.DefaultTestSet, unless PINAX_TEST_REPORT is set
 
-@testset TS "MyPkg" begin
+@pinaxtestset "MyPkg" begin                  # ← was: @testset
     for f in files
         @testset "$f" begin include(f) end   # a test FILE  → @page (status = :benchmark)
     end                                      # a nested @testset → @section
@@ -102,15 +101,12 @@ Whether to render is the **CI's** decision, not something baked into the test co
 PINAX_TEST_REPORT=1  PINAX_TEST_OUT=test-report   julia --project -e 'using Pkg; Pkg.test()'
 ```
 
-With the env var unset, `TS === Test.DefaultTestSet` — *literally* the stock type, not a Pinax set
-that skips rendering — so a plain `Pkg.test()` behaves exactly as before and switching the bridge on
-cannot regress a passing suite. Julia hands a nested `@testset` its parent's type, so the whole tree
-is captured with nothing to annotate; `@pinaxignore` inside a testset drops it (and its subtree) from
-the document while still running it and still counting it. A red suite always fails the process — a
-report must never turn a failing suite green.
-
-(The `const` is not ceremony: an extension cannot add a name to its parent's namespace, and `@testset
-T` accepts only a bare identifier naming a real `AbstractTestSet` subtype.)
+With the env var unset, `@pinaxtestset` expands to a plain `@testset` on `Test.DefaultTestSet` —
+*literally* the stock type, not a Pinax set that skips rendering — so a normal `Pkg.test()` behaves
+exactly as before and switching the report on cannot regress a passing suite. Julia hands a nested
+`@testset` its parent's type, so the whole tree is captured with nothing to annotate; `@pinaxignore`
+inside a testset drops it (and its subtree) from the document while still running it and still
+counting it. A red suite always fails the process — a report must never turn a failing suite green.
 
 The point is the **margin, not the verdict**. From `@test isapprox(got, want; rtol=…)` the real
 numbers are recovered, so each check reports `delta/tol`: how much of its tolerance budget it spent.

@@ -119,8 +119,7 @@ const _check_for = Ext._check_for
             script,
             """
             using Pinax, Test
-            const TS = Pinax.testset_type()
-            @testset TS "demo" begin
+            @pinaxtestset "demo" begin
                 @testset "test_demo.jl" begin
                     include($(repr(joinpath(dir, "test_demo.jl"))))
                 end
