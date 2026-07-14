@@ -127,7 +127,10 @@ const COMMENTS = joinpath(OUT, "comments.toml")
 
 # Seed one comment to show the LLM⇄me⇄teacher layer rendering co-located with the figure.
 Pinax.add_comment(
-    COMMENTS, :eq_energy, "残差が低温で増えるのは 2 ln χ 律速と整合。χ=80 の broken run に注意。"; author="llm"
+    COMMENTS,
+    :eq_energy,
+    "残差が低温で増えるのは 2 ln χ 律速と整合。χ=80 の broken run に注意。";
+    author="llm",
 )
 
 path = Pinax.render(; out=OUT, comments_file=COMMENTS)

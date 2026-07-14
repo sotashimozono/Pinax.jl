@@ -79,6 +79,40 @@ verdict — flows to every face. Themes are pluggable: `render(; theme = MyTheme
 pair to a project-specific `recipe` that builds the doc, and renders both the gallery and
 `agent.json` — so the same results become a human notebook and an LLM-readable artifact in one call.
 
+## Bridging a test suite
+
+A test suite is a binary: green or red. The `PinaxTestExt` extension (`Test` is a weakdep, so `using
+Pinax` alone never loads it) turns one into a report. The whole diff to `runtests.jl` is **one
+token** — no extra line, no Pinax-specific option, no test touched:
+
+```julia
+using Pinax, Test
+
+@pinaxtestset "MyPkg" begin                  # ← was: @testset
+    for f in files
+        @testset "$f" begin include(f) end   # a test FILE  → @page (status = :benchmark)
+    end                                      # a nested @testset → @section
+end                                          # each @test      → a Check
+```
+
+Whether to render is the **CI's** decision, not something baked into the test code:
+
+```
+PINAX_TEST_REPORT=1  PINAX_TEST_OUT=test-report   julia --project -e 'using Pkg; Pkg.test()'
+```
+
+With the env var unset, `@pinaxtestset` expands to a plain `@testset` on `Test.DefaultTestSet` —
+*literally* the stock type, not a Pinax set that skips rendering — so a normal `Pkg.test()` behaves
+exactly as before and switching the report on cannot regress a passing suite. Julia hands a nested
+`@testset` its parent's type, so the whole tree is captured with nothing to annotate; `@pinaxignore`
+inside a testset drops it (and its subtree) from the document while still running it and still
+counting it. A red suite always fails the process — a report must never turn a failing suite green.
+
+Sharded CI is handled by the same primitive: with `PINAX_TEST_DUMP` a run *dumps* its testset tree
+(TOML) instead of rendering, and `render_test_report(dumps; out)` merges the dumps into a single
+gallery whose pages are the test *files* — the shard boundary never appears in the output. Publishing
+that report alongside the Documenter docs is [#68](https://github.com/QAtlasHub/Pinax.jl/issues/68).
+
 ## MCP server
 
 `render(theme = :agent)` emits an `agent.json` an LLM can read. **[`clients/pinax-mcp`](clients/pinax-mcp)**

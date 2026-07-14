@@ -16,6 +16,7 @@ include("comments.jl")   # id-keyed annotation store (gallery comment layer, not
 include("theme.jl")      # theme = renderer (GalleryTheme)
 include("render.jl")     # render driver (pass 2 resolve + pass 3 materialize/emit)
 include("contents.jl")   # cross-gallery meta-index (a "map of contents" one level up)
+include("testset.jl")   # render a Julia `Test` suite as a Pinax document (Test -> @page/@section/Check)
 include("serve.jl")      # static HTTP preview server (Sockets) for the rendered gallery
 
 # structure macros (the manuscript DSL)
@@ -56,5 +57,7 @@ export render,
 
 # comment store (CLI / LLM-loop substrate)
 export read_comments, add_comment, set_bookmark!
+export testset_type, @pinaxtestset, @pinaxignore
+export render_test_report, dump_test_report, load_test_dump
 
 end # module Pinax
