@@ -81,11 +81,14 @@ pair to a project-specific `recipe` that builds the doc, and renders both the ga
 
 ## Bridging a test suite
 
-A test suite is a binary: green or red. `PinaxTestSet` turns it into a report — one line in
-`runtests.jl`, no test changes:
+A test suite is a binary: green or red. The `PinaxTestExt` extension (`Test` is a weakdep, so
+`using Pinax` alone never loads Test) turns one into a report — one line in `runtests.jl`, no test
+changes:
 
 ```julia
-using Pinax
+using Pinax, Test
+const PinaxTestSet = Pinax.testset_type()
+
 @testset PinaxTestSet "MyPkg" out="test-report" begin
     for f in files
         @testset "$f" begin include(f) end   # a test FILE  → @page (status = :benchmark)
@@ -94,7 +97,9 @@ end                                          # each @test      → a Check
 ```
 
 Julia hands a nested `@testset` its parent's type, so the whole tree is captured with nothing to
-annotate — and the set still fails the process when the suite is red.
+annotate — and the set still fails the process when the suite is red. (The `const` is not ceremony:
+an extension cannot add a name to its parent's namespace, and `@testset T` accepts only a bare
+identifier naming a real `AbstractTestSet` subtype.)
 
 The point is the **margin, not the verdict**. From `@test isapprox(got, want; rtol=…)` the real
 numbers are recovered, so each check reports `delta/tol`: how much of its tolerance budget it spent.

@@ -1,12 +1,32 @@
 using Pinax
-using Pinax: _approx_numbers, _result_data_expr, _check_for, _margin_svg, Check
+using Pinax: _approx_numbers, _margin_svg, Check
 using Test
+
+# The AbstractTestSet subtype lives in the extension — `Test` is a weakdep, because Pinax is a
+# rendering package and `using Pinax` must not drag Test into every user's session. Loading `Test`
+# (which you necessarily did, to write `@testset`) loads the extension.
+const PinaxTestSet = Pinax.testset_type()
+const Ext = Base.get_extension(Pinax, :PinaxTestExt)
+const _result_data_expr = Ext._result_data_expr
+const _check_for = Ext._check_for
 
 # The real entry point is `@testset PinaxTestSet … begin … end` at the ROOT of a runtests.jl, and a
 # root PinaxTestSet deliberately `error`s when the suite is red. That cannot run *inside* this
 # suite, so the end-to-end case runs in a subprocess — which also pins down the contract that
 # matters most: a failing suite still fails the process, report or no report.
 @testset "PinaxTestSet" begin
+    @testset "the extension is what defines the testset" begin
+        # Test is a WEAKDEP: `using Pinax` alone must not drag in Test (and Random/Logging/
+        # Serialization/InteractiveUtils with it) for the majority who never render a suite.
+        @test Ext !== nothing                       # `using Test` above loaded the extension
+        @test Pinax.testset_type() === Ext.PinaxTestSet
+        @test Pinax.testset_type() <: Test.AbstractTestSet
+        # …and it has to BE a type: `@testset T` accepts only a bare identifier naming a real
+        # AbstractTestSet subtype (parse_testset_args rejects any other expression; _check_testset
+        # rejects any other value). Hence the one-line `const` bind, not a clever callable.
+        @test PinaxTestSet("x") isa Ext.PinaxTestSet
+    end
+
     @testset "numbers survive both verdicts" begin
         # Pass.data is an Expr with evaluated args; Fail.data is a String. The asymmetry is the
         # whole trap: parse only the Expr and every FAILING check silently loses its numbers.
@@ -83,6 +103,7 @@ using Test
             script,
             """
             using Pinax, Test
+            const PinaxTestSet = Pinax.testset_type()
             @testset PinaxTestSet "demo" out=$(repr(joinpath(dir, "rep"))) begin
                 @testset "test_demo.jl" begin
                     include($(repr(joinpath(dir, "test_demo.jl"))))
