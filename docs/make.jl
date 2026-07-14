@@ -7,18 +7,38 @@ using Literate
 
 const GALLERY_JL = joinpath(@__DIR__, "literate", "gallery.jl")
 
-# The "Examples" page shows the gallery script's source verbatim (plain `julia` blocks, NOT
-# executed). The gallery itself is compiled separately (below) and linked from the top of the page.
+# The "Examples" page shows the gallery script's source verbatim (plain `julia` blocks, NOT executed).
+# The gallery itself is compiled separately (below); here we EMBED it live at the top of the page via
+# the Documenter bridge (PinaxDocumenterExt) — an auto-resizing `@raw html` <iframe> that shows the
+# rendered gallery AS-IS, right above the source that produced it (dogfood, roadmap 07). The format is
+# defined once and shared with `makedocs`, so `documenter_embed` resolves the site-root `gallery/`
+# against `examples.md` via `html_fmt.prettyurls` — correct on the deployed site AND a local build.
+const html_fmt = Documenter.HTML(;
+    canonical="https://codes.sota-shimozono.com/Pinax.jl/stable/",
+    prettyurls=get(ENV, "CI", "false") == "true",
+    mathengine=MathJax3(
+        Dict(
+            :tex => Dict(
+                :inlineMath => [["\$", "\$"], ["\\(", "\\)"]],
+                :tags => "ams",
+                :packages => ["base", "ams", "autoload", "physics"],
+            ),
+        ),
+    ),
+    assets=["assets/favicon.ico", "assets/custom.css"],
+)
+
 let
-    link =
-        "\n```@raw html\n<p style=\"margin:.4rem 0 1.2rem\"><a href=\"../gallery/\">" *
-        "<b>▶ Open the compiled gallery</b></a> — a thumbnail index with one page per example.</p>\n```\n"
-    add_link = function (content)
+    embed =
+        "\n" * Pinax.documenter_embed(
+            "gallery/", html_fmt; page="examples.md", title="Pinax example gallery"
+        )
+    add_embed = function (content)
         i = findfirst('\n', content)
         return if i === nothing
-            content * link
+            content * embed
         else
-            content[1:i] * link * content[(i + 1):end]
+            content[1:i] * embed * content[(i + 1):end]
         end
     end
     Literate.markdown(
@@ -28,7 +48,7 @@ let
         documenter=false,   # plain ```julia fences, not @example
         execute=false,      # do not run during page generation
         credit=false,
-        postprocess=add_link,
+        postprocess=add_embed,
     )
 end
 
@@ -41,20 +61,7 @@ Downloads.download("https://github.com/sotashimozono.png", joinpath(assets_dir, 
 
 makedocs(;
     sitename="Pinax.jl",
-    format=Documenter.HTML(;
-        canonical="https://codes.sota-shimozono.com/Pinax.jl/stable/",
-        prettyurls=get(ENV, "CI", "false") == "true",
-        mathengine=MathJax3(
-            Dict(
-                :tex => Dict(
-                    :inlineMath => [["\$", "\$"], ["\\(", "\\)"]],
-                    :tags => "ams",
-                    :packages => ["base", "ams", "autoload", "physics"],
-                ),
-            ),
-        ),
-        assets=["assets/favicon.ico", "assets/custom.css"],
-    ),
+    format=html_fmt,
     modules=[Pinax],
     pages=[
         "Home" => "index.md",

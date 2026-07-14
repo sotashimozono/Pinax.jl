@@ -64,6 +64,34 @@ function _read_manifest(outdir)
     end
 end
 
+"""
+    rendered_assets(dir; ext=nothing, absolute=false) -> Vector{String}
+
+The output asset files a Pinax render produced under `dir`, read from its `.pinax-manifest.toml`
+(every `@figure`/`@table` output — svg/pdf/png/gif/csv). Paths are relative to `dir` (or absolute
+with `absolute=true`), sorted and de-duplicated. `ext` filters by file extension — `ext="pdf"`
+returns just the PDF outputs, the "identify the output pdf paths" query for bundling a rendered
+gallery into a deploy (e.g. Documenter). Returns `String[]` when `dir` has no manifest (nothing
+rendered there yet) — never errors.
+
+This reads what a *previous* `render(; out=dir)` recorded; it does not itself render.
+"""
+function rendered_assets(dir::AbstractString; ext=nothing, absolute::Bool=false)
+    assets = String[]
+    for (_, v) in _read_manifest(dir)
+        v isa AbstractDict || continue
+        for a in get(v, "assets", String[])
+            push!(assets, String(a))
+        end
+    end
+    if ext !== nothing
+        want = lstrip(lowercase(String(ext)), '.')
+        filter!(a -> _ext(a) == want, assets)   # `_ext` (backends.jl) lower-cases the extension
+    end
+    sort!(unique!(assets))
+    return absolute ? String[joinpath(dir, a) for a in assets] : assets
+end
+
 function _write_manifest(outdir, manifest)
     open(joinpath(outdir, MANIFEST_FILE), "w") do io
         return TOML.print(io, manifest)
