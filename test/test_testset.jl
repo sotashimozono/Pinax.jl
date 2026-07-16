@@ -316,4 +316,49 @@ _check_for(r, i) = _check_from(_result_data_expr(r), Ext._label(r), r isa Test.P
         # @pinaxignore: gone from the document, but it still RAN (and would still fail the suite)
         @test !occursin("noisy fixture", md)
     end
+
+    @testset "Pinax.test renders a plain @testset suite (the interface, G)" begin
+        # The featured entry point: a suite with NO Pinax token — plain `@testset`/`@test` (it may
+        # also `@desc`) — rendered by calling `Pinax.test` instead of `include`. Runs at depth 0 in a
+        # subprocess so the root actually renders (and, for a red suite, re-throws).
+        dir = mktempdir()
+        write(
+            joinpath(dir, "suite.jl"),
+            """
+            using Pinax, Test
+            @testset "ok.jl" begin
+                @desc md"a description written inside a plain @testset"
+                @test isapprox(1.0, 1.0009; rtol=0.01)
+            end
+            """,
+        )
+        write(
+            joinpath(dir, "bad.jl"),
+            """
+            using Pinax, Test
+            @testset "bad.jl" begin
+                @test isapprox(0.5, 0.9; rtol=0.01)
+            end
+            """,
+        )
+        run_it = function (suite, out)
+            script = joinpath(dir, "run_" * basename(out) * ".jl")
+            write(
+                script,
+                "using Pinax, Test\nPinax.test($(repr(suite)); out=$(repr(out)), title=\"demo\")\n",
+            )
+            cmd = `$(Base.julia_cmd()) --startup-file=no --project=$(dirname(@__DIR__)) $script`
+            return success(run(pipeline(ignorestatus(cmd); stdout=devnull, stderr=devnull)))
+        end
+
+        # green suite → Pinax.test succeeds and renders, from a suite with no @pinaxtestset in sight
+        out = joinpath(dir, "rep")
+        @test run_it(joinpath(dir, "suite.jl"), out)
+        @test isfile(joinpath(out * "_html", "ok_jl.html"))
+        md = read(joinpath(out * "_agent", "agent.md"), String)
+        @test occursin("a description written inside a plain @testset", md)
+
+        # red suite → Pinax.test re-throws (process fails): a report never turns a red suite green
+        @test !run_it(joinpath(dir, "bad.jl"), joinpath(dir, "badrep"))
+    end
 end

@@ -42,6 +42,25 @@ function testset_type()
 end
 
 """
+    Pinax.test([runtests="test/runtests.jl"]; out="test-report", title="Test report") -> nothing
+
+Run a test suite and render it as a Pinax document — the interface that outputs a testset directly.
+
+The suite stays **plain `@testset` / `@test`**: there is no Pinax-specific macro to add to it. The one
+Pinax touch is calling `Pinax.test` instead of letting `Pkg.test` `include` the file. It opens a
+capturing root testset, `include`s `runtests` (nested `@testset`s inherit it — nothing to annotate),
+writes `<out>_html` + `<out>_agent`, and re-throws on a red suite so the verdict is never changed.
+
+A suite may *also* draw in Pinax's own vocabulary (`@desc`, `@figure`, `@table`, …) and that content is
+captured into the report; with the report machinery absent it is a no-op, so the same file runs
+untouched under a bare `Pkg.test()`.
+
+The machinery lives in `PinaxTestExt`, so this needs `Test` loaded (`using Test`); calling it without
+Test errors, pointing you at the fix.
+"""
+function test end
+
+"""
     @pinaxtestset "MyPkg" [options…] begin … end
 
 `@testset`, plus a rendered report when CI asks for one. The **only** change a suite ever needs:

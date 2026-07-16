@@ -177,6 +177,25 @@ function Test.finish(ts::PinaxTestSet)
     return ts
 end
 
+# The interface `Pinax.test` (docstring in src/testset.jl): open a capturing root and include the
+# suite. In the EXTENSION, `PinaxTestSet` is an ordinary visible name, so this is a plain
+# `@testset PinaxTestSet` — no gensym, no per-suite token; the suite the user writes is pure `@testset`.
+# `out` rides the env the constructor reads; the root's `finish` renders and re-throws on a red suite.
+function Pinax.test(
+    runtests::AbstractString="test/runtests.jl";
+    out=report_out(),
+    title::AbstractString="Test report",
+)
+    file = abspath(runtests)
+    isfile(file) || error("Pinax.test: no such test file — $(file)")
+    withenv("PINAX_TEST_OUT" => String(out)) do
+        Test.@testset PinaxTestSet "$(title)" begin
+            Base.include(Module(gensym(:PinaxTest)), file)
+        end
+    end
+    return nothing
+end
+
 # ── recovering the NUMBERS out of a Test result ──────────────────────
 #
 # Measured on Julia 1.12 (do not "simplify" this — the asymmetry is real):

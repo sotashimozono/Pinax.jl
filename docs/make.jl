@@ -53,19 +53,24 @@ let
     )
 end
 
-# The "Test → Pinax" page, same pattern: show the suite verbatim, live-embed the report gallery the
-# bridge renders from it (build/test2pinax_html/, compiled below) at the top.
+# The "Test → Pinax" page: show the suite verbatim and LINK the report the bridge renders from it
+# (build/test2pinax_html/, compiled below) — a plain link, not an embedded iframe. The link is
+# site-root-relative, resolved for prettyurls (deployed) vs a local build.
 let
-    embed =
-        "\n" * Pinax.documenter_embed(
-            "test2pinax_html/", html_fmt; page="test2pinax.md", title="DemoPkg test report"
-        )
-    add_embed = function (content)
+    url = html_fmt.prettyurls ? "../test2pinax_html/" : "test2pinax_html/"
+    link = string(
+        "\n```@raw html\n",
+        "<p><a href=\"",
+        url,
+        "\" class=\"pinax-report-link\">▶&nbsp; Open the rendered report</a></p>\n",
+        "```\n",
+    )
+    add_link = function (content)
         i = findfirst('\n', content)
         return if i === nothing
-            content * embed
+            content * link
         else
-            content[1:i] * embed * content[(i + 1):end]
+            content[1:i] * link * content[(i + 1):end]
         end
     end
     Literate.markdown(
@@ -75,7 +80,7 @@ let
         documenter=false,
         execute=false,
         credit=false,
-        postprocess=add_embed,
+        postprocess=add_link,
     )
 end
 
@@ -117,13 +122,11 @@ let build = joinpath(@__DIR__, "build")
     cd(build) do
         return Base.include(Module(:PinaxGallery), GALLERY_JL)
     end
-    # The test-report demo: run the suite with the report switched on (env-driven, exactly as CI
-    # drives it) so `render_test_report` writes build/test2pinax_html/ — the gallery embedded at the
-    # top of the "Test → Pinax" page. Every check passes, so the root testset does not error the build.
+    # The test-report demo: render the "Test → Pinax" page's own suite through the bridge's interface,
+    # `Pinax.test`, writing build/test2pinax_html/ (linked at the top of that page). Every check passes,
+    # so the root testset does not error the build.
     cd(build) do
-        return withenv("PINAX_TEST_REPORT" => "1", "PINAX_TEST_OUT" => "test2pinax") do
-            return Base.include(Module(:PinaxTest2Pinax), TEST2PINAX_JL)
-        end
+        return Pinax.test(TEST2PINAX_JL; out="test2pinax", title="Pinax self-test")
     end
 end
 
