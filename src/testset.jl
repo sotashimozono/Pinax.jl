@@ -192,25 +192,20 @@ function _check_from(expr, label::AbstractString, passed::Bool, i::Int)
     return Check(id, String(label), got, want, delta, tol, kind, passed)
 end
 
-function _push_check_raw!(chk::Check)
-    c = _current_container()
-    c === nothing && return chk
-    push!(c.checks, chk)
-    push!(c.content, :check => length(c.checks))
-    return chk
-end
-
-# ── the tree (Test-free) ─────────────────────────────────────────────
+# ── the tree DTO (Test-free) ─────────────────────────────────────────
 #
-# `TestNode` is the whole point of this file's shape: it is the testset tree with `Test` factored
-# OUT. The extension's only job is to turn a `PinaxTestSet` into one of these. Everything downstream
-# — summaries, the margin figure, the document, the TOML dump, and the merge of several dumps back
-# into ONE document — is then plain Julia over `TestNode`, testable with no `Test` in sight.
+# `TestNode` is the **serialisation DTO** for the shard dump — the testset tree with `Test` and its
+# closures factored OUT. It is NOT a second document model: the live tree is `PinaxTestSet` objects
+# (in the extension) holding Pinax's own structs directly, and the fold below is duck-typed so it
+# walks EITHER a live `PinaxTestSet` (direct render) or a merged `TestNode` (a sharded run). A
+# `TestNode` carries the same container fields as a `PinaxTestSet` (figures/tables/panels/desc +
+# content order) so that one fold serves both; the TOML dump currently persists checks + structure
+# only (a `Figure.gen` is a closure and cannot cross the process boundary — carrying user figures
+# through a shard is the E/L follow-up), so a loaded `TestNode` has those extra vectors empty.
 #
-# It is also what makes sharded CI work. Eight shards each run a disjoint set of test FILES, so eight
-# reports would be eight disconnected galleries. Instead each shard dumps its tree (no rendering at
-# all), and one later job merges the trees and renders the single coherent gallery the design always
-# implied: one page per test file.
+# This is what makes sharded CI work. Eight shards each run a disjoint set of test FILES; instead of
+# eight disconnected galleries, each shard dumps its tree (no rendering at all) and one later job
+# merges the trees and renders the single coherent gallery: one page per test file.
 struct TestNode
     description::String
     elapsed::Float64
@@ -219,6 +214,12 @@ struct TestNode
     nbroken::Int                # @test_broken / skipped: counted, never a Check — see below
     nerror::Int                 # how many of the failing checks were ERRORS rather than plain fails
     children::Vector{TestNode}
+    # container payload — same shape a `PinaxTestSet` captures live (the closure-free DTO half).
+    figures::Vector{Figure}
+    tables::Vector{Table}
+    panels::Vector{String}
+    desc::Union{Desc,Nothing}
+    content::Vector{Pair{Symbol,Int}}   # declaration order of figures/tables/panels/checks
 end
 
 function TestNode(
@@ -229,24 +230,40 @@ function TestNode(
     nbroken::Integer=0,
     nerror::Integer=0,
     children::Vector{TestNode}=TestNode[],
+    figures::Vector{Figure}=Figure[],
+    tables::Vector{Table}=Table[],
+    panels::Vector{String}=String[],
+    desc::Union{Desc,Nothing}=nothing,
+    content::Vector{Pair{Symbol,Int}}=Pair{Symbol,Int}[],
 )
     return TestNode(
-        String(description), Float64(elapsed), ignore, checks, nbroken, nerror, children
+        String(description),
+        Float64(elapsed),
+        ignore,
+        checks,
+        nbroken,
+        nerror,
+        children,
+        figures,
+        tables,
+        panels,
+        desc,
+        content,
     )
 end
 
 # A broken/skipped test is deliberately NOT a Check. It has no verdict to show: it did not pass, but
 # it did not fail either, and encoding it as `pass=false` would paint the page red and flip the
 # benchmark verdict to FAIL — for a test the runner is perfectly happy about.
-_ntests(n::TestNode) = length(n.checks) + n.nbroken + sum(_ntests, n.children; init=0)
-_nerror(n::TestNode) = n.nerror + sum(_nerror, n.children; init=0)
-_nbroken(n::TestNode) = n.nbroken + sum(_nbroken, n.children; init=0)
-function _nfail(n::TestNode)
+_ntests(n) = length(n.checks) + n.nbroken + sum(_ntests, n.children; init=0)
+_nerror(n) = n.nerror + sum(_nerror, n.children; init=0)
+_nbroken(n) = n.nbroken + sum(_nbroken, n.children; init=0)
+function _nfail(n)
     here = count(c -> !c.pass, n.checks) - n.nerror
     return here + sum(_nfail, n.children; init=0)
 end
 
-function _summary_line(n::TestNode)
+function _summary_line(n)
     total, f, e, b = _ntests(n), _nfail(n), _nerror(n), _nbroken(n)
     t = isnan(n.elapsed) ? "" : " · $(round(n.elapsed; digits=2))s"
     return "$(total - f - e - b)/$(total) passed" *
@@ -257,7 +274,7 @@ function _summary_line(n::TestNode)
 end
 
 # The largest delta/tol among this subtree's NUMERIC checks — how close the file came to red.
-function _worst_margin(n::TestNode)
+function _worst_margin(n)
     worst = nothing
     for c in n.checks
         c.kind === :abs && c.tol == 0.5 && c.want == 1.0 && continue   # the 1/0 indicator, not a margin
@@ -364,15 +381,11 @@ end
 # `acc` collects every Check pushed anywhere in this subtree, in emission order. A page's checks are
 # spread across its @sections (that is the whole nesting), so the page-level margin figure cannot be
 # rebuilt from the page container alone — it has to be accumulated on the way down.
-function _emit_node!(
-    n::TestNode, counter::Ref{Int}, page_when::Function, acc::Vector{Check}=Check[]
-)
-    for c in n.checks
-        counter[] += 1
-        c.id = Symbol("t", counter[])   # ids are assigned at RENDER time, so a merge renumbers cleanly
-        _push_check_raw!(c)
-        push!(acc, c)
-    end
+#
+# `n` is duck-typed: a live `PinaxTestSet` (direct render — carries user `@figure`/`@desc`/… too) or
+# a merged `TestNode` (a sharded run — checks + structure only). Same fold either way.
+function _emit_node!(n, counter::Ref{Int}, page_when::Function, acc::Vector{Check}=Check[])
+    _emit_own_content!(n, counter, acc)
     # Nested testsets become pages (a file) or sections (a group). @pinaxignore'd ones are skipped
     # HERE only — never in the counts, so an ignored subtree still fails the suite if it is red.
     for ch in n.children
@@ -403,7 +416,49 @@ function _emit_node!(
     return acc
 end
 
-function _collect_rows!(rows::Vector{NamedTuple}, n::TestNode, page_when::Function)
+# Move THIS node's own captured content (desc + figures/tables/panels + checks) into the CTX
+# container just entered, preserving declaration order. A live `PinaxTestSet` carries the full
+# interleaved `content`; a merged `TestNode` carries checks with empty `content`, so fall back to the
+# checks in that case. Uses `_ctx_container()` (never the probe) — the fold builds the doc in `CTX`.
+function _emit_own_content!(n, counter::Ref{Int}, acc::Vector{Check})
+    c = _ctx_container()
+    c === nothing && return acc
+    n.desc === nothing || (c.desc = n.desc)
+    if isempty(n.content) && !isempty(n.checks)
+        for chk in n.checks
+            _place_check!(c, chk, counter, acc)
+        end
+        return acc
+    end
+    for (kind, i) in n.content
+        if kind === :check
+            _place_check!(c, n.checks[i], counter, acc)
+        elseif kind === :figure
+            push!(c.figures, n.figures[i])
+            push!(c.content, :figure => length(c.figures))
+        elseif kind === :table
+            push!(c.tables, n.tables[i])
+            push!(c.content, :table => length(c.tables))
+        elseif kind === :panel
+            push!(c.panels, n.panels[i])
+            push!(c.content, :panel => length(c.panels))
+        end
+    end
+    return acc
+end
+
+# Assign the render-time id (t1, t2, … so a merge renumbers cleanly rather than N shards colliding at
+# t1) and place the check into the current container + content order + margin accumulator.
+function _place_check!(c, chk::Check, counter::Ref{Int}, acc::Vector{Check})
+    counter[] += 1
+    chk.id = Symbol("t", counter[])
+    push!(c.checks, chk)
+    push!(c.content, :check => length(c.checks))
+    push!(acc, chk)
+    return chk
+end
+
+function _collect_rows!(rows::Vector{NamedTuple}, n, page_when::Function)
     for ch in n.children
         ch.ignore && continue
         if page_when(ch.description)
@@ -443,7 +498,7 @@ Writes `<out>_html` (the human gallery) and `<out>_agent` (`agent.json`), follow
 convention as [`report`](@ref).
 """
 function render_test_report(
-    root::TestNode;
+    root;
     out::AbstractString,
     title::AbstractString="Test report",
     page_when::Function=_looks_like_a_file,
@@ -503,13 +558,27 @@ Write a testset tree to `path` as TOML, to be merged and rendered later by
 [`render_test_report`](@ref). This is what a CI shard emits instead of rendering its own partial
 gallery.
 """
-function dump_test_report(root::TestNode, path::AbstractString)
+function dump_test_report(root, path::AbstractString)
     dir = dirname(path)
     isempty(dir) || mkpath(dir)
+    _warn_if_undumpable(root)
     open(path, "w") do io
         return TOML.print(io, Dict("root" => _node_to_dict(root)))
     end
     return path
+end
+
+# A shard dump carries checks + structure only; a `@figure`/`@table`/`@raw` written inside a test is a
+# closure / raw HTML that cannot cross the process boundary yet (the E/L follow-up). Warn loudly
+# rather than drop it silently — a sharded report would otherwise be missing content with no trace.
+function _warn_if_undumpable(n)
+    if !isempty(n.figures) || !isempty(n.tables) || !isempty(n.panels)
+        @warn "Pinax: @figure/@table/@raw inside a test is not carried through a shard dump yet — \
+               it appears in a direct (non-sharded) render only." testset = n.description maxlog =
+            1
+    end
+    foreach(_warn_if_undumpable, n.children)
+    return nothing
 end
 
 """
@@ -519,7 +588,7 @@ Read back a tree written by [`dump_test_report`](@ref).
 """
 load_test_dump(path::AbstractString) = _dict_to_node(TOML.parsefile(path)["root"])
 
-function _node_to_dict(n::TestNode)
+function _node_to_dict(n)
     d = Dict{String,Any}(
         "description" => n.description,
         "ignore" => n.ignore,

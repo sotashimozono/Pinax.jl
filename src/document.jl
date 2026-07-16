@@ -248,6 +248,14 @@ current_document() = CTX.document
 current_page() = CTX.page
 current_section() = CTX.section
 
+# The test bridge (`PinaxTestExt`) registers a probe here when `Test` is loaded; it stays `nothing`
+# for the manuscript path, which then pays only a `Ref` read. The probe returns the innermost open
+# Pinax *test* container (a `PinaxTestSet`), or `:inert` (inside a test that is NOT capturing — the
+# report is off), or `:none` (not inside a testset at all). Kept `Test`-free by indirection: core
+# reads a `Ref`, the extension supplies the closure at load — no method the extension must overwrite.
+const _TEST_CONTAINER_PROBE = Base.RefValue{Any}(nothing)
+_probe_test_container() = (p=_TEST_CONTAINER_PROBE[]; p === nothing ? :none : p())
+
 "Reset the implicit document (fresh, empty). The preamble `@pinaxsetup` calls this."
 function reset!(; kwargs...)
     kw = Dict{Symbol,Any}(kwargs)
@@ -598,14 +606,30 @@ macro figure(args...)
     return _call(:_push_figure!, (), allk)
 end
 
-# The container the content macros write into: the open @section, else the open @page (page-as-leaf).
-# Returns `nothing` if neither is open.
-_current_container() = CTX.section !== nothing ? CTX.section : CTX.page
+# The manuscript container from the module-global build state only (no probe). The test-report fold
+# builds a `Document` in `CTX` post-hoc and must resolve against `CTX` directly — never the probe,
+# which could still see the finishing root testset. This is also the one integration seam: every
+# content macro resolves its target through `_current_container` below and nowhere else.
+_ctx_container() = CTX.section !== nothing ? CTX.section : CTX.page
+
+# Precedence: an open Pinax *test* container (report on) captures the test content; else an open
+# manuscript `CTX` container wins — a manuscript built even *inside* a stock `@testset` (as Pinax's
+# own tests do) must still go to `CTX`; else, if we are inside a stock testset with no manuscript
+# open, the content is test content with the report OFF → `:inert` (the caller no-ops, invariant V);
+# else nothing is open at all → `nothing` (the caller errors on manuscript misuse).
+function _current_container()
+    tc = _probe_test_container()
+    (tc === :none || tc === :inert) || return tc    # an open PinaxTestSet — capture into it
+    ctx = _ctx_container()
+    ctx === nothing || return ctx                   # an open manuscript container (even inside a test)
+    return tc === :inert ? :inert : nothing
+end
 
 function _push_figure!(;
     gen, code, params=nothing, caption="", id=nothing, thumbnail=false, data=nothing
 )
     c = _current_container()
+    c === :inert && return nothing   # inside a test with the report off — no-op (invariant V)
     c === nothing && error("@figure outside of a @section or @page")
     fid = _fig_id(c, id, params)
     fig = Figure(
@@ -646,6 +670,7 @@ end
 
 function _push_table!(; data, code, caption="", id=nothing, header=nothing, params=nothing)
     c = _current_container()
+    c === :inert && return nothing   # inside a test with the report off — no-op (invariant V)
     c === nothing && error("@table outside of a @section or @page")
     hdr, rows = _normalize_table(data, header)
     if !isempty(hdr)   # every row must be header-wide (catches a wrong-length header= or ragged rows)
@@ -685,6 +710,7 @@ end
 
 function _push_check!(; id, label, got, want=0.0, tol, kind=:auto)
     c = _current_container()
+    c === :inert && return nothing   # inside a test with the report off — no-op (invariant V)
     c === nothing && error("@expect outside of a @benchmark/@section/@page")
     g = Float64(got)
     w = Float64(want)
@@ -767,6 +793,7 @@ macro caption(x)
 end
 function _set_caption!(s)
     c = _current_container()
+    c === :inert && return nothing   # inside a test with the report off — no-op (invariant V)
     if c === nothing || isempty(c.figures)
         _diag!(
             WARNING, c === nothing ? "?" : c.anchor, "@caption with no preceding @figure"
@@ -785,6 +812,7 @@ macro desc(x)
 end
 function _set_desc!(s)
     c = _current_container()
+    c === :inert && return nothing   # inside a test with the report off — no-op (invariant V)
     c === nothing && error("@desc outside of a @section or @page")
     c.desc = Desc(string(s))
     return nothing
@@ -803,6 +831,7 @@ macro raw(x)
 end
 function _push_panel!(s)
     c = _current_container()
+    c === :inert && return nothing   # inside a test with the report off — no-op (invariant V)
     c === nothing && error("@raw outside of a @section or @page")
     push!(c.panels, string(s))
     push!(c.content, :panel => length(c.panels))
@@ -817,7 +846,10 @@ macro thumbnail(x)
 end
 function _set_thumbnail!(x)
     pg = CTX.page
-    pg === nothing && error("@thumbnail outside of a @page")
+    if pg === nothing
+        _probe_test_container() === :none || return nothing   # inside a test, no @page → no-op
+        error("@thumbnail outside of a @page")
+    end
     if x isa Symbol
         pg.thumbnail = FigRef(x)
     else
@@ -833,11 +865,17 @@ end
 "This page contributes no main figure to the index."
 macro no_thumbnail()
     return quote
-        pg = CTX.page
-        pg === nothing && error("@no_thumbnail outside of a @page")
-        pg.no_thumbnail = true
-        nothing
+        $(_set_no_thumbnail!)()
     end
+end
+function _set_no_thumbnail!()
+    pg = CTX.page
+    if pg === nothing
+        _probe_test_container() === :none || return nothing   # inside a test, no @page → no-op
+        error("@no_thumbnail outside of a @page")
+    end
+    pg.no_thumbnail = true
+    return nothing
 end
 
 "Raw string (preserves `\$…\$`). Used by `@desc md\"…\"` etc."

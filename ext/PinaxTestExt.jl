@@ -1,17 +1,29 @@
 # PinaxTestExt — the `Test`-dependent half of the test bridge (the Test-free half is src/testset.jl).
 #
-# This module is deliberately small. Its ONLY job is to observe a running suite through Test's
-# `AbstractTestSet` interface and hand Pinax a `TestNode` tree. Summaries, the margin figure, the
-# document, the TOML dump, and the merge of several shards' dumps are all plain Julia over `TestNode`
-# in Pinax proper — where they need no `Test`, and are testable without it.
+# This module is deliberately small. Its job is to observe a running suite through Test's
+# `AbstractTestSet` interface and to BE the container: a `PinaxTestSet` holds Pinax's own structs
+# (`Figure`/`Table`/`Check`/`Desc` + content order) directly — there is one document model, held in
+# the task-local testset (safe under parallel tests exactly as `Test`'s own stack is). Summaries, the
+# margin figure, the fold to a `Document`, and the shard dump/merge are all plain Julia over that
+# duck-typed shape in Pinax proper — where they need no `Test`.
+#
+# A content macro (`@figure`/`@desc`/…) inside a test finds this container through the ONE seam
+# `Pinax._current_container()`: we register a probe at load so that seam, staying `Test`-free, can
+# route into the open `PinaxTestSet` (or no-op when the report is off — invariant V).
 module PinaxTestExt
 
 using Pinax
 using Pinax:
     Check,
-    TestNode,
+    Figure,
+    Table,
+    Desc,
+    _anchor,
     _check_from,
     _looks_like_a_file,
+    _nerror,
+    _nfail,
+    _slug,
     _summary_line,
     dump_test_report,
     render_test_report,
@@ -19,6 +31,21 @@ using Pinax:
     report_enabled,
     report_out
 using Test: Test, AbstractTestSet
+
+function __init__()
+    # Register the container probe (a `Ref` assignment, not a method override — no precompile clash).
+    Pinax._TEST_CONTAINER_PROBE[] = _current_test_container
+    return nothing
+end
+
+# The probe `Pinax._current_container()` consults. Returns the innermost open Pinax test container,
+# `:inert` (inside a test whose set is NOT ours — the report is off, so content macros no-op), or
+# `:none` (not inside any testset — the manuscript path). Task-local via `Test.get_testset`.
+function _current_test_container()
+    Test.get_testset_depth() == 0 && return :none
+    ts = Test.get_testset()
+    return ts isa PinaxTestSet ? ts : :inert
+end
 
 """
     _testset_type() -> Type
@@ -30,16 +57,31 @@ suite that was passing.
 """
 _testset_type() = report_enabled() ? PinaxTestSet : Test.DefaultTestSet
 
+# The testset IS a Pinax container: the same fields a `Section`/`Page` carries, so the content macros
+# push into it duck-typed through the seam, and the fold moves the real structs with no second model.
 mutable struct PinaxTestSet <: AbstractTestSet
     description::String
-    results::Vector{Any}          # nested PinaxTestSet | Test.Result
+    # --- Pinax container payload (one model, held task-local) ---
+    id::Symbol
+    anchor::String
+    figures::Vector{Figure}
+    tables::Vector{Table}
+    checks::Vector{Check}
+    panels::Vector{String}
+    desc::Union{Desc,Nothing}
+    content::Vector{Pair{Symbol,Int}}   # declaration order of figures/tables/panels/checks
+    children::Vector{PinaxTestSet}
+    nbroken::Int                        # @test_broken / skipped: counted, never a Check
+    nerror::Int                         # failing checks that were ERRORS rather than plain fails
+    # --- testset bookkeeping ---
     t0::Float64
     elapsed::Float64
-    out::String                   # root only: where to render
-    dump::String                  # root only: dump the tree here INSTEAD of rendering ("" = render)
-    page_when::Function           # root only: which testsets become pages
+    ignore::Bool                        # @pinaxignore: run + count, but keep out of the document
+    # --- root-only options (a nested set is built by Test as T(desc), with none of these) ---
+    out::String
+    dump::String
+    page_when::Function
     title::String
-    ignore::Bool                  # set by @pinaxignore: run, count, but do not render
 end
 
 # Both entry points land here: `@pinaxtestset "…"` (options only ever on the ROOT), and a NESTED
@@ -52,16 +94,27 @@ function PinaxTestSet(
     page_when::Function=_looks_like_a_file,
     title::AbstractString="Test report",
 )
+    id = _slug(description)
     return PinaxTestSet(
         String(description),
-        Any[],
+        id,
+        _anchor(id),
+        Figure[],
+        Table[],
+        Check[],
+        String[],
+        nothing,
+        Pair{Symbol,Int}[],
+        PinaxTestSet[],
+        0,
+        0,
         time(),
         NaN,
+        false,
         String(out),
         String(dump),
         page_when,
         String(title),
-        false,
     )
 end
 
@@ -74,35 +127,52 @@ function Pinax._ignore_current_testset!()
     return nothing
 end
 
-Test.record(ts::PinaxTestSet, res) = (push!(ts.results, res); res)
+# Record straight into the container: a nested set is a child; a Pass/Fail/Error becomes a `Check`
+# tagged into content order at its emission site; a Broken is counted (see `finish`). Doing the
+# conversion HERE (not lazily at finish) is what keeps the tree one model with no `.results` shadow.
+function Test.record(ts::PinaxTestSet, res)
+    if res isa PinaxTestSet
+        push!(ts.children, res)                       # nest
+    elseif res isa Test.Broken
+        # A broken/skipped test is deliberately NOT a Check: it did not pass, but the runner is happy
+        # about it, and `pass=false` would paint the page red and flip the verdict to FAIL. Counted.
+        ts.nbroken += 1
+    elseif res isa Test.Result                        # Pass / Fail / Error
+        res isa Test.Error && (ts.nerror += 1)
+        chk = _check_from(_result_data_expr(res), _label(res), res isa Test.Pass, 0)
+        push!(ts.checks, chk)
+        push!(ts.content, :check => length(ts.checks))
+    end
+    return res
+end
 
 function Test.finish(ts::PinaxTestSet)
     ts.elapsed = time() - ts.t0
     if Test.get_testset_depth() > 0
-        Test.record(Test.get_testset(), ts)      # nest into the parent
+        Test.record(Test.get_testset(), ts)           # nest into the parent
         return ts
     end
     # ── ROOT ─────────────────────────────────────────────────────────
-    root = _to_node(ts)
     if ts.ignore
         nothing
     elseif !isempty(ts.dump)
         # A CI shard: dump the tree, render NOTHING. One later job merges every shard's tree into the
         # single gallery the design implies — one page per test FILE, not one gallery per shard.
-        dump_test_report(root, ts.dump)
-        println("\nPinax test report: ", _summary_line(root), "\n  dumped → ", ts.dump)
+        dump_test_report(ts, ts.dump)
+        println("\nPinax test report: ", _summary_line(ts), "\n  dumped → ", ts.dump)
     else
-        render_test_report(root; out=ts.out, title=ts.title, page_when=ts.page_when)
+        render_test_report(ts; out=ts.out, title=ts.title, page_when=ts.page_when)
         println(
             "\nPinax test report: ",
-            _summary_line(root),
+            _summary_line(ts),
             "\n  rendered → $(ts.out)_html/  $(ts.out)_agent/",
         )
     end
-    n_fail, n_err = _count(ts, Test.Fail), _count(ts, Test.Error)
-    if n_fail + n_err > 0
-        # Stay a well-behaved testset: a failing suite must still fail the process.
-        error("PinaxTestSet: $(n_fail) failed, $(n_err) errored")
+    # Stay a well-behaved testset: a failing suite must still fail the process (invariant IV — a
+    # report never turns a red suite green). Counted from the folded checks, duck-typed.
+    nfail, nerr = _nfail(ts), _nerror(ts)
+    if nfail + nerr > 0
+        error("PinaxTestSet: $(nfail) failed, $(nerr) errored")
     end
     return ts
 end
@@ -132,45 +202,6 @@ function _label(r::Test.Result)
     s = e === nothing ? string(typeof(r)) : string(e)
     length(s) > 110 && (s = s[1:107] * "…")
     return s
-end
-
-# A Pass/Fail/Error becomes a Check. A Broken one does NOT: it has no verdict to show — it did not
-# pass, but the runner is perfectly happy about it, and encoding it as `pass=false` would paint the
-# page red and flip the benchmark verdict to FAIL. It is counted instead.
-_is_check(r) = r isa Test.Pass || r isa Test.Fail || r isa Test.Error
-
-function _to_node(ts::PinaxTestSet)
-    checks = Check[]
-    children = TestNode[]
-    nbroken = 0
-    nerror = 0
-    for r in ts.results
-        if r isa PinaxTestSet
-            push!(children, _to_node(r))
-        elseif _is_check(r)
-            r isa Test.Error && (nerror += 1)
-            push!(checks, _check_from(_result_data_expr(r), _label(r), r isa Test.Pass, 0))
-        elseif r isa Test.Result
-            nbroken += 1
-        end
-    end
-    return TestNode(
-        ts.description;
-        elapsed=ts.elapsed,
-        ignore=ts.ignore,
-        checks=checks,
-        nbroken=nbroken,
-        nerror=nerror,
-        children=children,
-    )
-end
-
-function _count(ts::PinaxTestSet, T::Type)
-    n = 0
-    for r in ts.results
-        r isa PinaxTestSet ? (n += _count(r, T)) : (r isa T && (n += 1))
-    end
-    return n
 end
 
 end # module

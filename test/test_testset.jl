@@ -147,12 +147,56 @@ _check_for(r, i) = _check_from(_result_data_expr(r), Ext._label(r), r isa Test.P
         @test occursin("1/2 passed", Pinax._summary_line(n))
     end
 
+    @testset "the seam: content macros route into the open testset (A)" begin
+        # A PinaxTestSet on the stack IS the container — @figure/@desc land in it, in declaration
+        # order, through the one seam Pinax._current_container(). No @page/@section, no CTX; the
+        # gens are deferred, so nothing is plotted here.
+        root = PinaxTestSet("cap-root")
+        captured = nothing
+        Test.push_testset(root)
+        try
+            captured = Pinax._current_container()
+            @figure "plotA"
+            @desc md"a description"
+            @figure "plotB"
+        finally
+            Test.pop_testset()
+        end
+        @test captured === root
+        @test length(root.figures) == 2
+        @test root.desc !== nothing && occursin("a description", root.desc.source)
+        @test root.content == [:figure => 1, :figure => 2]   # @desc sets desc, not content order
+    end
+
+    @testset "the seam is inert inside a stock testset, report off (invariant V)" begin
+        # A DefaultTestSet is the innermost and no manuscript is open → :inert → @figure no-ops, and
+        # its argument (a deferred gen) is never evaluated. It must neither error nor capture.
+        @testset "stock inner" begin
+            @test Pinax._current_container() === :inert
+            @figure error("this gen must never run")   # no-op: not stored, not evaluated
+        end
+    end
+
+    @testset "a manuscript built inside a test still writes to CTX, not :inert (A)" begin
+        # Pinax's own suite builds manuscripts inside @testset. An open CTX container must win over
+        # the enclosing stock testset — otherwise every manuscript test would silently go inert.
+        doc = Pinax.document() do
+            @page :p "P" begin
+                @section :s "S" begin
+                    @figure "fig-in-manuscript"
+                end
+            end
+        end
+        @test length(doc.pages[1].sections[1].figures) == 1
+    end
+
     @testset "end-to-end: env-driven, and a red suite still fails the process" begin
         dir = mktempdir()
         write(
             joinpath(dir, "test_demo.jl"),
             """
             @testset "converges" begin
+                @desc md"convergence of E against the oracle"
                 @test isapprox(-0.10203402715213993, -0.10242223073749557; rtol=0.01)
             end
             @testset "does not" begin
@@ -215,6 +259,8 @@ _check_for(r, i) = _check_from(_result_data_expr(r), Ext._label(r), r isa Test.P
         @test occursin("tol 0.01 rel", md)
         # …and the passing one reports how much of its budget it spent, not just "green"
         @test occursin("got -0.10203402715213993, want -0.10242223073749557", md)
+        # a @desc written INSIDE a test now appears in the report — the whole point of A
+        @test occursin("convergence of E against the oracle", md)
         @test occursin(
             "\"verdict\"", read(joinpath(dir, "rep_agent", "agent.json"), String)
         )
