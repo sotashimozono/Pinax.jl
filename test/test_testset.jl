@@ -173,8 +173,56 @@ _check_for(r, i) = _check_from(_result_data_expr(r), Ext._label(r), r isa Test.P
         # its argument (a deferred gen) is never evaluated. It must neither error nor capture.
         @testset "stock inner" begin
             @test Pinax._current_container() === :inert
-            @figure error("this gen must never run")   # no-op: not stored, not evaluated
+            ## every content macro is inert here — none stores anything, none errors
+            @figure error("this gen must never run")   # gen deferred + inert → never evaluated
+            @table (; N=[1, 2], E=[3, 4])
+            @raw "<b>x</b>"
+            @desc md"d"
+            @caption "c"
         end
+    end
+
+    @testset "fold places captured tables / panels / figures; dump warns on a figure" begin
+        # Drive the fold over a node carrying every content kind (a live PinaxTestSet and a merged
+        # TestNode share this duck-typed shape), so the :table / :panel / :figure branches all run and
+        # land on the page in declaration order.
+        fig = Pinax.Figure(
+            :f,
+            "f",
+            "cap",
+            nothing,
+            () -> (p=tempname() * ".svg"; write(p, "<svg/>"); p),
+            "code",
+            false,
+            String[],
+            nothing,
+        )
+        tbl = Pinax.Table(
+            :tb,
+            "tb",
+            "a table caption",
+            ["N", "E"],
+            [Any[10, -0.1], Any[20, -0.11]],
+            "tc",
+            nothing,
+        )
+        node = TestNode(
+            "test_x.jl";
+            elapsed=0.1,
+            checks=[Check(:t0, "chk", 1.0, 1.0, 0.0, 0.5, :abs, true)],
+            figures=[fig],
+            tables=[tbl],
+            panels=["<p>hand built</p>"],
+            content=[:panel => 1, :table => 1, :figure => 1, :check => 1],
+        )
+        root = TestNode("Pkg"; children=[node])
+        dir = mktempdir()
+        Pinax.render_test_report(root; out=joinpath(dir, "r"), title="T")
+        html = read(joinpath(dir, "r_html", "test_x_jl.html"), String)
+        @test occursin("a table caption", html)   # the @table folded onto the page
+        @test occursin("hand built", html)         # the @raw panel folded onto the page
+        # the dump carries checks + structure and WARNS (never silently drops) a test's figure
+        @test isfile(Pinax.dump_test_report(root, joinpath(dir, "d.toml")))
     end
 
     @testset "a manuscript built inside a test still writes to CTX, not :inert (A)" begin
