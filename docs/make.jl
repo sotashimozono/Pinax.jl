@@ -6,7 +6,6 @@ using Downloads
 using Literate
 
 const GALLERY_JL = joinpath(@__DIR__, "literate", "gallery.jl")
-const TEST2PINAX_JL = joinpath(@__DIR__, "literate", "test2pinax.jl")
 
 # The "Examples" page shows the gallery script's source verbatim (plain `julia` blocks, NOT executed).
 # The gallery itself is compiled separately (below); here we EMBED it live at the top of the page via
@@ -53,37 +52,6 @@ let
     )
 end
 
-# The "Test → Pinax" page: show the suite verbatim and LINK the report the bridge renders from it
-# (build/test2pinax_html/, compiled below) — a plain link, not an embedded iframe. The link is
-# site-root-relative, resolved for prettyurls (deployed) vs a local build.
-let
-    url = html_fmt.prettyurls ? "../test2pinax_html/" : "test2pinax_html/"
-    link = string(
-        "\n```@raw html\n",
-        "<p><a href=\"",
-        url,
-        "\" class=\"pinax-report-link\">▶&nbsp; Open the rendered report</a></p>\n",
-        "```\n",
-    )
-    add_link = function (content)
-        i = findfirst('\n', content)
-        return if i === nothing
-            content * link
-        else
-            content[1:i] * link * content[(i + 1):end]
-        end
-    end
-    Literate.markdown(
-        TEST2PINAX_JL,
-        joinpath(@__DIR__, "src");
-        name="test2pinax",
-        documenter=false,
-        execute=false,
-        credit=false,
-        postprocess=add_link,
-    )
-end
-
 assets_dir = joinpath(@__DIR__, "src", "assets")
 mkpath(assets_dir)
 Downloads.download(
@@ -121,12 +89,6 @@ let build = joinpath(@__DIR__, "build")
     end
     cd(build) do
         return Base.include(Module(:PinaxGallery), GALLERY_JL)
-    end
-    # The test-report demo: render the "Test → Pinax" page's own suite through the bridge's interface,
-    # `Pinax.test`, writing build/test2pinax_html/ (linked at the top of that page). Every check passes,
-    # so the root testset does not error the build.
-    cd(build) do
-        return Pinax.test(TEST2PINAX_JL; out="test2pinax", title="Pinax self-test")
     end
 end
 

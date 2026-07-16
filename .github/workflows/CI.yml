@@ -32,3 +32,56 @@ jobs:
         with:
           file: lcov.info
           token: ${{ secrets.CODECOV_TOKEN }}
+
+  # ── Design proof: the SAME plain-`@testset` suite (`test/runtests.jl`, no token) runs three ways.
+  # `Pkg.test()` is the `test` job above (stock Test, no report); these two add the Pinax entry points.
+  # All three green, with the same verdict, is the proof that Pinax renders a report without changing
+  # what the suite is, how it runs, or whether it passes — i.e. that `Pkg` and `Pinax` compose cleanly.
+  pinax-test-delegation:
+    name: "Pinax.test() — Pkg.test delegation"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: julia-actions/setup-julia@v3
+        with:
+          version: '1'
+      - uses: julia-actions/cache@v3
+      - uses: julia-actions/julia-buildpkg@v1
+      - name: "Pinax.test() renders the suite via the Pkg.test -L capturing root"
+        run: julia --project=. -e 'using Pinax; Pinax.test(; out="pinax-report")'
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pinax-report-delegation
+          path: |
+            pinax-report_html
+            pinax-report_agent
+
+  pinax-test-inprocess:
+    name: "Pinax.test(runtests) — in-process (Test-level)"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: julia-actions/setup-julia@v3
+        with:
+          version: '1'
+      - uses: julia-actions/cache@v3
+      - name: "Pinax.test(\"test/runtests.jl\") renders the same suite in the current process"
+        run: |
+          julia -e '
+            import Pkg
+            Pkg.activate(; temp=true)
+            Pkg.develop(; path=".")
+            Pkg.add("TestEnv")
+            using TestEnv
+            TestEnv.activate("Pinax")
+            using Pinax
+            Pinax.test("test/runtests.jl"; out="pinax-report")
+          '
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: pinax-report-inprocess
+          path: |
+            pinax-report_html
+            pinax-report_agent

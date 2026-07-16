@@ -618,10 +618,12 @@ _ctx_container() = CTX.section !== nothing ? CTX.section : CTX.page
 # open, the content is test content with the report OFF → `:inert` (the caller no-ops, invariant V);
 # else nothing is open at all → `nothing` (the caller errors on manuscript misuse).
 function _current_container()
-    tc = _probe_test_container()
-    (tc === :none || tc === :inert) || return tc    # an open PinaxTestSet — capture into it
     ctx = _ctx_container()
-    ctx === nothing || return ctx                   # an open manuscript container (even inside a test)
+    ctx === nothing || return ctx                   # an EXPLICITLY-open manuscript container wins — a
+    # manuscript built inside a test (even a captured one, via `document()`/`@page`) writes to `CTX`,
+    # not the testset; only when nothing is open does the enclosing testset capture the content.
+    tc = _probe_test_container()
+    (tc === :none || tc === :inert) || return tc    # an open PinaxTestSet — capture the test content
     return tc === :inert ? :inert : nothing
 end
 

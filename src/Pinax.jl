@@ -63,7 +63,7 @@ export render,
 
 # comment store (CLI / LLM-loop substrate)
 export read_comments, add_comment, set_bookmark!
-export testset_type, @pinaxtestset, @pinaxignore
+export @pinaxignore
 export render_test_report, dump_test_report, load_test_dump
 
 end # module Pinax

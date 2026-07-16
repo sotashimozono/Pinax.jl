@@ -8,9 +8,9 @@ const FIG_BASE = joinpath(pkgdir(Pinax), "docs", "src", "assets")
 const PATHS = Dict()
 mkpath.(values(PATHS))
 
-# `@pinaxtestset` is `@testset` unless PINAX_TEST_REPORT is set, in which case the whole tree is
-# captured and rendered/dumped as a Pinax document (Pinax dogfooding its own test bridge).
-@pinaxtestset "tests" begin
+# Plain `@testset`: a bare `Pkg.test()` runs stock. Running `Pinax.test()` instead captures this same
+# tree and renders/dumps it as a Pinax document (Pinax dogfooding its own bridge, no token in the file).
+@testset "tests" begin
     # ----- Test the module itself. -----
     @testset "Aqua tests" begin
         @pinaxignore              # ran and counted, but it is not a result anyone wants to read

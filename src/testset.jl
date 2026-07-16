@@ -22,93 +22,60 @@
 # and the `record`/`finish` machinery live in the extension.
 
 """
-    testset_type() -> Type
-
-The testset type [`@pinaxtestset`](@ref) binds: **`Test.DefaultTestSet` unless `PINAX_TEST_REPORT` is
-set**, otherwise the `PinaxTestExt` type that renders the suite as a Pinax document.
-
-Reach for this directly only when you need the type itself (a custom testset wrapper, a driver of
-your own). The normal entry point is `@pinaxtestset`, which generates the binding for you — `@testset
-T` insists that `T` be a bare identifier, which is exactly what a macro can produce and a caller
-otherwise cannot get, since Julia forbids an extension from adding a name to its parent's namespace.
-"""
-function testset_type()
-    ext = Base.get_extension(@__MODULE__, :PinaxTestExt)
-    ext === nothing && error(
-        "Pinax: the test bridge needs the Test stdlib loaded (`using Test`) — the testset type " *
-        "lives in the PinaxTestExt extension.",
-    )
-    return ext._testset_type()
-end
-
-"""
-    Pinax.test([runtests="test/runtests.jl"]; out="test-report", title="Test report") -> nothing
+    Pinax.test([runtests]; out="test-report", title="Test report", dump="") -> nothing
 
 Run a test suite and render it as a Pinax document — the interface that outputs a testset directly.
+There is **no Pinax-specific macro** in the suite: it stays plain `@testset` / `@test`. The only Pinax
+touch is the call. Two forms:
 
-The suite stays **plain `@testset` / `@test`**: there is no Pinax-specific macro to add to it. The one
-Pinax touch is calling `Pinax.test` instead of letting `Pkg.test` `include` the file. It opens a
-capturing root testset, `include`s `runtests` (nested `@testset`s inherit it — nothing to annotate),
-writes `<out>_html` + `<out>_agent`, and re-throws on a red suite so the verdict is never changed.
+  - `Pinax.test()` — test the *active package*. Delegates to an unmodified `Pkg.test`, passing a `-L`
+    preamble that installs a capturing root before the suite runs (so its `@testset` tree is captured)
+    and renders at exit. `Pkg.test` still does all the sandbox / dependency work; a bare `Pkg.test()`
+    without this installs no root and produces no report.
+  - `Pinax.test(runtests::AbstractString)` — render a specific test file in the current process (no
+    sandbox): open a capturing root testset, `include` the file, render.
 
-A suite may *also* draw in Pinax's own vocabulary (`@desc`, `@figure`, `@table`, …) and that content is
-captured into the report; with the report machinery absent it is a no-op, so the same file runs
-untouched under a bare `Pkg.test()`.
+Each test *file* (a `.jl`-named `@testset`) becomes a `status = :benchmark` page, each nested
+`@testset` a section, each `@test` a `Check` carrying its real `got`/`want`/`tol`. Writes
+`<out>_html` + `<out>_agent`; with `dump` set, dumps the tree there instead (a sharded CI shard) for
+[`render_test_report`](@ref) to merge later. A red suite still fails the process — the report never
+changes the verdict. A suite may also draw (`@desc`/`@figure`/`@table`/…); that content is captured,
+and is a no-op under a bare `Pkg.test()`.
 
-The machinery lives in `PinaxTestExt`, so this needs `Test` loaded (`using Test`); calling it without
-Test errors, pointing you at the fix.
+The `test()` delegation is `Test`-free (only `Pkg`, a stdlib); the in-process `test(runtests)` form
+lives in `PinaxTestExt` and needs `Test` loaded.
 """
-function test end
-
-"""
-    @pinaxtestset "MyPkg" [options…] begin … end
-
-`@testset`, plus a rendered report when CI asks for one. The **only** change a suite ever needs:
-
-    using Pinax, Test
-
-    @pinaxtestset "MyPkg" begin
-        for f in files
-            @testset "\$f" begin include(f) end   # a test FILE       → @page (status = :benchmark)
-        end                                       # a nested @testset → @section
-    end                                           # each @test        → a Check
-
-    # CI:
-    PINAX_TEST_REPORT=1  PINAX_TEST_OUT=test-report   julia --project -e 'using Pkg; Pkg.test()'
-
-With `PINAX_TEST_REPORT` unset this expands to a plain `@testset` on `Test.DefaultTestSet` — the
-stock type, not a Pinax set that skips rendering — so a normal `Pkg.test()` behaves exactly as
-before and switching the report on cannot regress a passing suite. Every argument is forwarded to
-`@testset`, so existing options keep working.
-
-Nested testsets inherit the parent's type from Julia, so the whole tree is captured with nothing to
-annotate. Use [`@pinaxignore`](@ref) to drop a subtree from the document (it still runs, and still
-fails the suite if it is red). A red suite always fails the process: a report must never turn a
-failing suite green.
-
-Why a macro rather than a name you could pass to `@testset` yourself: `@testset T` takes only a bare
-identifier bound to a real `AbstractTestSet` subtype (`Test.parse_testset_args` rejects any other
-expression, `Test._check_testset` any other value), and Julia forbids an extension from adding a name
-to its parent's namespace — so Pinax cannot simply export the type. The macro generates the binding,
-which is the one thing that *is* allowed to be a bare identifier: a gensym.
-"""
-macro pinaxtestset(args...)
-    ts = gensym("PinaxTestSet")
-    # `Test` is resolved in the CALLER's module — Pinax does not depend on Test, and anyone writing
-    # `@pinaxtestset` necessarily has `using Test` already.
-    testset = Expr(
-        :macrocall, Expr(:., :Test, QuoteNode(Symbol("@testset"))), __source__, ts, args...
-    )
-    return esc(Expr(:block, Expr(:(=), ts, :($(testset_type)())), testset))
+function test(; out=report_out(), dump=report_dump(), title::AbstractString=report_title())
+    # Delegate to an UNMODIFIED `Pkg.test`, injecting a `-L` preamble that installs a capturing root
+    # before the suite's include (invariant V′). `Pkg.test` does all the sandbox/dependency work; we
+    # add one flag and make `out` ABSOLUTE (the caller's dir) so the report survives sandbox teardown.
+    Pkg = Base.require(Base.PkgId(Base.UUID("44cfe95a-1eb2-52ea-b672-e2afdf69b78f"), "Pkg"))
+    preamble = joinpath(pkgdir(@__MODULE__), "src", "test_preamble.jl")
+    withenv(
+        "PINAX_TEST_OUT" => abspath(out),
+        "PINAX_TEST_DUMP" => (isempty(dump) ? "" : abspath(dump)),
+        "PINAX_TEST_TITLE" => String(title),
+    ) do
+        return Pkg.test(; julia_args=`-L $(preamble)`)
+    end
+    return nothing
 end
 
-"Is the test report switched on? (`PINAX_TEST_REPORT` = 1 / true / yes / on, case-insensitive.)"
-function report_enabled()
-    return lowercase(get(ENV, "PINAX_TEST_REPORT", "")) in ("1", "true", "yes", "on")
-end
+"""
+    _install_test_capture!()
+
+Push a capturing root `PinaxTestSet` onto the (task-local) testset stack and register an `atexit` hook
+that renders/dumps it and sets the exit code — the `Pkg.test`-delegation half of [`test`](@ref). The
+`-L` preamble the delegating `Pinax.test()` hands to `Pkg.test` calls this; the method lives in
+`PinaxTestExt` (needs `Test`).
+"""
+function _install_test_capture! end
 
 "Where the test report is written (`PINAX_TEST_OUT`, default `test-report`) → `<out>_html` + `<out>_agent`."
 report_out() = get(ENV, "PINAX_TEST_OUT", "test-report")
+
+"Report title (`PINAX_TEST_TITLE`, default `Test report`) — the document title + overview heading."
+report_title() = get(ENV, "PINAX_TEST_TITLE", "Test report")
 
 """
     @pinaxignore
@@ -421,6 +388,12 @@ function _emit_node!(n, counter::Ref{Int}, page_when::Function, acc::Vector{Chec
             finally
                 _exit_page!()
             end
+        elseif _ctx_container() === nothing
+            # At the root with no page open, a non-file testset is a GROUPING (e.g. the top-level
+            # `@testset "MyPkg"` that most runtests wrap everything in) → flatten it: its children
+            # become top-level pages, exactly as `_collect_rows!` already treats it. A section needs a
+            # page, which a grouping at this level does not provide.
+            _emit_node!(ch, counter, page_when, acc)
         else
             _enter_section!(
                 _slug(ch.description), ch.description; summary=_summary_line(ch)
