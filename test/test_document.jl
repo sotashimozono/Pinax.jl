@@ -193,8 +193,14 @@ const SIDE = Ref(0)   # for checking @figure deferral
     end
 
     @testset "misuse errors" begin
+        # Inside a testset, a content macro with no container open is invariant-V test-content: it
+        # no-ops (returns nothing, adds nothing) rather than erroring, so a bare `Pkg.test()` with a
+        # stray `@figure` in a test can never break. The manuscript-misuse error still fires at depth
+        # 0 — a docs build script — where the content seam is not inert.
         Pinax.reset!()
-        @test_throws ErrorException (@figure 1)               # @figure outside @section
+        @test (@figure 1) === nothing                         # @figure outside @section → inert no-op
+        @test isempty(Pinax.current_document().pages)         # …and nothing was added
+        # A structure macro resolves against CTX directly (not the content seam), so it still errors.
         Pinax.reset!()
         @test_throws ErrorException (@section :s "S" begin
             @figure 1

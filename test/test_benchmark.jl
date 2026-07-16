@@ -183,11 +183,12 @@ end
         @test occursin("\"custom_chk\":\"E\"", j)   # override fired via _agent_benchmark! dispatch
     end
 
-    @testset "@expect outside a container errors" begin
+    @testset "@expect with no container is inert inside a test (invariant V)" begin
+        # No container open + inside a testset → the content seam is inert → `_push_check!` no-ops
+        # (returns nothing) rather than erroring. With a container open (a `@benchmark` page) the
+        # value-validation gate still fires, so ill-posed checks are still caught (below).
         Pinax.reset!()
-        @test_throws ErrorException Pinax._push_check!(;
-            id=:x, label="y", got=1.0, tol=1e-3
-        )
+        @test Pinax._push_check!(; id=:x, label="y", got=1.0, tol=1e-3) === nothing
     end
 
     @testset "ill-posed checks error (the trust gate)" begin
