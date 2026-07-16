@@ -1,0 +1,7 @@
+[assets_figures_test_energy_jl_test_energy_jl_margins]
+key = "5687739857050624634"
+assets = ["assets/figures/test_energy_jl/test_energy_jl_margins.svg"]
+
+[assets_figures_test_magnetisation_jl_test_magnetisation_jl_margins]
+key = "5687739857050624634"
+assets = ["assets/figures/test_magnetisation_jl/test_magnetisation_jl_margins.svg"]
