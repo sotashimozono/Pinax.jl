@@ -255,7 +255,7 @@ _check_for(r, i) = _check_from(_result_data_expr(r), Ext._label(r), r isa Test.P
             write(script, body)
             log = tempname()
             cmd = addenv(
-                `$(Base.julia_cmd()) --startup-file=no --project=$(dirname(@__DIR__)) $script`,
+                `$(Base.julia_cmd()) --startup-file=no --project=$(dirname(Base.active_project())) $script`,
                 "PINAX_TEST_OUT" => joinpath(dir, "rep"),
             )
             p = run(pipeline(ignorestatus(cmd); stdout=log, stderr=log))
@@ -311,7 +311,7 @@ _check_for(r, i) = _check_from(_result_data_expr(r), Ext._label(r), r isa Test.P
                 script,
                 "using Pinax, Test\nPinax.test($(repr(suite)); out=$(repr(out)), title=\"demo\")\n",
             )
-            cmd = `$(Base.julia_cmd()) --startup-file=no --project=$(dirname(@__DIR__)) $script`
+            cmd = `$(Base.julia_cmd()) --startup-file=no --project=$(dirname(Base.active_project())) $script`
             return success(run(pipeline(ignorestatus(cmd); stdout=devnull, stderr=devnull)))
         end
 
