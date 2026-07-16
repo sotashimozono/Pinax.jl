@@ -179,9 +179,14 @@ function Pinax.test(
 )
     file = abspath(runtests)
     isfile(file) || error("Pinax.test: no such test file — $(file)")
+    # A fresh `Module()` has NO module-local `include` / `eval` (unlike a `module … end`), so a
+    # `runtests.jl` that `include`s its test files would hit `UndefVarError: include`. Define them.
+    m = Module(gensym(:PinaxTest))
+    Core.eval(m, :(include(p) = $(Base.include)($m, p)))
+    Core.eval(m, :(eval(x) = $(Core.eval)($m, x)))
     withenv("PINAX_TEST_OUT" => String(out), "PINAX_TEST_TITLE" => String(title)) do
         Test.@testset PinaxTestSet "$(title)" begin
-            Base.include(Module(gensym(:PinaxTest)), file)
+            Base.include(m, file)
         end
     end
     return nothing
