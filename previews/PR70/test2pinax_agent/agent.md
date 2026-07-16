@@ -1,38 +1,48 @@
 # Test report
 
 ### Test report  [id: overview]
-_3/3 passed · 1.1s_
+_5/5 passed · 0.34s_
 
 _Per-file result profile. `worst margin` is the largest `delta/tol` seen in that file: 1.0 means a check landed exactly on its tolerance._  [table: per_file]
 | file | tests | passed | failed | errored | seconds | worst_margin |
 | --- | --- | --- | --- | --- | --- | --- |
-| test_energy.jl | 2 | 2 | 0 | 0 | 1.03 | 0.975 |
-| test_magnetisation.jl | 1 | 1 | 0 | 0 | 0.0 | 0.225 |
+| margins.jl | 4 | 4 | 0 | 0 | 0.17 |  |
+| recovery.jl | 1 | 1 | 0 | 0 | 0.02 | 0.379 |
 
-### test_energy.jl  [id: test_energy_jl]  [status: benchmark]
-**test_energy.jl   2/2 PASS**
-_2/2 passed · 1.03s_
-Ground-state observables of the demo model against the exact reference.
-- [PASS] t1 — isapprox(-1.2731, -1.2735; rtol = 0.01): got -1.2731, want -1.2735 (Δ 0.0003140950137417966 vs tol 0.01 rel)
-- [PASS] t2 — isapprox(0.4122, 0.4102; rtol = 0.005): got 0.4122, want 0.4102 (Δ 0.004875670404680648 vs tol 0.005 rel)
-- [fig: test_energy_jl_margins] Tolerance budget spent by each check. The dashed line is the pass/fail boundary — a bar close to it passed, but barely.
-  - asset: ../test2pinax_html/assets/figures/test_energy_jl/test_energy_jl_margins.svg
+### margins.jl  [id: margins_jl]  [status: benchmark]
+**margins.jl   4/4 PASS**
+_4/4 passed · 0.17s_
+A `Check` keeps `got` / `want` / `tol`, so the report shows the *margin* each test
+passed by. The two checks below both pass, but one is a refactor from red and the
+other is rock-solid — indistinguishable on a green badge, obvious here.
+- [PASS] t1 — solid.pass: got 1.0, want 1.0 (Δ 0.0 vs tol 0.5 abs)
+- [PASS] t2 — solid.delta / solid.tol < 0.1: got 1.0, want 1.0 (Δ 0.0 vs tol 0.5 abs)
+- [PASS] t3 — tight.pass: got 1.0, want 1.0 (Δ 0.0 vs tol 0.5 abs)
+- [PASS] t4 — tight.delta / tight.tol > 0.9: got 1.0, want 1.0 (Δ 0.0 vs tol 0.5 abs)
+- [fig: margins_jl_margins] Tolerance budget spent by each check. The dashed line is the pass/fail boundary — a bar close to it passed, but barely.
+  - asset: ../test2pinax_html/assets/figures/margins_jl/margins_jl_margins.svg
 
 | series | x | y |
 | --- | --- | --- |
-| margin | 1 | 0.03140950137417966 |
-| margin | 2 | 0.9751340809361295 |
+| margin | 1 | 0.0 |
+| margin | 2 | 0.0 |
+| margin | 3 | 0.0 |
+| margin | 4 | 0.0 |
 | pass/fail boundary | 1 | 1.0 |
 | pass/fail boundary | 2 | 1.0 |
+| pass/fail boundary | 3 | 1.0 |
+| pass/fail boundary | 4 | 1.0 |
 
-### test_magnetisation.jl  [id: test_magnetisation_jl]  [status: benchmark]
-**test_magnetisation.jl   1/1 PASS**
-_1/1 passed · 0.0s_
-- [PASS] t3 — isapprox(0.6664, 0.6667; rtol = 0.002): got 0.6664, want 0.6667 (Δ 0.00044997750112489424 vs tol 0.002 rel)
-- [fig: test_magnetisation_jl_margins] Tolerance budget spent by each check. The dashed line is the pass/fail boundary — a bar close to it passed, but barely.
-  - asset: ../test2pinax_html/assets/figures/test_magnetisation_jl/test_magnetisation_jl_margins.svg
+### recovery.jl  [id: recovery_jl]  [status: benchmark]
+**recovery.jl   1/1 PASS**
+_1/1 passed · 0.02s_
+An `@test isapprox(got, want; rtol)` is enough — the bridge recovers the numbers the
+             assertion actually compared, so the page is legible with no figure code at all.
+- [PASS] t5 — isapprox(-0.10203402715213993, -0.10242223073749557; rtol = 0.01): got -0.10203402715213993, want -0.10242223073749557 (Δ 0.0037902277909821567 vs tol 0.01 rel)
+- [fig: recovery_jl_margins] Tolerance budget spent by each check. The dashed line is the pass/fail boundary — a bar close to it passed, but barely.
+  - asset: ../test2pinax_html/assets/figures/recovery_jl/recovery_jl_margins.svg
 
 | series | x | y |
 | --- | --- | --- |
-| margin | 1 | 0.2249887505624471 |
+| margin | 1 | 0.37902277909821563 |
 | pass/fail boundary | 1 | 1.0 |
