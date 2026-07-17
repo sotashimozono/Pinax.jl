@@ -1,0 +1,74 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>test_comments.jl · Test report</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="style.css"></head><body>
+<nav class="pinax-top"><a href="index.html">← Test report</a></nav>
+<h1>test_comments.jl</h1>
+<div class="pinax-meta">1 figure</div>
+<script type="application/json" id="pinax-committed">{"comments":{},"bookmarks":{},"features":["comments","bookmarks","export"]}</script>
+<section class="page" id="test_comments_jl">
+<p class="pinax-subtitle">22/22 passed · 0.31s</p>
+<div class="pinax-benchmark">
+<div class="pinax-verdict pinax-verdict-pass">test_comments.jl   22/22 PASS</div>
+<table class="pinax-checks"><thead><tr><th></th><th>id</th><th>label</th><th>got</th><th>want</th><th>Δ vs tol (kind)</th></tr></thead><tbody>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t192</td><td>isempty(c) <span class="pinax-src">@ test_comments.jl:12</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t193</td><td>isempty(b) <span class="pinax-src">@ test_comments.jl:13</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t194</td><td>length(c[:energy]) == 2 <span class="pinax-src">@ test_comments.jl:22</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t195</td><td>((c[:energy])[1]).author == &quot;me&quot; <span class="pinax-src">@ test_comments.jl:23</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t196</td><td>((c[:energy])[1]).text == &quot;first note&quot; <span class="pinax-src">@ test_comments.jl:24</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t197</td><td>((c[:energy])[2]).author == &quot;llm&quot; <span class="pinax-src">@ test_comments.jl:25</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t198</td><td>((c[:other])[1]).author == &quot;sensei&quot; <span class="pinax-src">@ test_comments.jl:26</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t199</td><td>isempty(b) <span class="pinax-src">@ test_comments.jl:27</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t200</td><td>:energy in b <span class="pinax-src">@ test_comments.jl:35</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t201</td><td>length(c[:energy]) == 1 <span class="pinax-src">@ test_comments.jl:36</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t202</td><td>occursin(&quot;&lt;div class=\&quot;pinax-comments\&quot;&gt;&quot;, html) <span class="pinax-src">@ test_comments.jl:49</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t203</td><td>occursin(&quot;&lt;span class=\&quot;author\&quot;&gt;llm&lt;/span&gt;&quot;, html) <span class="pinax-src">@ test_comments.jl:50</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t204</td><td>occursin(&quot;&lt;strong&gt;large&lt;/strong&gt;&quot;, html) <span class="pinax-src">@ test_comments.jl:51</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t205</td><td>occursin(&quot;class=\&quot;pinax-bm-on\&quot;&quot;, html) <span class="pinax-src">@ test_comments.jl:64</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t206</td><td>occursin(&quot;class=\&quot;section bookmarked\&quot;&quot;, html) <span class="pinax-src">@ test_comments.jl:65</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t207</td><td>!(occursin(&quot;&lt;div class=\&quot;pinax-comments\&quot;&gt;&quot;, html)) <span class="pinax-src">@ test_comments.jl:76</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t208</td><td>occursin(&quot;&amp;lt;script&amp;gt;&quot;, html) <span class="pinax-src">@ test_comments.jl:89</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t209</td><td>!(occursin(&quot;&lt;script&gt;alert&quot;, html)) <span class="pinax-src">@ test_comments.jl:90</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t210</td><td>read(f, String) == before <span class="pinax-src">@ test_comments.jl:104</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t211</td><td>occursin(&quot;&lt;div class=\&quot;pinax-comments\&quot;&gt;&quot;, card) <span class="pinax-src">@ test_comments.jl:119</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t212</td><td>occursin(&quot;look at this peak&quot;, card) <span class="pinax-src">@ test_comments.jl:120</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t213</td><td>occursin(&quot;&lt;span class=\&quot;author\&quot;&gt;me&lt;/span&gt;&quot;, card) <span class="pinax-src">@ test_comments.jl:121</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+</tbody></table></div>
+<div class="figgrid">
+<figure id="test_comments_jl_margins">
+<img src="assets/figures/test_comments_jl/test_comments_jl_margins.svg" alt="test_comments_jl_margins">
+<a class="pinax-dl" href="assets/figures/test_comments_jl/test_comments_jl_margins.svg" download title="download test_comments_jl_margins.svg">⤓ download</a>
+<figcaption><b>Fig. 7.</b> Tolerance budget spent by each check. The dashed line is the pass/fail boundary — a bar close to it passed, but barely.</figcaption>
+</figure>
+</div>
+<nav><strong>Contents</strong>
+<a href="#test_comments_jl_comment_store_inline_rendering">comment store + inline rendering</a>
+<a href="#test_comments_jl_read_comments_on_a_missing_file_is_empty">read_comments on a missing file is empty</a>
+<a href="#test_comments_jl_add_comment_appends_turns_multi_writer_no_clobber_">add_comment appends turns (multi-writer, no clobber)</a>
+<a href="#test_comments_jl_set_bookmark_round_trips_and_preserves_comments">set_bookmark! round-trips and preserves comments</a>
+<a href="#test_comments_jl_comments_render_inline_under_their_section">comments render inline under their section</a>
+<a href="#test_comments_jl_bookmarked_section_shows_a_marker_class">bookmarked section shows a marker + class</a>
+<a href="#test_comments_jl_no_comments_file_no_comment_markup">no comments file -&gt; no comment markup</a>
+<a href="#test_comments_jl_raw_html_in_a_comment_is_escaped">raw HTML in a comment is escaped</a>
+<a href="#test_comments_jl_render_only_reads_the_comments_file_never_clobbers_it_">render only reads the comments file (never clobbers it)</a>
+<a href="#test_comments_jl_comments_attach_to_a_figure_co_located_inside_its_card_">comments attach to a figure (co-located inside its card)</a>
+</nav>
+<section class="section" id="test_comments_jl_comment_store_inline_rendering"><h2>Sec. 54. comment store + inline rendering</h2>
+</section>
+<section class="section" id="test_comments_jl_read_comments_on_a_missing_file_is_empty"><h2>Sec. 55. read_comments on a missing file is empty</h2>
+</section>
+<section class="section" id="test_comments_jl_add_comment_appends_turns_multi_writer_no_clobber_"><h2>Sec. 56. add_comment appends turns (multi-writer, no clobber)</h2>
+</section>
+<section class="section" id="test_comments_jl_set_bookmark_round_trips_and_preserves_comments"><h2>Sec. 57. set_bookmark! round-trips and preserves comments</h2>
+</section>
+<section class="section" id="test_comments_jl_comments_render_inline_under_their_section"><h2>Sec. 58. comments render inline under their section</h2>
+</section>
+<section class="section" id="test_comments_jl_bookmarked_section_shows_a_marker_class"><h2>Sec. 59. bookmarked section shows a marker + class</h2>
+</section>
+<section class="section" id="test_comments_jl_no_comments_file_no_comment_markup"><h2>Sec. 60. no comments file -&gt; no comment markup</h2>
+</section>
+<section class="section" id="test_comments_jl_raw_html_in_a_comment_is_escaped"><h2>Sec. 61. raw HTML in a comment is escaped</h2>
+</section>
+<section class="section" id="test_comments_jl_render_only_reads_the_comments_file_never_clobbers_it_"><h2>Sec. 62. render only reads the comments file (never clobbers it)</h2>
+</section>
+<section class="section" id="test_comments_jl_comments_attach_to_a_figure_co_located_inside_its_card_"><h2>Sec. 63. comments attach to a figure (co-located inside its card)</h2>
+</section>
+</section>
+<script src="app.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script><script>window.addEventListener("load",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],macros:{},throwOnError:false});});</script></body></html>
