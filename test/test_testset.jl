@@ -539,6 +539,20 @@ _check_for(r, i) = _check_from(_result_data_expr(r), Ext._label(r), r isa Test.P
         end
     end
 
+    @testset "@caption after a @test names the check's quantity (C follow-up)" begin
+        # A swept `@testset for` folds by the check's label; `@caption` sets that label to a human name,
+        # so a convergence figure is titled `energy` rather than the raw `isapprox(...)` expression.
+        root = PinaxTestSet("cap")
+        Test.push_testset(root)
+        try
+            @test isapprox(1.0, 1.0009; rtol=0.01)   # records a check into the captured testset
+            @caption "energy"
+        finally
+            Test.pop_testset()
+        end
+        @test root.checks[end].label == "energy"     # the caption renamed the quantity
+    end
+
     @testset "@expect inside a captured test is forbidden — @test is the assertion (F)" begin
         # `@expect` is manuscript vocabulary. Directly inside a test — here a captured `PinaxTestSet`,
         # the report-ON path — it errors and points to `@test`, so a check can never be recorded but
