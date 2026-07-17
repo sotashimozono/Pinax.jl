@@ -4,9 +4,9 @@
 <div class="pinax-meta">1 figure</div>
 <script type="application/json" id="pinax-committed">{"comments":{},"bookmarks":{},"features":["comments","bookmarks","export"]}</script>
 <section class="page" id="test_testset_jl">
-<p class="pinax-subtitle">105/105 passed · 76.55s</p>
+<p class="pinax-subtitle">109/109 passed · 54.29s</p>
 <div class="pinax-benchmark">
-<div class="pinax-verdict pinax-verdict-pass">test_testset.jl   105/105 PASS</div>
+<div class="pinax-verdict pinax-verdict-pass">test_testset.jl   109/109 PASS</div>
 <table class="pinax-checks"><thead><tr><th></th><th>id</th><th>label</th><th>got</th><th>want</th><th>Δ vs tol (kind)</th></tr></thead><tbody>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t687</td><td>Ext !== nothing <span class="pinax-src">@ test_testset.jl:32</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t688</td><td>PinaxTestSet &lt;: Test.AbstractTestSet <span class="pinax-src">@ test_testset.jl:33</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
@@ -133,12 +133,16 @@
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t791</td><td>any((r-&gt;begin
             #= /home/runner/work/Pinax.jl/Pinax.jl/test/test_testset.jl:707 =#
             r.… <span class="pinax-src">@ test_testset.jl:706</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t792</td><td>Pinax._checks_fingerprint(c1) == Pinax._checks_fingerprint(c1) <span class="pinax-src">@ test_testset.jl:720</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t793</td><td>Pinax._checks_fingerprint(c1) != Pinax._checks_fingerprint(c2) <span class="pinax-src">@ test_testset.jl:721</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t794</td><td>svgfor() == s1 <span class="pinax-src">@ test_testset.jl:741</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t795</td><td>svgfor() != s1 <span class="pinax-src">@ test_testset.jl:743</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
 </tbody></table></div>
 <div class="figgrid">
 <figure id="test_testset_jl_margins">
 <img src="assets/figures/test_testset_jl/test_testset_jl_margins.svg" alt="test_testset_jl_margins">
 <a class="pinax-dl" href="assets/figures/test_testset_jl/test_testset_jl_margins.svg" download title="download test_testset_jl_margins.svg">⤓ download</a>
-<figcaption><b>Fig. 51.</b> Tolerance budget spent by each check. The dashed line is the pass/fail boundary — a bar close to it passed, but barely. Showing the 40 worst of 105 checks &#40;the rest are in agent.json&#41;.</figcaption>
+<figcaption><b>Fig. 51.</b> Tolerance budget spent by each check. The dashed line is the pass/fail boundary — a bar close to it passed, but barely. Showing the 40 worst of 109 checks &#40;the rest are in agent.json&#41;.</figcaption>
 </figure>
 </div>
 <nav><strong>Contents</strong>
@@ -170,6 +174,7 @@
 <a href="#test_testset_jl_a_failing_check_carries_file_line_the_failure_payload_i_">a failing check carries file:line — the failure payload (I)</a>
 <a href="#test_testset_jl_at_scale_the_human_gallery_caps_rows_agent_json_stays_complete_j_">at scale the human gallery caps rows; agent.json stays complete (J)</a>
 <a href="#test_testset_jl_a_ci_matrix_merges_as_parts_not_shards_the_cell_is_a_binding_k_">a CI matrix merges as parts, not shards — the cell is a binding (K)</a>
+<a href="#test_testset_jl_derived_figures_are_data_keyed_no_stale_figure_on_rebuild_l_">derived figures are data-keyed — no stale figure on rebuild (L)</a>
 </nav>
 <section class="section" id="test_testset_jl_pinaxtestset"><h2>Sec. 210. PinaxTestSet</h2>
 </section>
@@ -226,6 +231,8 @@
 <section class="section" id="test_testset_jl_at_scale_the_human_gallery_caps_rows_agent_json_stays_complete_j_"><h2>Sec. 236. at scale the human gallery caps rows; agent.json stays complete (J)</h2>
 </section>
 <section class="section" id="test_testset_jl_a_ci_matrix_merges_as_parts_not_shards_the_cell_is_a_binding_k_"><h2>Sec. 237. a CI matrix merges as parts, not shards — the cell is a binding (K)</h2>
+</section>
+<section class="section" id="test_testset_jl_derived_figures_are_data_keyed_no_stale_figure_on_rebuild_l_"><h2>Sec. 238. derived figures are data-keyed — no stale figure on rebuild (L)</h2>
 </section>
 </section>
 <script src="app.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script><script>window.addEventListener("load",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],macros:{},throwOnError:false});});</script></body></html>
