@@ -4,7 +4,9 @@
 # into a convergence figure + a tolerance-margin figure, and `@caption` naming the quantity. The
 # assertions are genuine (a real convergent quadrature), so under a bare `Pkg.test()` this is an honest
 # smoke test of the environment's floating point; under `Pinax.test()` it draws itself.
-@testset "test_report_demo.jl" begin
+# NOTE: the wrapper testset is DESCRIPTIVE, not the file name — `runtests.jl` already wraps every file
+# in `@testset "<file>.jl"`, and a second `.jl`-named testset would nest a page inside a page.
+@testset "midpoint rule → π (a convergence study)" begin
     @desc md"The midpoint rule for the integral of 4/(1+x^2) on [0,1] converges to π as O(1/n²). The report shows the estimate approaching π and the tolerance budget shrinking — from the numbers the suite already computed, with no figure code."
 
     midpoint(n) = sum(k -> 4 / (1 + ((k - 0.5) / n)^2), 1:n) / n   # → π as n → ∞
