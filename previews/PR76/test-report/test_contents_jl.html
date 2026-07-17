@@ -1,0 +1,78 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>test_contents.jl · Test report</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="style.css"></head><body>
+<nav class="pinax-top"><a href="index.html">← Test report</a></nav>
+<h1>test_contents.jl</h1>
+<div class="pinax-meta">1 figure</div>
+<script type="application/json" id="pinax-committed">{"comments":{},"bookmarks":{},"features":["comments","bookmarks","export"]}</script>
+<section class="page" id="test_contents_jl">
+<p class="pinax-subtitle">32/32 passed · 0.84s</p>
+<div class="pinax-benchmark">
+<div class="pinax-verdict pinax-verdict-pass">test_contents.jl   32/32 PASS</div>
+<table class="pinax-checks"><thead><tr><th></th><th>id</th><th>label</th><th>got</th><th>want</th><th>Δ vs tol (kind)</th></tr></thead><tbody>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t214</td><td>path == joinpath(sitedir(&quot;c1&quot;), &quot;index.html&quot;)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t215</td><td>isfile(path)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t216</td><td>occursin(&quot;&lt;title&gt;Atlas&lt;/title&gt;&quot;, html)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t217</td><td>occursin(&quot;2 galleries&quot;, html)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t218</td><td>occursin(&quot;&lt;div class=\&quot;pinax-cards\&quot;&gt;&quot;, html)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t219</td><td>occursin(&quot;&lt;a class=\&quot;pinax-card\&quot; href=\&quot;thermal/index.html\&quot;&gt;&quot;, html)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t220</td><td>occursin(&quot;&lt;a class=\&quot;pinax-card\&quot; href=\&quot;quench/index.html\&quot;&gt;&quot;, html)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t221</td><td>occursin(&quot;&lt;div class=\&quot;card-title\&quot;&gt;Thermal&lt;/div&gt;&quot;, html)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t222</td><td>occursin(&quot;&lt;div class=\&quot;card-summary\&quot;&gt;Equilibrium TPQ&lt;/div&gt;&quot;, html)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t223</td><td>occursin(&quot;&lt;img src=\&quot;thermal/cv.svg\&quot;&quot;, html)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t224</td><td>occursin(&quot;&lt;div class=\&quot;card-meta\&quot;&gt;3 pages · 40 figures&lt;/div&gt;&quot;, html)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t225</td><td>occursin(&quot;card-thumb card-thumb-empty&quot;, html)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t226</td><td>count(&quot;&lt;div class=\&quot;card-summary\&quot;&gt;&quot;, html) == 1</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t227</td><td>!(occursin(&quot;&lt;div class=\&quot;card-sections\&quot;&gt;&quot;, html))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t228</td><td>occursin(&quot;&lt;div class=\&quot;card-sections\&quot;&gt;&quot;, html)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t229</td><td>occursin(&quot;&lt;div class=\&quot;sec-item\&quot;&gt;Heat capacity&lt;/div&gt;&quot;, html)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t230</td><td>occursin(&quot;&lt;div class=\&quot;sec-item\&quot;&gt;Entropy&lt;/div&gt;&quot;, html)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t231</td><td>occursin(&quot;&lt;div class=\&quot;card-summary\&quot;&gt;Equilibrium TPQ&lt;/div&gt;&quot;, html)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t232</td><td>!(occursin(&quot;&lt;div class=\&quot;card-sections\&quot;&gt;&quot;, empty_items))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t233</td><td>occursin(&quot;&lt;ul class=\&quot;pinax-toc\&quot;&gt;&quot;, html)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t234</td><td>!(occursin(&quot;&lt;div class=\&quot;pinax-cards\&quot;&gt;&quot;, html))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t235</td><td>occursin(&quot;&lt;a href=\&quot;thermal/index.html\&quot;&gt;Thermal&lt;/a&gt;&quot;, html)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t236</td><td>occursin(&quot;&lt;span class=\&quot;toc-summary\&quot;&gt;— Equilibrium TPQ&lt;/span&gt;&quot;, html)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t237</td><td>occursin(&quot;&lt;span class=\&quot;toc-meta\&quot;&gt;(3 pages · 40 figures)&lt;/span&gt;&quot;, html)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t238</td><td>occursin(&quot;A &amp;amp; B&quot;, html)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t239</td><td>occursin(&quot;x&amp;lt;y&quot;, html)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t240</td><td>Pinax.contents([(; title = &quot;no href&quot;)]; out = sitedir(&quot;e1&quot;))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t241</td><td>Pinax.contents([(; title = &quot;A&quot;, href = &quot;a.html&quot;)]; out = sitedir(&quot;e2&quot;), level = :bogus)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t242</td><td>isfile(path)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t243</td><td>occursin(&quot;0 galleries&quot;, html)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t244</td><td>occursin(&quot;&lt;div class=\&quot;pinax-cards\&quot;&gt;&quot;, html)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t245</td><td>!(occursin(&quot;&lt;a class=\&quot;pinax-card\&quot;&quot;, html))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+</tbody></table></div>
+<div class="figgrid">
+<figure id="test_contents_jl_margins">
+<img src="assets/figures/test_contents_jl/test_contents_jl_margins.svg" alt="test_contents_jl_margins">
+<a class="pinax-dl" href="assets/figures/test_contents_jl/test_contents_jl_margins.svg" download title="download test_contents_jl_margins.svg">⤓ download</a>
+<figcaption><b>Fig. 8.</b> Tolerance budget spent by each check. The dashed line is the pass/fail boundary — a bar close to it passed, but barely.</figcaption>
+</figure>
+</div>
+<nav><strong>Contents</strong>
+<a href="#test_contents_jl_contents_cross_gallery_meta_index">contents: cross-gallery meta-index</a>
+<a href="#test_contents_jl_returns_the_written_index_html_path">returns the written index.html path</a>
+<a href="#test_contents_jl_default_cards_renders_a_card_per_entry">default :cards renders a card per entry</a>
+<a href="#test_contents_jl_level_rich_lists_each_entry_s_items">level=:rich lists each entry's items</a>
+<a href="#test_contents_jl_level_toc_is_a_compact_link_list_not_cards">level=:toc is a compact link list, not cards</a>
+<a href="#test_contents_jl_html_in_fields_is_escaped">HTML in fields is escaped</a>
+<a href="#test_contents_jl_errors_missing_required_field_and_bad_level">errors: missing required field and bad level</a>
+<a href="#test_contents_jl_no_entries_renders_a_valid_empty_index">no entries renders a valid, empty index</a>
+</nav>
+<section class="section" id="test_contents_jl_contents_cross_gallery_meta_index"><h2>Sec. 64. contents: cross-gallery meta-index</h2>
+</section>
+<section class="section" id="test_contents_jl_returns_the_written_index_html_path"><h2>Sec. 65. returns the written index.html path</h2>
+</section>
+<section class="section" id="test_contents_jl_default_cards_renders_a_card_per_entry"><h2>Sec. 66. default :cards renders a card per entry</h2>
+</section>
+<section class="section" id="test_contents_jl_level_rich_lists_each_entry_s_items"><h2>Sec. 67. level=:rich lists each entry's items</h2>
+</section>
+<section class="section" id="test_contents_jl_level_toc_is_a_compact_link_list_not_cards"><h2>Sec. 68. level=:toc is a compact link list, not cards</h2>
+</section>
+<section class="section" id="test_contents_jl_html_in_fields_is_escaped"><h2>Sec. 69. HTML in fields is escaped</h2>
+</section>
+<section class="section" id="test_contents_jl_errors_missing_required_field_and_bad_level"><h2>Sec. 70. errors: missing required field and bad level</h2>
+</section>
+<section class="section" id="test_contents_jl_no_entries_renders_a_valid_empty_index"><h2>Sec. 71. no entries renders a valid, empty index</h2>
+</section>
+</section>
+<script src="app.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script><script>window.addEventListener("load",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],macros:{},throwOnError:false});});</script></body></html>
