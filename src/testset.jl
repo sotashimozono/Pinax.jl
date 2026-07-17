@@ -362,6 +362,390 @@ function _push_margin_figure!(page_id::Symbol, checks::Vector{Check})
     return nothing
 end
 
+# ── sweeps: an unnamed `@testset for` is a SAMPLE, not a section (issue #69 point C) ──
+#
+# Test's `testset_forloop` emits, for `@testset for χ in (8, 16)` written with NO description, one child
+# testset per iteration whose description is the machine-generated canonical string `"χ = 8"` (and
+# `"χ = 8, β = 0.1"` for a multi-variable `for χ in …, β in …`). We read the axis ONLY from that
+# canonical string (invariant III) — never from a human-written description. When EVERY child of a
+# level parses to a binding over the SAME variables, that level is a SWEEP, not a stack of sections: its
+# checks are collected, keyed by test expression (the quantity), each tagged with its binding, and drawn
+# as a convergence figure (got vs axis, want reference, tolerance band) and a margin figure (delta/tol
+# vs axis) — one pair per quantity — instead of N near-identical repeated sections. The INNERMOST loop
+# is the x-axis; the outer loops collapse into the series legend (C3: no facet grid, one composite key).
+#
+# Decisions for the open points in #69 C:
+#   • C1 non-numeric axis (`for model in (:TFIM, :Heisenberg)`) → a CATEGORICAL x-axis (evenly-spaced
+#     ticks labelled by the value string). Same figure, categorical ticks — not small multiples.
+#   • C2 a binding that does not round-trip → a non-issue here: the axis key is ALWAYS the canonical
+#     STRING Test already produced, never the live object, so nothing needs to serialize. No index
+#     fallback is needed; the string label IS the stable key (and it dumps as-is for a sharded run).
+#   • C3 three or more nested loops → innermost = x, ALL outer bindings join into ONE legend key.
+#   • C4 a render-side `x_axis=` override is deferred: the code is the figure spec (innermost = x).
+#
+# The whole thing is Test-free and duck-typed over the same shape `_emit_node!` already walks, so a
+# sharded run gets its sweeps too: a dump carries child descriptions + checks, and the fold rebuilds the
+# convergence figure from the merged tree with no extra machinery.
+
+const _SERIES_COLORS = [
+    "#4c78a8", "#f58518", "#54a24b", "#e45756", "#72b7b2", "#b279a2", "#ff9da6", "#9d755d"
+]
+
+# Split on top-level commas only — a bound value may itself be a tuple `(1, 2)`, so track bracket depth.
+function _split_top_commas(s::AbstractString)
+    segs = String[]
+    depth = 0
+    start = firstindex(s)
+    for (i, ch) in pairs(s)
+        if ch in ('(', '[', '{')
+            depth += 1
+        elseif ch in (')', ']', '}')
+            depth = max(depth - 1, 0)
+        elseif ch == ',' && depth == 0
+            push!(segs, s[start:prevind(s, i)])
+            start = nextind(s, i)
+        end
+    end
+    push!(segs, s[start:end])
+    return segs
+end
+
+# Parse Test's canonical forloop description into `[var => value-string, …]`, or `nothing` if it is not
+# canonical. Each top-level segment must be `<identifier> = <value>` (an identifier LHS is exactly what
+# a loop variable produces); anything else — a human sentence, a name with no `=` — does not fold.
+function _parse_binding(desc::AbstractString)
+    out = Pair{Symbol,String}[]
+    for seg in _split_top_commas(desc)
+        eq = findfirst('=', seg)
+        eq === nothing && return nothing
+        lhs = strip(seg[1:prevind(seg, eq)])
+        rhs = strip(seg[nextind(seg, eq):end])
+        # LHS must be a real identifier (a loop variable), and the RHS must not itself start with `=`
+        # (guards `==`/`>=`/`<=` — a human comparison, never a Test forloop binding). Unicode-aware, so
+        # `χ`/`β`/… parse (a character-class regex would miss them).
+        (isempty(lhs) || isempty(rhs) || startswith(rhs, "=")) && return nothing
+        Base.isidentifier(lhs) || return nothing
+        push!(out, Symbol(lhs) => String(rhs))
+    end
+    return isempty(out) ? nothing : out
+end
+
+_binding_vars(b) = Symbol[k for (k, _) in b]
+_binding_str(b) = join(("$(k) = $(v)" for (k, v) in b), ", ")
+
+# A level is a sweep iff it has children, every non-ignored one parses to a binding, and they all agree
+# on the variable sequence. A test FILE is never a sample (it is a page), and a mix of canonical and
+# non-canonical siblings does not fold (we keep them as sections and warn — never silently).
+function _is_swept(n, page_when::Function)
+    vars = nothing
+    any = false
+    for ch in n.children
+        ch.ignore && continue
+        page_when(ch.description) && return false
+        b = _parse_binding(ch.description)
+        b === nothing && return false
+        v = _binding_vars(b)
+        vars === nothing ? (vars = v) : (v == vars || return false)
+        any = true
+    end
+    return any
+end
+
+# Every leaf Check under a swept node, each tagged with its full binding stack (recursing through nested
+# sweeps, flattening any non-sweep structure inside a sample). Returns `[(bindings, check), …]`.
+function _sweep_samples!(out, n, prefix, page_when::Function)
+    for ch in n.children
+        ch.ignore && continue
+        b = _parse_binding(ch.description)
+        stack = b === nothing ? prefix : vcat(prefix, b)
+        if _is_swept(ch, page_when)
+            _sweep_samples!(out, ch, stack, page_when)
+        else
+            for c in _collect_checks!(Check[], ch)
+                push!(out, (stack, c))
+            end
+        end
+    end
+    return out
+end
+
+function _collect_checks!(acc, n)
+    append!(acc, n.checks)
+    for ch in n.children
+        ch.ignore || _collect_checks!(acc, ch)
+    end
+    return acc
+end
+
+function _sweep_has_user_content(n)
+    return !isempty(n.figures) ||
+           !isempty(n.tables) ||
+           !isempty(n.panels) ||
+           any(_sweep_has_user_content, n.children)
+end
+
+# Group samples by quantity = the check label (the test expression `orig_expr`, which is loop-invariant,
+# so it is a stable identity across iterations — issue #69 B). Preserves first-seen order.
+function _group_quantities(samples)
+    order = String[]
+    groups = Dict{String,typeof(samples)}()
+    for s in samples
+        key = s[2].label
+        haskey(groups, key) || (push!(order, key); groups[key]=typeof(samples)())
+        push!(groups[key], s)
+    end
+    return [(k, groups[k]) for k in order]
+end
+
+# Render a swept level: a convergence + margin figure per quantity, then every sample check placed flat
+# (binding-tagged) so the page's pass/fail counts and `agent.json` verdict stay exactly what they were —
+# the sweep changes only how the checks are DRAWN, never the verdict.
+function _emit_sweep!(n, counter::Ref{Int}, page_when::Function, acc::Vector{Check})
+    c = _ctx_container()
+    samples = _sweep_samples!(
+        Tuple{Vector{Pair{Symbol,String}},Check}[], n, Pair{Symbol,String}[], page_when
+    )
+    isempty(samples) && return acc
+    _sweep_has_user_content(n) && _diag!(
+        WARNING,
+        string(c.id, "_sweep"),
+        "@figure/@table inside a swept `@testset for` is not folded yet — omitted from the sweep view (issue #69 E follow-up)",
+    )
+    qi = Ref(0)
+    for (label, pts) in _group_quantities(samples)
+        _push_sweep_figures!(c.id, qi, label, pts)
+    end
+    for (bind, chk) in samples
+        tagged = Check(
+            chk.id,
+            string(chk.label, "  [", _binding_str(bind), "]"),
+            chk.got,
+            chk.want,
+            chk.delta,
+            chk.tol,
+            chk.kind,
+            chk.pass,
+        )
+        _place_check!(c, tagged, counter, acc)
+    end
+    return acc
+end
+
+# Build the two figures for one quantity. Innermost binding = x (numeric → a real axis, else categorical
+# ticks); outer bindings = the legend. `want`/`tol` recover the reference line and tolerance band.
+function _push_sweep_figures!(cid::Symbol, qi::Ref{Int}, label::AbstractString, pts)
+    xvar = last(_binding_vars(pts[1][1]))
+    xval(p) = last(p[1])[2]
+    numeric = all(p -> tryparse(Float64, xval(p)) !== nothing, pts)
+    ticks =
+        numeric ? sort(unique(xval.(pts)); by=s -> parse(Float64, s)) : unique(xval.(pts))
+    xticklabels = numeric ? [_fmt_num(parse(Float64, t)) for t in ticks] : ticks
+    tickindex = Dict(t => i for (i, t) in enumerate(ticks))
+    K = length(ticks)
+    legkey(p) = _binding_str(p[1][1:(end - 1)])
+    legs = unique(legkey.(pts))
+    wantv = fill(NaN, K)
+    bandlo = fill(NaN, K)
+    bandhi = fill(NaN, K)
+    conv_series = NamedTuple[]
+    marg_series = NamedTuple[]
+    for lg in legs
+        xs, gy, my, ok = Int[], Float64[], Float64[], Bool[]
+        for p in pts
+            legkey(p) == lg || continue
+            i = tickindex[xval(p)]
+            c = p[2]
+            push!(xs, i)
+            push!(gy, c.got)
+            push!(my, _margin(c))
+            push!(ok, c.pass)
+            wantv[i] = c.want
+            tolabs = c.kind === :rel ? c.tol * abs(c.want) : c.tol
+            bandlo[i] = c.want - tolabs
+            bandhi[i] = c.want + tolabs
+        end
+        perm = sortperm(xs)
+        push!(conv_series, (; label=lg, xs=xs[perm], ys=gy[perm], ok=ok[perm]))
+        push!(marg_series, (; label=lg, xs=xs[perm], ys=my[perm], ok=ok[perm]))
+    end
+    band = [(bandlo[i], bandhi[i]) for i in 1:K]
+    qi[] += 1
+    q = _trunc(label, 44)
+    _push_figure!(;
+        gen=() -> _sweep_plot_svg(
+            tempname() * ".svg";
+            title="convergence — $(q)",
+            xlabel=string(xvar),
+            ylabel="got",
+            xticklabels=xticklabels,
+            series=conv_series,
+            band=band,
+            refline=wantv,
+        ),
+        code="",
+        caption="Convergence of `$(q)` over the swept axis `$(xvar)`. Dashed line = `want`; the shaded " *
+                "band is the tolerance; a red marker is a failed check.",
+        id=Symbol(cid, :_conv_, qi[]),
+        data=(;
+            xlabel=string(xvar),
+            ylabel="got",
+            series=[
+                (; label=isempty(s.label) ? "got" : s.label, x=s.xs, y=s.ys) for
+                s in conv_series
+            ],
+        ),
+    )
+    _push_figure!(;
+        gen=() -> _sweep_plot_svg(
+            tempname() * ".svg";
+            title="margin — $(q)",
+            xlabel=string(xvar),
+            ylabel="delta / tol",
+            xticklabels=xticklabels,
+            series=marg_series,
+            hline=1.0,
+        ),
+        code="",
+        caption="Tolerance budget `delta/tol` of `$(q)` over `$(xvar)`; the dashed line at 1.0 is the " *
+                "pass/fail boundary.",
+        id=Symbol(cid, :_swpmargin_, qi[]),
+        data=(;
+            xlabel=string(xvar),
+            ylabel="delta / tol",
+            series=[
+                (; label=isempty(s.label) ? "margin" : s.label, x=s.xs, y=s.ys) for
+                s in marg_series
+            ],
+        ),
+    )
+    return nothing
+end
+
+_trunc(s, n) = length(s) > n ? first(s, n - 1) * "…" : String(s)
+function _fmt_num(v)
+    isfinite(v) || return ""
+    return (isinteger(v) && abs(v) < 1e15) ? string(Int(v)) : string(round(v; sigdigits=4))
+end
+
+# A small multi-series line plot as hand-written SVG (same reason as `_margin_svg`: `@figure`'s gen may
+# return a file path, so a test report draws itself without dragging a plotting backend into every test
+# env). `series` is `[(; label, xs::Vector{Int}, ys::Vector{Float64}, ok::Vector{Bool}), …]` where `xs`
+# index into `xticklabels`; `band` shades a per-tick `(lo, hi)`, `refline` dashes a per-tick reference,
+# `hline` draws one horizontal boundary. y is auto-scaled over everything drawn.
+function _sweep_plot_svg(
+    path;
+    title,
+    xlabel,
+    ylabel,
+    xticklabels::Vector{String},
+    series,
+    band=nothing,
+    refline=nothing,
+    hline=nothing,
+)
+    K = length(xticklabels)
+    W, H, L, R, T, Bm = 640, 300, 66, 150, 30, 46
+    plotw, ploth = W - L - R, H - T - Bm
+    xat(i) = K <= 1 ? L + plotw / 2 : L + plotw * (i - 1) / (K - 1)
+    ys = Float64[]
+    for s in series, y in s.ys
+        isfinite(y) && push!(ys, y)
+    end
+    band === nothing || for (lo, hi) in band
+        isfinite(lo) && push!(ys, lo)
+        isfinite(hi) && push!(ys, hi)
+    end
+    refline === nothing || append!(ys, filter(isfinite, refline))
+    hline === nothing || push!(ys, hline)
+    isempty(ys) && (ys = [0.0, 1.0])
+    ylo, yhi = extrema(ys)
+    ylo == yhi && (ylo -= 0.5; yhi += 0.5)
+    pad = 0.08 * (yhi - ylo)
+    ylo -= pad
+    yhi += pad
+    yat(v) = T + ploth * (1 - (v - ylo) / (yhi - ylo))
+    io = IOBuffer()
+    print(
+        io,
+        """<svg xmlns="http://www.w3.org/2000/svg" width="$(W)" height="$(H)" font-family="ui-monospace,Menlo,monospace" font-size="11">
+        <text x="$(L)" y="16" font-size="12" fill="#444">$(_xml(title))</text>
+        <line x1="$(L)" y1="$(T)" x2="$(L)" y2="$(T + ploth)" stroke="#bbb"/>
+        <line x1="$(L)" y1="$(T + ploth)" x2="$(L + plotw)" y2="$(T + ploth)" stroke="#bbb"/>
+        <text x="$(L + plotw / 2)" y="$(H - 8)" text-anchor="middle" fill="#444">$(_xml(xlabel))</text>
+        <text x="14" y="$(T + ploth / 2)" transform="rotate(-90 14 $(T + ploth / 2))" text-anchor="middle" fill="#444">$(_xml(ylabel))</text>
+        """,
+    )
+    for v in (ylo + pad, (ylo + yhi) / 2, yhi - pad)
+        y = yat(v)
+        print(
+            io,
+            """<line x1="$(L - 4)" y1="$(y)" x2="$(L)" y2="$(y)" stroke="#bbb"/><text x="$(L - 7)" y="$(y + 3)" text-anchor="end" fill="#888">$(_fmt_num(v))</text>\n""",
+        )
+    end
+    for i in 1:K
+        x = xat(i)
+        print(
+            io,
+            """<line x1="$(x)" y1="$(T + ploth)" x2="$(x)" y2="$(T + ploth + 4)" stroke="#bbb"/><text x="$(x)" y="$(T + ploth + 16)" text-anchor="middle" fill="#888">$(_xml(xticklabels[i]))</text>\n""",
+        )
+    end
+    if band !== nothing
+        hi_pts, lo_pts = String[], String[]
+        for i in 1:K
+            lo, hi = band[i]
+            (isfinite(lo) && isfinite(hi)) || continue
+            push!(hi_pts, "$(xat(i)),$(yat(hi))")
+            pushfirst!(lo_pts, "$(xat(i)),$(yat(lo))")
+        end
+        isempty(hi_pts) || print(
+            io,
+            """<polygon points="$(join(vcat(hi_pts, lo_pts), " "))" fill="#4c9f70" fill-opacity="0.12"/>\n""",
+        )
+    end
+    if refline !== nothing
+        d = ["$(xat(i)),$(yat(refline[i]))" for i in 1:K if isfinite(refline[i])]
+        length(d) >= 2 && print(
+            io,
+            """<polyline points="$(join(d, " "))" fill="none" stroke="#4c9f70" stroke-width="1.3" stroke-dasharray="4,3"/>\n""",
+        )
+    end
+    if hline !== nothing
+        y = yat(hline)
+        print(
+            io,
+            """<line x1="$(L)" y1="$(y)" x2="$(L + plotw)" y2="$(y)" stroke="#d9534f" stroke-width="1" stroke-dasharray="3,2"/><text x="$(L + plotw)" y="$(y - 3)" text-anchor="end" fill="#d9534f">tol</text>\n""",
+        )
+    end
+    ly = T + 4
+    for (si, s) in enumerate(series)
+        col = _SERIES_COLORS[(si - 1) % length(_SERIES_COLORS) + 1]
+        d = [
+            "$(xat(s.xs[j])),$(yat(s.ys[j]))" for j in eachindex(s.xs) if isfinite(s.ys[j])
+        ]
+        length(d) >= 2 && print(
+            io,
+            """<polyline points="$(join(d, " "))" fill="none" stroke="$(col)" stroke-width="1.6"/>\n""",
+        )
+        for j in eachindex(s.xs)
+            isfinite(s.ys[j]) || continue
+            print(
+                io,
+                """<circle cx="$(xat(s.xs[j]))" cy="$(yat(s.ys[j]))" r="3" fill="$(s.ok[j] ? col : "#d9534f")" stroke="#fff" stroke-width="0.6"/>\n""",
+            )
+        end
+        if !isempty(s.label)
+            print(
+                io,
+                """<line x1="$(L + plotw + 10)" y1="$(ly)" x2="$(L + plotw + 26)" y2="$(ly)" stroke="$(col)" stroke-width="2"/><text x="$(L + plotw + 30)" y="$(ly + 3)" fill="#555">$(_xml(_trunc(s.label, 18)))</text>\n""",
+            )
+            ly += 15
+        end
+    end
+    print(io, "</svg>\n")
+    write(path, take!(io))
+    return path
+end
+
 # ── the document ─────────────────────────────────────────────────────
 
 # Assign a COLLISION-FREE id: `base` if unseen, else `base-2`, `base-3`, … plus a loud diagnostic —
@@ -397,6 +781,13 @@ function _emit_node!(
     n, counter::Ref{Int}, page_when::Function, seen::Set{Symbol}, acc::Vector{Check}=Check[]
 )
     _emit_own_content!(n, counter, acc)
+    # A level whose children are all canonical `@testset for` samples is a SWEEP, not a stack of
+    # sections: fold it into convergence + margin figures (issue #69 C). Only inside an open container
+    # (a page/section) — never at the root, where children are files and the grouping-flatten runs.
+    if _ctx_container() !== nothing && _is_swept(n, page_when)
+        _emit_sweep!(n, counter, page_when, acc)
+        return acc
+    end
     # Nested testsets become pages (a file) or sections (a group). @pinaxignore'd ones are skipped
     # HERE only — never in the counts, so an ignored subtree still fails the suite if it is red.
     for ch in n.children
@@ -420,6 +811,18 @@ function _emit_node!(
             # page, which a grouping at this level does not provide.
             _emit_node!(ch, counter, page_when, seen, acc)
         else
+            # A child that parses as a canonical binding but is being rendered as a SECTION means its
+            # siblings are not a consistent sweep (mixed/partial) — so we did not fold. Say so once
+            # (invariant III: never fall back to silence), then render it as an ordinary section.
+            if _parse_binding(ch.description) !== nothing && !(:_sweep_warned in seen)
+                push!(seen, :_sweep_warned)
+                _diag!(
+                    WARNING,
+                    "sweep",
+                    "a `@testset for` sample could not be folded (its siblings are not a consistent " *
+                    "canonical sweep) — rendered as a section instead",
+                )
+            end
             # Section ids are PAGE-QUALIFIED (`<pageid>_<slug>`) so a "conv" section in two files does
             # not clash; a true sibling collision within one page then gets the `-2` suffix.
             sid = _unique_id!(

@@ -1,5 +1,14 @@
 using Pinax
-using Pinax: _approx_numbers, _check_from, _margin_svg, Check, TestNode
+using Pinax:
+    _approx_numbers,
+    _check_from,
+    _margin_svg,
+    _parse_binding,
+    _is_swept,
+    _looks_like_a_file,
+    render_test_report,
+    Check,
+    TestNode
 using Test
 using Test: DefaultTestSet   # explicit stock context for report-off (inert) assertions
 
@@ -352,5 +361,129 @@ _check_for(r, i) = _check_from(_result_data_expr(r), Ext._label(r), r isa Test.P
 
         # red suite → Pinax.test re-throws (process fails): a report never turns a red suite green
         @test !run_it(joinpath(dir, "bad.jl"), joinpath(dir, "badrep"))
+    end
+
+    @testset "a `@testset for` is a SAMPLE, not a section — the sweep fold (C)" begin
+        # An unnamed `@testset for χ in …` is not N sections; it is a sweep. We read the axis ONLY from
+        # the canonical string Test itself generates ("χ = 8"), fold the iterations into a convergence +
+        # margin figure keyed by the test expression, and never touch the verdict. Tested on the
+        # Test-free `TestNode` shape (the fold walks the live `PinaxTestSet` and a merged dump the same).
+        mkchk(g, w, rt) = Check(
+            :t,
+            "isapprox(E, oracle; rtol = $(rt))",
+            g,
+            w,
+            abs(g - w) / abs(w),
+            rt,
+            :rel,
+            abs(g - w) / abs(w) <= rt,
+        )
+
+        @testset "the binding parser reads ONLY the canonical form (invariant III)" begin
+            @test _parse_binding("χ = 8") == [:χ => "8"]            # Unicode loop var
+            @test _parse_binding("χ = 8, β = 0.1") == [:χ => "8", :β => "0.1"]
+            @test _parse_binding("N = (1, 2)") == [:N => "(1, 2)"]  # a comma inside a tuple value
+            @test _parse_binding("a plain sentence") === nothing    # a human description does not fold
+            @test _parse_binding("MyPkg") === nothing               # a grouping name has no binding
+            @test _parse_binding("x == y") === nothing              # a comparison is not a binding
+        end
+
+        @testset "numeric sweep → one convergence + margin figure, verdict preserved" begin
+            samp(χ, got) = TestNode("χ = $(χ)"; checks=[mkchk(got, 1.0, 0.05)])
+            file = TestNode(
+                "test_conv.jl"; children=[samp(8, 1.2), samp(16, 1.05), samp(32, 1.01)]
+            )
+            @test _is_swept(file, _looks_like_a_file)
+            out = joinpath(mktempdir(), "rep")
+            render_test_report(TestNode("Test report"; children=[file]); out=out)
+            html = read(joinpath(out * "_html", "test_conv_jl.html"), String)
+            md = read(joinpath(out * "_agent", "agent.md"), String)
+            @test occursin("Convergence of", html)                 # the derived figure
+            @test occursin("test_conv_jl_conv_1", md)              # convergence fig id
+            @test occursin("test_conv_jl_swpmargin_1", md)         # margin-vs-axis fig id
+            @test occursin("1/3 FAIL", md)                         # verdict untouched (2 of 3 fail)
+            @test occursin("[χ = 8]", md) && occursin("[χ = 32]", md)  # checks binding-tagged
+            @test !occursin("[id: test_conv_jl_8]", md)            # NOT rendered as a per-value section
+        end
+
+        @testset "nested loops: innermost = x-axis, outer = legend (C3)" begin
+            inner(β, got) = TestNode("β = $(β)"; checks=[mkchk(got, 1.0, 0.05)])
+            outer(χ, gots) = TestNode("χ = $(χ)"; children=[inner(b, g) for (b, g) in gots])
+            file = TestNode(
+                "test_nest.jl";
+                children=[
+                    outer(8, [(0.1, 1.2), (0.2, 1.1)]),
+                    outer(16, [(0.1, 1.05), (0.2, 1.02)]),
+                ],
+            )
+            @test _is_swept(file, _looks_like_a_file)
+            out = joinpath(mktempdir(), "rep")
+            render_test_report(TestNode("Test report"; children=[file]); out=out)
+            html = read(joinpath(out * "_html", "test_nest_jl.html"), String)
+            @test occursin("χ = 8", html) && occursin("χ = 16", html)   # the two legend series
+        end
+
+        @testset "non-numeric axis → categorical ticks (C1)" begin
+            csamp(m, got) = TestNode("model = $(m)"; checks=[mkchk(got, 1.0, 0.05)])
+            file = TestNode(
+                "test_cat.jl"; children=[csamp("TFIM", 1.01), csamp("Heisenberg", 1.03)]
+            )
+            @test _is_swept(file, _looks_like_a_file)
+            out = joinpath(mktempdir(), "rep")
+            render_test_report(TestNode("Test report"; children=[file]); out=out)
+            html = read(joinpath(out * "_html", "test_cat_jl.html"), String)
+            @test occursin("TFIM", html) && occursin("Heisenberg", html) # string ticks, not numbers
+        end
+
+        @testset "mixed / inconsistent siblings do NOT fold — kept as sections, warned (III)" begin
+            file = TestNode(
+                "test_mix.jl";
+                children=[
+                    TestNode("χ = 8"; checks=[mkchk(1.01, 1.0, 0.05)]),
+                    TestNode("a smoke check"; checks=[mkchk(1.0, 1.0, 0.05)]),
+                ],
+            )
+            @test !_is_swept(file, _looks_like_a_file)              # not a consistent sweep
+            out = joinpath(mktempdir(), "rep")
+            render_test_report(TestNode("Test report"; children=[file]); out=out)
+            files = readdir(out * "_html")
+            txt = join(
+                read(joinpath(out * "_html", f), String) for
+                f in files if endswith(f, ".html")
+            )
+            @test occursin("a smoke check", txt)                   # rendered as an ordinary section
+            @test occursin("could not be folded", txt)             # never silent (a loud diagnostic)
+        end
+
+        @testset "a real `@testset for` folds through the delegation preamble (end-to-end)" begin
+            # The same fold, but driven by Test's own `testset_forloop` (the canonical descriptions are
+            # machine-generated, not hand-written) through the capturing root — at depth 0, so subprocess.
+            dir = mktempdir()
+            write(
+                joinpath(dir, "runtests.jl"),
+                """
+                @testset "test_sweep.jl" begin
+                    @testset for χ in (8, 16, 32)
+                        E = 1.0 + 1.0 / χ            # → 1.0 as χ grows
+                        @test isapprox(E, 1.0; rtol=0.05)
+                    end
+                end
+                """,
+            )
+            script = tempname() * ".jl"
+            write(
+                script,
+                "using Pinax, Test\nPinax._install_test_capture!()\ninclude($(repr(joinpath(dir, "runtests.jl"))))\n",
+            )
+            cmd = addenv(
+                `$(Base.julia_cmd()) --startup-file=no --project=$(dirname(Base.active_project())) $script`,
+                "PINAX_TEST_OUT" => joinpath(dir, "rep"),
+            )
+            run(pipeline(ignorestatus(cmd); stdout=devnull, stderr=devnull))
+            md = read(joinpath(dir, "rep_agent", "agent.md"), String)
+            @test occursin("Convergence of", md)                   # the sweep figure, from a real forloop
+            @test occursin("[χ = 8]", md) && occursin("[χ = 32]", md)
+            @test occursin("1/3", md)                              # verdict preserved (only χ=32 passes)
+        end
     end
 end
