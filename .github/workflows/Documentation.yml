@@ -27,7 +27,7 @@ jobs:
       # `make.jl` carries it into build/test-report/, linked from the "Test → Pinax" page. Waiting for
       # the CI run (not re-running the suite) is what keeps the docs build free of a second test pass.
       - name: Download the Pinax self-test report
-        uses: dawidd6/action-download-artifact@v6
+        uses: dawidd6/action-download-artifact@v21
         with:
           workflow: CI.yml
           name: pinax-report-delegation
