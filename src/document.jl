@@ -804,7 +804,16 @@ function _normalize_table(data, header)
     )
 end
 
-"Attach a caption to the preceding `@figure` (like `\\caption`); it overwrites any `caption=` set there, since it runs afterward."
+"""
+Name the **preceding** item (like `\\caption`), overwriting any caption/label set before it:
+
+  - after a `@figure` → the figure's caption;
+  - after a `@test` / `@expect` → the **check's quantity name** (its label). This is how a swept
+    `@testset for` names the quantity a convergence figure plots — `@test isapprox(E, oracle; rtol=…)`
+    followed by `@caption "energy"` titles the check (and its convergence figure) `energy` instead of
+    the raw expression (issue #69 C). Grouping is by this label, so every iteration's `@caption` folds
+    the sweep into one named quantity.
+"""
 macro caption(x)
     return quote
         _set_caption!($(esc(x)))
@@ -813,12 +822,16 @@ end
 function _set_caption!(s)
     c = _current_container()
     c === :inert && return nothing   # inside a test with the report off — no-op (invariant V)
-    if c === nothing || isempty(c.figures)
-        _diag!(
-            WARNING, c === nothing ? "?" : c.anchor, "@caption with no preceding @figure"
-        )
-    else
+    if c !== nothing && !isempty(c.content) && c.content[end][1] === :check
+        c.checks[c.content[end][2]].label = string(s)   # name the check's quantity
+    elseif c !== nothing && !isempty(c.figures)
         c.figures[end].caption = string(s)
+    else
+        _diag!(
+            WARNING,
+            c === nothing ? "?" : c.anchor,
+            "@caption with no preceding @figure or @test",
+        )
     end
     return nothing
 end
