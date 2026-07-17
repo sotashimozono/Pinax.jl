@@ -8,6 +8,11 @@ from red, yet the badge shows the same green as a rock-solid one.
 Pinax provides an interface that **outputs a testset directly** as a document — one page per test file,
 each check shown with the margin it passed by (`delta / tol`) — readable by a human and by an agent.
 
+!!! tip "See it live"
+    **[▶ Open Pinax's own test report](../test-report/)** — rendered from Pinax's real `test/runtests.jl`
+    by `Pinax.test()` in CI (the delegation job below), carried into this site unchanged. Not a
+    contrived demo, and not re-run for the docs: it *is* the CI run's output.
+
 ## The interface: `Pinax.test`
 
 The suite stays **plain `@testset` / `@test`** — there is no Pinax-specific macro to add to it. The one
