@@ -1,0 +1,76 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>test_cite.jl · Test report</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="style.css"></head><body>
+<nav class="pinax-top"><a href="index.html">← Test report</a></nav>
+<h1>test_cite.jl</h1>
+<div class="pinax-meta">1 figure</div>
+<script type="application/json" id="pinax-committed">{"comments":{},"bookmarks":{},"features":["comments","bookmarks","export"]}</script>
+<section class="page" id="test_cite_jl">
+<p class="pinax-subtitle">24/24 passed · 1.59s</p>
+<div class="pinax-benchmark">
+<div class="pinax-verdict pinax-verdict-pass">test_cite.jl   24/24 PASS</div>
+<table class="pinax-checks"><thead><tr><th></th><th>id</th><th>label</th><th>got</th><th>want</th><th>Δ vs tol (kind)</th></tr></thead><tbody>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t168</td><td>e.year == &quot;2026&quot; <span class="pinax-src">@ test_cite.jl:55</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t169</td><td>occursin(&quot;Environment-matrix-product operator&quot;, e.title) <span class="pinax-src">@ test_cite.jl:56</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t170</td><td>occursin(&quot;Shimozono&quot;, e.authors) &amp;&amp; occursin(&quot;Hotta&quot;, e.authors) <span class="pinax-src">@ test_cite.jl:57</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t171</td><td>e.venue == &quot;Physical Review B&quot; <span class="pinax-src">@ test_cite.jl:58</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t172</td><td>Pinax.bib_link(e) === nothing <span class="pinax-src">@ test_cite.jl:59</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t173</td><td>occursin(&quot;&lt;a href=\&quot;#ref-shimozono2026environment\&quot;&gt;[1]&lt;/a&gt;&quot;, html) <span class="pinax-src">@ test_cite.jl:71</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t174</td><td>occursin(&quot;id=\&quot;bibliography\&quot;&quot;, html) <span class="pinax-src">@ test_cite.jl:72</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t175</td><td>occursin(&quot;id=\&quot;ref-shimozono2026environment\&quot;&quot;, html) <span class="pinax-src">@ test_cite.jl:73</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t176</td><td>occursin(&quot;Shimozono&quot;, html) <span class="pinax-src">@ test_cite.jl:74</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t177</td><td>occursin(&quot;&lt;a href=\&quot;#bibliography\&quot;&gt;References&lt;/a&gt;&quot;, html) <span class="pinax-src">@ test_cite.jl:75</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t178</td><td>occursin(&quot;&lt;a href=\&quot;#ref-example_url\&quot;&gt;[1]&lt;/a&gt;&quot;, html) <span class="pinax-src">@ test_cite.jl:87</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t179</td><td>occursin(&quot;&lt;a href=\&quot;#ref-shimozono2026environment\&quot;&gt;[2]&lt;/a&gt;&quot;, html) <span class="pinax-src">@ test_cite.jl:88</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t180</td><td>count(&quot;id=\&quot;ref-example_url\&quot;&quot;, html) == 1 <span class="pinax-src">@ test_cite.jl:89</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t181</td><td>occursin(&quot;&lt;a href=\&quot;#ref-shimozono2026environment\&quot;&gt;Shimozono and Hotta&lt;/a&gt;&quot;, html) <span class="pinax-src">@ test_cite.jl:101</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t182</td><td>occursin(&quot;https://doi.org/10.0000/example.doi&quot;, html) <span class="pinax-src">@ test_cite.jl:115</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t183</td><td>occursin(&quot;https://example.com/pat&quot;, html) <span class="pinax-src">@ test_cite.jl:116</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t184</td><td>occursin(&quot;https://arxiv.org/abs/0000.00001&quot;, html) <span class="pinax-src">@ test_cite.jl:117</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t185</td><td>occursin(&quot;[?]&quot;, html) <span class="pinax-src">@ test_cite.jl:129</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t186</td><td>occursin(&quot;unknown key :ghost&quot;, html) <span class="pinax-src">@ test_cite.jl:130</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t187</td><td>!(occursin(&quot;id=\&quot;bibliography\&quot;&quot;, html)) <span class="pinax-src">@ test_cite.jl:142</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t188</td><td>!(occursin(&quot;&gt;References&lt;/a&gt;&quot;, html)) <span class="pinax-src">@ test_cite.jl:143</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t189</td><td>occursin(&quot;&lt;a href=\&quot;#ref-shimozono2026environment\&quot;&gt;[1]&lt;/a&gt;&quot;, html) <span class="pinax-src">@ test_cite.jl:156</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t190</td><td>occursin(&quot;id=\&quot;ref-shimozono2026environment\&quot;&quot;, html) <span class="pinax-src">@ test_cite.jl:157</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t191</td><td>occursin(&quot;file not found&quot;, html) <span class="pinax-src">@ test_cite.jl:169</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+</tbody></table></div>
+<div class="figgrid">
+<figure id="test_cite_jl_margins">
+<img src="assets/figures/test_cite_jl/test_cite_jl_margins.svg" alt="test_cite_jl_margins">
+<a class="pinax-dl" href="assets/figures/test_cite_jl/test_cite_jl_margins.svg" download title="download test_cite_jl_margins.svg">⤓ download</a>
+<figcaption><b>Fig. 6.</b> Tolerance budget spent by each check. The dashed line is the pass/fail boundary — a bar close to it passed, but barely.</figcaption>
+</figure>
+</div>
+<nav><strong>Contents</strong>
+<a href="#test_cite_jl__cite_bibliography_plain_bibtex_">@cite / @bibliography (plain bibtex)</a>
+<a href="#test_cite_jl_parse_bib_parses_entries_and_fields">parse_bib parses entries and fields</a>
+<a href="#test_cite_jl__cite_renders_n_linked_to_a_references_entry">@cite renders [n] linked to a References entry</a>
+<a href="#test_cite_jl_citation_numbering_by_first_appearance_repeat_keeps_the_number">citation numbering by first appearance; repeat keeps the number</a>
+<a href="#test_cite_jl__text_cite_key_keeps_its_link_text">[text](@cite key) keeps its link text</a>
+<a href="#test_cite_jl_doi_url_arxiv_links_in_the_bibliography">doi / url / arXiv links in the bibliography</a>
+<a href="#test_cite_jl_unknown_cite_key_diagnostic">unknown cite key -&gt; [?] + diagnostic</a>
+<a href="#test_cite_jl_no_citations_no_references_section_or_nav_link">no citations -&gt; no References section or nav link</a>
+<a href="#test_cite_jl__cite_works_in_a_caption">@cite works in a caption</a>
+<a href="#test_cite_jl_missing_bib_file_diagnostic_non_fatal_">missing .bib file -&gt; diagnostic (non-fatal)</a>
+</nav>
+<section class="section" id="test_cite_jl__cite_bibliography_plain_bibtex_"><h2>Sec. 44. @cite / @bibliography (plain bibtex)</h2>
+</section>
+<section class="section" id="test_cite_jl_parse_bib_parses_entries_and_fields"><h2>Sec. 45. parse_bib parses entries and fields</h2>
+</section>
+<section class="section" id="test_cite_jl__cite_renders_n_linked_to_a_references_entry"><h2>Sec. 46. @cite renders [n] linked to a References entry</h2>
+</section>
+<section class="section" id="test_cite_jl_citation_numbering_by_first_appearance_repeat_keeps_the_number"><h2>Sec. 47. citation numbering by first appearance; repeat keeps the number</h2>
+</section>
+<section class="section" id="test_cite_jl__text_cite_key_keeps_its_link_text"><h2>Sec. 48. [text](@cite key) keeps its link text</h2>
+</section>
+<section class="section" id="test_cite_jl_doi_url_arxiv_links_in_the_bibliography"><h2>Sec. 49. doi / url / arXiv links in the bibliography</h2>
+</section>
+<section class="section" id="test_cite_jl_unknown_cite_key_diagnostic"><h2>Sec. 50. unknown cite key -&gt; [?] + diagnostic</h2>
+</section>
+<section class="section" id="test_cite_jl_no_citations_no_references_section_or_nav_link"><h2>Sec. 51. no citations -&gt; no References section or nav link</h2>
+</section>
+<section class="section" id="test_cite_jl__cite_works_in_a_caption"><h2>Sec. 52. @cite works in a caption</h2>
+</section>
+<section class="section" id="test_cite_jl_missing_bib_file_diagnostic_non_fatal_"><h2>Sec. 53. missing .bib file -&gt; diagnostic (non-fatal)</h2>
+</section>
+</section>
+<script src="app.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script><script>window.addEventListener("load",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],macros:{},throwOnError:false});});</script></body></html>

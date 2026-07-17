@@ -1,0 +1,47 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>test_stack.jl · Test report</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="style.css"></head><body>
+<nav class="pinax-top"><a href="index.html">← Test report</a></nav>
+<h1>test_stack.jl</h1>
+<div class="pinax-meta">1 figure</div>
+<script type="application/json" id="pinax-committed">{"comments":{},"bookmarks":{},"features":["comments","bookmarks","export"]}</script>
+<section class="page" id="test_stack_jl">
+<p class="pinax-subtitle">10/10 passed · 0.3s</p>
+<div class="pinax-benchmark">
+<div class="pinax-verdict pinax-verdict-pass">test_stack.jl   10/10 PASS</div>
+<table class="pinax-checks"><thead><tr><th></th><th>id</th><th>label</th><th>got</th><th>want</th><th>Δ vs tol (kind)</th></tr></thead><tbody>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t641</td><td>(figs[1]).id !== :s_fig1 <span class="pinax-src">@ test_stack.jl:23</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t642</td><td>occursin(&quot;N_8&quot;, String((figs[1]).id)) <span class="pinax-src">@ test_stack.jl:24</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t643</td><td>(figs[1]).id !== (figs[2]).id <span class="pinax-src">@ test_stack.jl:25</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t644</td><td>((((Pinax.current_document()).pages[1]).sections[1]).figures[1]).id === (figs[1]).id <span class="pinax-src">@ test_stack.jl:34</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t645</td><td>Set(ab) == Set(ba) <span class="pinax-src">@ test_stack.jl:54</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t646</td><td>ab[1] === ba[2] <span class="pinax-src">@ test_stack.jl:55</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t647</td><td>(figs[1]).id === :s_fig1 <span class="pinax-src">@ test_stack.jl:67</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t648</td><td>(figs[2]).id === :custom <span class="pinax-src">@ test_stack.jl:68</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t649</td><td>cnt[] == 1 <span class="pinax-src">@ test_stack.jl:84</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t650</td><td>cnt[] == 1 <span class="pinax-src">@ test_stack.jl:96</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+</tbody></table></div>
+<div class="figgrid">
+<figure id="test_stack_jl_margins">
+<img src="assets/figures/test_stack_jl/test_stack_jl_margins.svg" alt="test_stack_jl_margins">
+<a class="pinax-dl" href="assets/figures/test_stack_jl/test_stack_jl_margins.svg" download title="download test_stack_jl_margins.svg">⤓ download</a>
+<figcaption><b>Fig. 49.</b> Tolerance budget spent by each check. The dashed line is the pass/fail boundary — a bar close to it passed, but barely.</figcaption>
+</figure>
+</div>
+<nav><strong>Contents</strong>
+<a href="#test_stack_jl_paramio_lineage_param_derived_ids_canonical_cache_key">ParamIO lineage: param-derived ids + canonical cache key</a>
+<a href="#test_stack_jl_id_is_derived_from_params_not_positional_order_independent">id is derived from params (not positional), order-independent</a>
+<a href="#test_stack_jl_ids_stay_put_when_figures_are_reordered">ids stay put when figures are reordered</a>
+<a href="#test_stack_jl_explicit_id_and_non_datakey_params_keep_positional_explicit_behaviour">explicit id and non-DataKey params keep positional/explicit behaviour</a>
+<a href="#test_stack_jl_cache_key_uses_canonical_params_reordered_params_cache_hit_">cache key uses canonical params (reordered params -&gt; cache hit)</a>
+</nav>
+<section class="section" id="test_stack_jl_paramio_lineage_param_derived_ids_canonical_cache_key"><h2>Sec. 195. ParamIO lineage: param-derived ids + canonical cache key</h2>
+</section>
+<section class="section" id="test_stack_jl_id_is_derived_from_params_not_positional_order_independent"><h2>Sec. 196. id is derived from params (not positional), order-independent</h2>
+</section>
+<section class="section" id="test_stack_jl_ids_stay_put_when_figures_are_reordered"><h2>Sec. 197. ids stay put when figures are reordered</h2>
+</section>
+<section class="section" id="test_stack_jl_explicit_id_and_non_datakey_params_keep_positional_explicit_behaviour"><h2>Sec. 198. explicit id and non-DataKey params keep positional/explicit behaviour</h2>
+</section>
+<section class="section" id="test_stack_jl_cache_key_uses_canonical_params_reordered_params_cache_hit_"><h2>Sec. 199. cache key uses canonical params (reordered params -&gt; cache hit)</h2>
+</section>
+</section>
+<script src="app.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script><script>window.addEventListener("load",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],macros:{},throwOnError:false});});</script></body></html>
