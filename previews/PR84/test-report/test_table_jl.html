@@ -1,0 +1,220 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>test_table.jl · Test report</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="style.css"></head><body>
+<nav class="pinax-top"><a href="index.html">← Test report</a></nav>
+<h1>test_table.jl</h1>
+<div class="pinax-meta">1 figure</div>
+<script type="application/json" id="pinax-committed">{"comments":{},"bookmarks":{},"features":["comments","bookmarks","export"]}</script>
+<section class="page" id="test_table_jl">
+<p class="pinax-subtitle">36/36 passed · 2.11s</p>
+<div class="pinax-benchmark">
+<div class="pinax-verdict pinax-verdict-pass">test_table.jl   36/36 PASS</div>
+<table class="pinax-checks"><thead><tr><th></th><th>id</th><th>label</th><th>got</th><th>want</th><th>Δ vs tol (kind)</th></tr></thead><tbody>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">@testset &quot;@table primitive&quot; begin
+    @testset &quot;input normalization: columns / matrix / row-records&quot; begin
+        Pinax.reset!(; title=&quot;t&quot;)
+        @page :p &quot;P&quot; begin
+            @table (T=[1.0, 2.0], M=[0.5, 0.6]) caption = &quot;m(t)&quot;
+            @section :s &quot;S&quot; begin
+                @table [1 2; 3 4] header = [&quot;a&quot;, &quot;b&quot;]
+                @table [(name=&quot;x&quot;, v=1), (name=&quot;y&quot;, v=2)]
+            end
+        end
+        pg = Pinax.current_document().pages[1]
+        @test pg.tables[1].header == [&quot;T&quot;, &quot;M&quot;]</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t651</td><td>(pg.tables[1]).header == [&quot;T&quot;, &quot;M&quot;] <span class="pinax-src">@ test_table.jl:24</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test pg.tables[1].rows == [[1.0, 0.5], [2.0, 0.6]]   # columnar -&gt; row-major</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t652</td><td>(pg.tables[1]).rows == [[1.0, 0.5], [2.0, 0.6]] <span class="pinax-src">@ test_table.jl:25</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test pg.tables[1].caption == &quot;m(t)&quot;</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t653</td><td>(pg.tables[1]).caption == &quot;m(t)&quot; <span class="pinax-src">@ test_table.jl:26</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test pg.tables[1].id == :p_tbl1</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t654</td><td>(pg.tables[1]).id == :p_tbl1 <span class="pinax-src">@ test_table.jl:27</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        s = pg.sections[1]
+        @test s.tables[1].header == [&quot;a&quot;, &quot;b&quot;]                # matrix + explicit header</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t655</td><td>(s.tables[1]).header == [&quot;a&quot;, &quot;b&quot;] <span class="pinax-src">@ test_table.jl:29</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test s.tables[1].rows == [[1, 2], [3, 4]]</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t656</td><td>(s.tables[1]).rows == [[1, 2], [3, 4]] <span class="pinax-src">@ test_table.jl:30</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test s.tables[2].header == [&quot;name&quot;, &quot;v&quot;]             # row records -&gt; header from fields</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t657</td><td>(s.tables[2]).header == [&quot;name&quot;, &quot;v&quot;] <span class="pinax-src">@ test_table.jl:31</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test s.tables[2].rows == [[&quot;x&quot;, 1], [&quot;y&quot;, 2]]</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t658</td><td>(s.tables[2]).rows == [[&quot;x&quot;, 1], [&quot;y&quot;, 2]] <span class="pinax-src">@ test_table.jl:32</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">
+    @testset &quot;renders to all three backends&quot; begin
+        tmp = mktempdir()
+        Pinax.reset!(; title=&quot;T&quot;)
+        @page :p &quot;P&quot; begin
+            @table (T=[1.0, 2.0], M=[0.5, 0.6]) caption = &quot;cap&quot;
+            @section :s &quot;S&quot; begin
+                @table [1 2; 3 4] header = [&quot;a&quot;, &quot;b&quot;]
+            end
+        end
+        g = read(Pinax.render(; out=joinpath(tmp, &quot;g&quot;), theme=:gallery), String)
+        @test occursin(&quot;class=\&quot;pinax-table\&quot;&quot;, g)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t659</td><td>occursin(&quot;class=\&quot;pinax-table\&quot;&quot;, g) <span class="pinax-src">@ test_table.jl:45</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;&lt;th&gt;T&lt;/th&gt;&quot;, g)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t660</td><td>occursin(&quot;&lt;th&gt;T&lt;/th&gt;&quot;, g) <span class="pinax-src">@ test_table.jl:46</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;&lt;td&gt;0.5&lt;/td&gt;&quot;, g)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t661</td><td>occursin(&quot;&lt;td&gt;0.5&lt;/td&gt;&quot;, g) <span class="pinax-src">@ test_table.jl:47</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">
+        Pinax.render(; out=joinpath(tmp, &quot;a&quot;), theme=:agent)
+        aj = read(joinpath(tmp, &quot;a&quot;, &quot;agent.json&quot;), String)
+        @test occursin(&quot;\&quot;header\&quot;:[\&quot;T\&quot;,\&quot;M\&quot;]&quot;, aj)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t662</td><td>occursin(&quot;\&quot;header\&quot;:[\&quot;T\&quot;,\&quot;M\&quot;]&quot;, aj) <span class="pinax-src">@ test_table.jl:51</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;\&quot;rows\&quot;:[[1.0,0.5],[2.0,0.6]]&quot;, aj)   # native numbers, not strings</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t663</td><td>occursin(&quot;\&quot;rows\&quot;:[[1.0,0.5],[2.0,0.6]]&quot;, aj) <span class="pinax-src">@ test_table.jl:52</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;\&quot;tables\&quot;:[&quot;, aj)                     # section/page tables array</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t664</td><td>occursin(&quot;\&quot;tables\&quot;:[&quot;, aj) <span class="pinax-src">@ test_table.jl:53</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        am = read(joinpath(tmp, &quot;a&quot;, &quot;agent.md&quot;), String)
+        @test occursin(&quot;| T | M |&quot;, am)                        # markdown table</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t665</td><td>occursin(&quot;| T | M |&quot;, am) <span class="pinax-src">@ test_table.jl:55</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">
+        lx = read(Pinax.render(; out=joinpath(tmp, &quot;l&quot;), theme=:latex), String)
+        @test occursin(&quot;\\begin{tabular}&quot;, lx)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t666</td><td>occursin(&quot;\\begin{tabular}&quot;, lx) <span class="pinax-src">@ test_table.jl:58</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;T &amp; M&quot;, lx)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t667</td><td>occursin(&quot;T &amp; M&quot;, lx) <span class="pinax-src">@ test_table.jl:59</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;ragged columns -&gt; missing cell (blank text / null json)&quot; begin
+        tmp = mktempdir()
+        Pinax.reset!(; title=&quot;t&quot;)
+        @page :p &quot;P&quot; begin
+            @table (a=[1, 2], b=[10])   # b shorter -&gt; 2nd row's b is missing
+        end
+        Pinax.render(; out=joinpath(tmp, &quot;a&quot;), theme=:agent)
+        aj = read(joinpath(tmp, &quot;a&quot;, &quot;agent.json&quot;), String)
+        @test occursin(&quot;[2,null]&quot;, aj)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t668</td><td>occursin(&quot;[2,null]&quot;, aj) <span class="pinax-src">@ test_table.jl:70</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;unsupported input errors clearly&quot; begin
+        @test_throws ErrorException Pinax._normalize_table(42, nothing)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t669</td><td>Pinax._normalize_table(42, nothing) <span class="pinax-src">@ test_table.jl:74</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;vector-of-rows + auto header (4th input form)&quot; begin
+        h, r = Pinax._normalize_table([[10, 20], [30, 40]], [&quot;x&quot;, &quot;y&quot;])
+        @test h == [&quot;x&quot;, &quot;y&quot;]</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t670</td><td>h == [&quot;x&quot;, &quot;y&quot;] <span class="pinax-src">@ test_table.jl:79</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test r == [[10, 20], [30, 40]]</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t671</td><td>r == [[10, 20], [30, 40]] <span class="pinax-src">@ test_table.jl:80</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        h2, r2 = Pinax._normalize_table([(1, 2, 3)], nothing)
+        @test h2 == [&quot;1&quot;, &quot;2&quot;, &quot;3&quot;]   # auto-numbered header</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t672</td><td>h2 == [&quot;1&quot;, &quot;2&quot;, &quot;3&quot;] <span class="pinax-src">@ test_table.jl:82</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test r2 == [[1, 2, 3]]</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t673</td><td>r2 == [[1, 2, 3]] <span class="pinax-src">@ test_table.jl:83</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;header/row width mismatch errors at build time&quot; begin
+        Pinax.reset!()
+        @test_throws ErrorException (@page :p &quot;P&quot; begin</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t674</td><td>#= /home/runner/work/Pinax.jl/Pinax.jl/test/test_table.jl:88 =# @page :p &quot;P&quot; begin
+        #= /home/runner/… <span class="pinax-src">@ test_table.jl:88</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">            @table [1 2 3; 4 5 6] header = [&quot;a&quot;, &quot;b&quot;]   # 3 columns, 2 headers
+        end)
+        Pinax.reset!()
+        @test_throws ErrorException (@page :q &quot;Q&quot; begin</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t675</td><td>#= /home/runner/work/Pinax.jl/Pinax.jl/test/test_table.jl:92 =# @page :q &quot;Q&quot; begin
+        #= /home/runner/… <span class="pinax-src">@ test_table.jl:92</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">            @table [(1, 2), (3, 4, 5)]                  # ragged rows
+        end)
+    end
+
+    @testset &quot;cell escaping + missing across HTML/LaTeX&quot; begin
+        tmp = mktempdir()
+        Pinax.reset!(; title=&quot;t&quot;)
+        @page :p &quot;P&quot; begin
+            @table (a=[&quot;a&amp;b&quot;, missing], b=[&quot;c_d&quot;, &quot;x&quot;])
+        end
+        g = read(Pinax.render(; out=joinpath(tmp, &quot;g&quot;), theme=:gallery), String)
+        @test occursin(&quot;a&amp;amp;b&quot;, g)    # &amp; HTML-escaped</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t676</td><td>occursin(&quot;a&amp;amp;b&quot;, g) <span class="pinax-src">@ test_table.jl:104</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;&lt;td&gt;&lt;/td&gt;&quot;, g)  # missing -&gt; blank cell</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t677</td><td>occursin(&quot;&lt;td&gt;&lt;/td&gt;&quot;, g) <span class="pinax-src">@ test_table.jl:105</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        lx = read(Pinax.render(; out=joinpath(tmp, &quot;l&quot;), theme=:latex), String)
+        @test occursin(&quot;a\\&amp;b&quot;, lx)     # &amp; LaTeX-escaped</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t678</td><td>occursin(&quot;a\\&amp;b&quot;, lx) <span class="pinax-src">@ test_table.jl:107</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;c\\_d&quot;, lx)     # _ LaTeX-escaped</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t679</td><td>occursin(&quot;c\\_d&quot;, lx) <span class="pinax-src">@ test_table.jl:108</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;emit_table is an overridable dispatch point&quot; begin
+        tmp = mktempdir()
+        Pinax.reset!(; title=&quot;x&quot;)
+        @page :p &quot;P&quot; begin
+            @table (a=[1, 2], b=[3, 4])
+        end
+        Pinax.render(; out=joinpath(tmp, &quot;a&quot;), theme=TableOverrideAgent())
+        j = read(joinpath(tmp, &quot;a&quot;, &quot;agent.json&quot;), String)
+        @test occursin(&quot;\&quot;custom_tbl\&quot;:\&quot;p_tbl1\&quot;&quot;, j)   # override fired via _agent_tables! dispatch</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t680</td><td>occursin(&quot;\&quot;custom_tbl\&quot;:\&quot;p_tbl1\&quot;&quot;, j) <span class="pinax-src">@ test_table.jl:119</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test !occursin(&quot;\&quot;header\&quot;&quot;, j)                  # default emit_table did NOT run</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t681</td><td>!(occursin(&quot;\&quot;header\&quot;&quot;, j)) <span class="pinax-src">@ test_table.jl:120</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">            @caption &quot;FIGONE&quot;
+            @table (a=[1], b=[2]) caption = &quot;TBLONE&quot;
+            @figure svg
+            @caption &quot;FIGTWO&quot;
+        end
+        ord(s) =
+            first(findfirst(&quot;FIGONE&quot;, s)) &lt;
+            first(findfirst(&quot;TBLONE&quot;, s)) &lt;
+            first(findfirst(&quot;FIGTWO&quot;, s))
+
+        g = read(Pinax.render(; out=joinpath(tmp, &quot;g&quot;), theme=:gallery), String)
+        @test ord(g)                              # gallery preserves order</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t682</td><td>ord(g) <span class="pinax-src">@ test_table.jl:141</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test count(&quot;class=\&quot;figgrid&quot;, g) == 2    # fig1 grid | table | fig2 grid (table flushes the grid)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t683</td><td>count(&quot;class=\&quot;figgrid&quot;, g) == 2 <span class="pinax-src">@ test_table.jl:142</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">
+        Pinax.render(; out=joinpath(tmp, &quot;a&quot;), theme=:agent)
+        @test ord(read(joinpath(tmp, &quot;a&quot;, &quot;agent.md&quot;), String))   # agent.md is linear, in order</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t684</td><td>ord(read(joinpath(tmp, &quot;a&quot;, &quot;agent.md&quot;), String)) <span class="pinax-src">@ test_table.jl:145</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        aj = read(joinpath(tmp, &quot;a&quot;, &quot;agent.json&quot;), String)
+        @test occursin(</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t685</td><td>occursin(&quot;\&quot;content\&quot;:[{\&quot;kind\&quot;:\&quot;figure\&quot;,\&quot;id\&quot;:\&quot;p_fig1\&quot;},{\&quot;kind\&quot;:\&quot;table\&quot;,\&quot;id\&quot;:\&quot;p_tbl1\&quot;},{\&quot;ki… <span class="pinax-src">@ test_table.jl:147</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">            &quot;\&quot;content\&quot;:[{\&quot;kind\&quot;:\&quot;figure\&quot;,\&quot;id\&quot;:\&quot;p_fig1\&quot;},{\&quot;kind\&quot;:\&quot;table\&quot;,\&quot;id\&quot;:\&quot;p_tbl1\&quot;},{\&quot;kind\&quot;:\&quot;figure\&quot;,\&quot;id\&quot;:\&quot;p_fig2\&quot;}]&quot;,
+            aj,
+        )   # the order index in agent.json
+
+        @test ord(read(Pinax.render(; out=joinpath(tmp, &quot;l&quot;), theme=:latex), String))   # latex order</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t686</td><td>ord(read(Pinax.render(; out = joinpath(tmp, &quot;l&quot;), theme = :latex), String)) <span class="pinax-src">@ test_table.jl:152</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+</tbody></table></div>
+<div class="figgrid">
+<figure id="test_table_jl_margins">
+<img src="assets/figures/test_table_jl/test_table_jl_margins.svg" alt="test_table_jl_margins">
+<a class="pinax-dl" href="assets/figures/test_table_jl/test_table_jl_margins.svg" download title="download test_table_jl_margins.svg">⤓ download</a>
+<figcaption><b>Fig. 50.</b> Tolerance budget spent by each check. The dashed line is the pass/fail boundary — a bar close to it passed, but barely.</figcaption>
+</figure>
+</div>
+<nav><strong>Contents</strong>
+<a href="#test_table_jl__table_primitive">@table primitive</a>
+<a href="#test_table_jl_input_normalization_columns_matrix_row_records">input normalization: columns / matrix / row-records</a>
+<a href="#test_table_jl_renders_to_all_three_backends">renders to all three backends</a>
+<a href="#test_table_jl_ragged_columns_missing_cell_blank_text_null_json_">ragged columns -&gt; missing cell (blank text / null json)</a>
+<a href="#test_table_jl_unsupported_input_errors_clearly">unsupported input errors clearly</a>
+<a href="#test_table_jl_vector_of_rows_auto_header_4th_input_form_">vector-of-rows + auto header (4th input form)</a>
+<a href="#test_table_jl_header_row_width_mismatch_errors_at_build_time">header/row width mismatch errors at build time</a>
+<a href="#test_table_jl_cell_escaping_missing_across_html_latex">cell escaping + missing across HTML/LaTeX</a>
+<a href="#test_table_jl_emit_table_is_an_overridable_dispatch_point">emit_table is an overridable dispatch point</a>
+<a href="#test_table_jl_interleaved_figure_table_render_in_declaration_order">interleaved figure/table render in declaration order</a>
+</nav>
+<section class="section" id="test_table_jl__table_primitive"><h2>Sec. 200. @table primitive</h2>
+</section>
+<section class="section" id="test_table_jl_input_normalization_columns_matrix_row_records"><h2>Sec. 201. input normalization: columns / matrix / row-records</h2>
+</section>
+<section class="section" id="test_table_jl_renders_to_all_three_backends"><h2>Sec. 202. renders to all three backends</h2>
+</section>
+<section class="section" id="test_table_jl_ragged_columns_missing_cell_blank_text_null_json_"><h2>Sec. 203. ragged columns -&gt; missing cell (blank text / null json)</h2>
+</section>
+<section class="section" id="test_table_jl_unsupported_input_errors_clearly"><h2>Sec. 204. unsupported input errors clearly</h2>
+</section>
+<section class="section" id="test_table_jl_vector_of_rows_auto_header_4th_input_form_"><h2>Sec. 205. vector-of-rows + auto header (4th input form)</h2>
+</section>
+<section class="section" id="test_table_jl_header_row_width_mismatch_errors_at_build_time"><h2>Sec. 206. header/row width mismatch errors at build time</h2>
+</section>
+<section class="section" id="test_table_jl_cell_escaping_missing_across_html_latex"><h2>Sec. 207. cell escaping + missing across HTML/LaTeX</h2>
+</section>
+<section class="section" id="test_table_jl_emit_table_is_an_overridable_dispatch_point"><h2>Sec. 208. emit_table is an overridable dispatch point</h2>
+</section>
+<section class="section" id="test_table_jl_interleaved_figure_table_render_in_declaration_order"><h2>Sec. 209. interleaved figure/table render in declaration order</h2>
+</section>
+</section>
+<script src="app.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script><script>window.addEventListener("load",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],macros:{},throwOnError:false});});</script></body></html>

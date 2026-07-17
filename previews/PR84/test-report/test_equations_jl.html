@@ -1,0 +1,217 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>test_equations.jl · Test report</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="style.css"></head><body>
+<nav class="pinax-top"><a href="index.html">← Test report</a></nav>
+<h1>test_equations.jl</h1>
+<div class="pinax-meta">1 figure</div>
+<script type="application/json" id="pinax-committed">{"comments":{},"bookmarks":{},"features":["comments","bookmarks","export"]}</script>
+<section class="page" id="test_equations_jl">
+<p class="pinax-subtitle">22/22 passed · 0.34s</p>
+<div class="pinax-benchmark">
+<div class="pinax-verdict pinax-verdict-pass">test_equations.jl   22/22 PASS</div>
+<table class="pinax-checks"><thead><tr><th></th><th>id</th><th>label</th><th>got</th><th>want</th><th>Δ vs tol (kind)</th></tr></thead><tbody>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    svg = joinpath(tmp, &quot;a.svg&quot;)
+    write(svg, &quot;&lt;svg xmlns='http://www.w3.org/2000/svg'&gt;&lt;rect/&gt;&lt;/svg&gt;&quot;)
+
+    @testset &quot;KaTeX assets are included&quot; begin
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; begin
+                @desc md&quot;text&quot;
+            end
+        end
+        html = read(Pinax.render(; out=site(&quot;k&quot;)), String)
+        @test occursin(&quot;katex.min.css&quot;, html)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t380</td><td>occursin(&quot;katex.min.css&quot;, html) <span class="pinax-src">@ test_equations.jl:18</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;auto-render.min.js&quot;, html)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t381</td><td>occursin(&quot;auto-render.min.js&quot;, html) <span class="pinax-src">@ test_equations.jl:19</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;renderMathInElement&quot;, html)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t382</td><td>occursin(&quot;renderMathInElement&quot;, html) <span class="pinax-src">@ test_equations.jl:20</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;display equation is numbered and wrapped&quot; begin
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; begin
+                @desc md&quot;The energy is $$ E = \langle H \rangle $$ and more.&quot;
+            end
+        end
+        html = read(Pinax.render(; out=site(&quot;eq1&quot;)), String)
+        @test occursin(&quot;\\tag{1}&quot;, html)              # numbered for KaTeX</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t383</td><td>occursin(&quot;\\tag{1}&quot;, html) <span class="pinax-src">@ test_equations.jl:31</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;\\langle H \\rangle&quot;, html)   # math content preserved</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t384</td><td>occursin(&quot;\\langle H \\rangle&quot;, html) <span class="pinax-src">@ test_equations.jl:32</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;class=\&quot;pinax-eq\&quot;&quot;, html)    # wrapped in an anchored span</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t385</td><td>occursin(&quot;class=\&quot;pinax-eq\&quot;&quot;, html) <span class="pinax-src">@ test_equations.jl:33</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;@label + @ref to an equation (forward reference)&quot; begin
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; begin
+                @desc md&quot;See @ref(:E). @label(:E) $$ a = b $$&quot;
+            end
+        end
+        html = read(Pinax.render(; out=site(&quot;eqref&quot;)), String)
+        @test occursin(&quot;id=\&quot;E\&quot;&quot;, html)                 # equation anchored by its label</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t386</td><td>occursin(&quot;id=\&quot;E\&quot;&quot;, html) <span class="pinax-src">@ test_equations.jl:44</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;&lt;a href=\&quot;#E\&quot;&gt;(1)&lt;/a&gt;&quot;, html)   # @ref resolves to the number, even forward</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t387</td><td>occursin(&quot;&lt;a href=\&quot;#E\&quot;&gt;(1)&lt;/a&gt;&quot;, html) <span class="pinax-src">@ test_equations.jl:45</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test !occursin(&quot;@label&quot;, html)                  # the @label token is consumed</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t388</td><td>!(occursin(&quot;@label&quot;, html)) <span class="pinax-src">@ test_equations.jl:46</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;multiple equations number sequentially&quot; begin
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; begin
+                @desc md&quot;$$ x = 1 $$ then $$ y = 2 $$&quot;
+            end
+        end
+        html = read(Pinax.render(; out=site(&quot;eqmulti&quot;)), String)
+        @test occursin(&quot;\\tag{1}&quot;, html)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t389</td><td>occursin(&quot;\\tag{1}&quot;, html) <span class="pinax-src">@ test_equations.jl:57</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;\\tag{2}&quot;, html)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t390</td><td>occursin(&quot;\\tag{2}&quot;, html) <span class="pinax-src">@ test_equations.jl:58</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;inline math is left for KaTeX (not numbered)&quot; begin
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; begin
+                @desc md&quot;inline $x^2$ here&quot;
+            end
+        end
+        html = read(Pinax.render(; out=site(&quot;inline&quot;)), String)
+        @test occursin(&quot;\$x^2\$&quot;, html)   # single-$ survives for client-side KaTeX</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t391</td><td>occursin(&quot;\$x^2\$&quot;, html) <span class="pinax-src">@ test_equations.jl:69</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test !occursin(&quot;\\tag&quot;, html)     # not numbered</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t392</td><td>!(occursin(&quot;\\tag&quot;, html)) <span class="pinax-src">@ test_equations.jl:70</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;equation numbering is preamble-overridable&quot; begin
+        nb(kind, c) = kind === :equation ? &quot;Eq. $(c.equation)&quot; : &quot;Sec. $(c.section)&quot;
+        @pinaxsetup numberer = nb
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; begin
+                @desc md&quot;see @ref(:e). @label(:e) $$ z = 0 $$&quot;
+            end
+        end
+        html = read(Pinax.render(; out=site(&quot;eqover&quot;)), String)
+        @test occursin(&quot;&lt;a href=\&quot;#e\&quot;&gt;Eq. 1&lt;/a&gt;&quot;, html)   # overridden equation label in @ref</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t393</td><td>occursin(&quot;&lt;a href=\&quot;#e\&quot;&gt;Eq. 1&lt;/a&gt;&quot;, html) <span class="pinax-src">@ test_equations.jl:82</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;unlabeled equation gets an auto-anchor&quot; begin
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; begin
+                @desc md&quot;$$ q = 1 $$&quot;
+            end
+        end
+        html = read(Pinax.render(; out=site(&quot;eqauto&quot;)), String)
+        @test occursin(&quot;id=\&quot;s_eq1\&quot;&quot;, html)   # &lt;section anchor&gt;_eq&lt;k&gt;</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t394</td><td>occursin(&quot;id=\&quot;s_eq1\&quot;&quot;, html) <span class="pinax-src">@ test_equations.jl:93</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">
+    @testset &quot;equation in a figure caption is numbered&quot; begin
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; begin
+                @desc md&quot;$$ A = 1 $$&quot;               # eq 1 in the desc
+                @figure svg
+                @caption md&quot;see $$ B = 2 $$&quot;        # eq 2 in the caption
+            end
+        end
+        html = read(Pinax.render(; out=site(&quot;eqcap&quot;)), String)
+        @test occursin(&quot;\\tag{1}&quot;, html)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t395</td><td>occursin(&quot;\\tag{1}&quot;, html) <span class="pinax-src">@ test_equations.jl:106</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;\\tag{2}&quot;, html)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t396</td><td>occursin(&quot;\\tag{2}&quot;, html) <span class="pinax-src">@ test_equations.jl:107</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test count(&quot;class=\&quot;pinax-eq\&quot;&quot;, html) == 2</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t397</td><td>count(&quot;class=\&quot;pinax-eq\&quot;&quot;, html) == 2 <span class="pinax-src">@ test_equations.jl:108</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    @testset &quot;@ref to an equation in a later section (cross-node forward ref)&quot; begin
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :a &quot;A&quot; begin
+                @desc md&quot;see @ref(:E).&quot;
+            end
+            @section :b &quot;B&quot; begin
+                @desc md&quot;@label(:E) $$ x = 0 $$&quot;
+            end
+        end
+        html = read(Pinax.render(; out=site(&quot;eqxref&quot;)), String)
+        @test occursin(&quot;&lt;a href=\&quot;#E\&quot;&gt;(1)&lt;/a&gt;&quot;, html)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t398</td><td>occursin(&quot;&lt;a href=\&quot;#E\&quot;&gt;(1)&lt;/a&gt;&quot;, html) <span class="pinax-src">@ test_equations.jl:122</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;math with &lt; / &amp; is escaped (safe: KaTeX reads decoded textContent)&quot; begin
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; begin
+                @desc md&quot;$$ a &lt; b $$&quot;
+            end
+        end
+        html = read(Pinax.render(; out=site(&quot;eqesc&quot;)), String)
+        @test occursin(&quot;a &amp;lt; b&quot;, html)       # escaped in the serialized HTML...</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t399</td><td>occursin(&quot;a &amp;lt; b&quot;, html) <span class="pinax-src">@ test_equations.jl:133</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test !occursin(&quot;\$\$ a &lt; b&quot;, html)     # ...not raw (the HTML parser would mis-read `&lt;`)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t400</td><td>!(occursin(&quot;\$\$ a &lt; b&quot;, html)) <span class="pinax-src">@ test_equations.jl:134</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;equation @label colliding with a section/figure id is diagnosed&quot; begin
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; begin
+                @figure svg id = :dup
+                @desc md&quot;@label(:dup) $$ y = 0 $$&quot;
+            end
+        end
+        html = read(Pinax.render(; out=site(&quot;eqdup&quot;)), String)
+        @test occursin(&quot;collides with a section/figure id&quot;, html)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t401</td><td>occursin(&quot;collides with a section/figure id&quot;, html) <span class="pinax-src">@ test_equations.jl:146</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+</tbody></table></div>
+<div class="figgrid">
+<figure id="test_equations_jl_margins">
+<img src="assets/figures/test_equations_jl/test_equations_jl_margins.svg" alt="test_equations_jl_margins">
+<a class="pinax-dl" href="assets/figures/test_equations_jl/test_equations_jl_margins.svg" download title="download test_equations_jl_margins.svg">⤓ download</a>
+<figcaption><b>Fig. 13.</b> Tolerance budget spent by each check. The dashed line is the pass/fail boundary — a bar close to it passed, but barely.</figcaption>
+</figure>
+</div>
+<nav><strong>Contents</strong>
+<a href="#test_equations_jl_equations_katex">equations + KaTeX</a>
+<a href="#test_equations_jl_katex_assets_are_included">KaTeX assets are included</a>
+<a href="#test_equations_jl_display_equation_is_numbered_and_wrapped">display equation is numbered and wrapped</a>
+<a href="#test_equations_jl__label_ref_to_an_equation_forward_reference_">@label + @ref to an equation (forward reference)</a>
+<a href="#test_equations_jl_multiple_equations_number_sequentially">multiple equations number sequentially</a>
+<a href="#test_equations_jl_inline_math_is_left_for_katex_not_numbered_">inline math is left for KaTeX (not numbered)</a>
+<a href="#test_equations_jl_equation_numbering_is_preamble_overridable">equation numbering is preamble-overridable</a>
+<a href="#test_equations_jl_unlabeled_equation_gets_an_auto_anchor">unlabeled equation gets an auto-anchor</a>
+<a href="#test_equations_jl_equation_in_a_figure_caption_is_numbered">equation in a figure caption is numbered</a>
+<a href="#test_equations_jl__ref_to_an_equation_in_a_later_section_cross_node_forward_ref_">@ref to an equation in a later section (cross-node forward ref)</a>
+<a href="#test_equations_jl_math_with_is_escaped_safe_katex_reads_decoded_textcontent_">math with &lt; / &amp; is escaped (safe: KaTeX reads decoded textContent)</a>
+<a href="#test_equations_jl_equation_label_colliding_with_a_section_figure_id_is_diagnosed">equation @label colliding with a section/figure id is diagnosed</a>
+</nav>
+<section class="section" id="test_equations_jl_equations_katex"><h2>Sec. 103. equations + KaTeX</h2>
+</section>
+<section class="section" id="test_equations_jl_katex_assets_are_included"><h2>Sec. 104. KaTeX assets are included</h2>
+</section>
+<section class="section" id="test_equations_jl_display_equation_is_numbered_and_wrapped"><h2>Sec. 105. display equation is numbered and wrapped</h2>
+</section>
+<section class="section" id="test_equations_jl__label_ref_to_an_equation_forward_reference_"><h2>Sec. 106. @label + @ref to an equation (forward reference)</h2>
+</section>
+<section class="section" id="test_equations_jl_multiple_equations_number_sequentially"><h2>Sec. 107. multiple equations number sequentially</h2>
+</section>
+<section class="section" id="test_equations_jl_inline_math_is_left_for_katex_not_numbered_"><h2>Sec. 108. inline math is left for KaTeX (not numbered)</h2>
+</section>
+<section class="section" id="test_equations_jl_equation_numbering_is_preamble_overridable"><h2>Sec. 109. equation numbering is preamble-overridable</h2>
+</section>
+<section class="section" id="test_equations_jl_unlabeled_equation_gets_an_auto_anchor"><h2>Sec. 110. unlabeled equation gets an auto-anchor</h2>
+</section>
+<section class="section" id="test_equations_jl_equation_in_a_figure_caption_is_numbered"><h2>Sec. 111. equation in a figure caption is numbered</h2>
+</section>
+<section class="section" id="test_equations_jl__ref_to_an_equation_in_a_later_section_cross_node_forward_ref_"><h2>Sec. 112. @ref to an equation in a later section (cross-node forward ref)</h2>
+</section>
+<section class="section" id="test_equations_jl_math_with_is_escaped_safe_katex_reads_decoded_textcontent_"><h2>Sec. 113. math with &lt; / &amp; is escaped (safe: KaTeX reads decoded textContent)</h2>
+</section>
+<section class="section" id="test_equations_jl_equation_label_colliding_with_a_section_figure_id_is_diagnosed"><h2>Sec. 114. equation @label colliding with a section/figure id is diagnosed</h2>
+</section>
+</section>
+<script src="app.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script><script>window.addEventListener("load",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],macros:{},throwOnError:false});});</script></body></html>

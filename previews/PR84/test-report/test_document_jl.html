@@ -1,0 +1,259 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>test_document.jl · Test report</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="style.css"></head><body>
+<nav class="pinax-top"><a href="index.html">← Test report</a></nav>
+<h1>test_document.jl</h1>
+<div class="pinax-meta">1 figure</div>
+<script type="application/json" id="pinax-committed">{"comments":{},"bookmarks":{},"features":["comments","bookmarks","export"]}</script>
+<section class="page" id="test_document_jl">
+<p class="pinax-subtitle">41/41 passed · 0.94s</p>
+<div class="pinax-benchmark">
+<div class="pinax-verdict pinax-verdict-pass">test_document.jl   41/41 PASS</div>
+<table class="pinax-checks"><thead><tr><th></th><th>id</th><th>label</th><th>got</th><th>want</th><th>Δ vs tol (kind)</th></tr></thead><tbody>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @page :eq &quot;Thermal Equilibrium&quot; begin
+            @section :energy &quot;Energy vs T&quot; begin
+                @desc md&quot;intent $E=\langle H\rangle$&quot;
+                @figure 1 + 1
+                @figure 2 + 2
+            end
+            @section :conv &quot;Convergence&quot; by = &quot;system.g&quot; begin
+                @figure 3 + 3
+            end
+        end
+        doc = Pinax.current_document()
+        @test length(doc.pages) == 1</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t273</td><td>length(doc.pages) == 1 <span class="pinax-src">@ test_document.jl:21</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        pg = doc.pages[1]
+        @test pg.id === :eq</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t274</td><td>pg.id === :eq <span class="pinax-src">@ test_document.jl:23</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test pg.title == &quot;Thermal Equilibrium&quot;</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t275</td><td>pg.title == &quot;Thermal Equilibrium&quot; <span class="pinax-src">@ test_document.jl:24</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test pg.anchor == &quot;eq&quot;</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t276</td><td>pg.anchor == &quot;eq&quot; <span class="pinax-src">@ test_document.jl:25</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test length(pg.sections) == 2</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t277</td><td>length(pg.sections) == 2 <span class="pinax-src">@ test_document.jl:26</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test pg.sections[1].id === :energy</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t278</td><td>(pg.sections[1]).id === :energy <span class="pinax-src">@ test_document.jl:27</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test pg.sections[2].id === :conv</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t279</td><td>(pg.sections[2]).id === :conv <span class="pinax-src">@ test_document.jl:28</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test length(pg.sections[1].figures) == 2</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t280</td><td>length((pg.sections[1]).figures) == 2 <span class="pinax-src">@ test_document.jl:29</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test length(pg.sections[2].figures) == 1</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t281</td><td>length((pg.sections[2]).figures) == 1 <span class="pinax-src">@ test_document.jl:30</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test pg.sections[2].facet == &quot;system.g&quot;</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t282</td><td>(pg.sections[2]).facet == &quot;system.g&quot; <span class="pinax-src">@ test_document.jl:31</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test pg.sections[1].desc isa Pinax.Desc</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t283</td><td>(pg.sections[1]).desc isa Pinax.Desc <span class="pinax-src">@ test_document.jl:32</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;langle&quot;, pg.sections[1].desc.source)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t284</td><td>occursin(&quot;langle&quot;, (pg.sections[1]).desc.source) <span class="pinax-src">@ test_document.jl:33</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        SIDE[] = 0
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; begin
+                @figure begin
+                    SIDE[] += 1
+                    42
+                end
+            end
+        end
+        fig = Pinax.current_document().pages[1].sections[1].figures[1]
+        @test SIDE[] == 0                 # build did NOT evaluate the plot expr</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t285</td><td>SIDE[] == 0 <span class="pinax-src">@ test_document.jl:48</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test fig.gen() == 42             # materialize on demand</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t286</td><td>fig.gen() == 42 <span class="pinax-src">@ test_document.jl:49</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test SIDE[] == 1                 # side effect ran exactly once</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t287</td><td>SIDE[] == 1 <span class="pinax-src">@ test_document.jl:50</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;42&quot;, fig.code)    # source captured for change detection</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t288</td><td>occursin(&quot;42&quot;, fig.code) <span class="pinax-src">@ test_document.jl:51</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;ids: auto vs explicit&quot; begin
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; begin
+                @figure 1
+                @figure 2 id = :custom
+            end
+        end
+        figs = Pinax.current_document().pages[1].sections[1].figures
+        @test figs[1].id === :s_fig1</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t289</td><td>(figs[1]).id === :s_fig1 <span class="pinax-src">@ test_document.jl:63</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test figs[1].anchor == &quot;s_fig1&quot;</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t290</td><td>(figs[1]).anchor == &quot;s_fig1&quot; <span class="pinax-src">@ test_document.jl:64</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test figs[2].id === :custom</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t291</td><td>(figs[2]).id === :custom <span class="pinax-src">@ test_document.jl:65</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;params lineage&quot; begin
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; begin
+                @figure 1 params = (N=8, g=0.5)
+            end
+        end
+        fig = Pinax.current_document().pages[1].sections[1].figures[1]
+        @test fig.params == (N=8, g=0.5)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t292</td><td>fig.params == (N = 8, g = 0.5) <span class="pinax-src">@ test_document.jl:76</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">
+    @testset &quot;caption: @caption, precedence, diagnostics&quot; begin
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; begin
+                @figure 1 caption = &quot;kw&quot;
+                @caption md&quot;override&quot;      # wins
+                @figure 2 caption = &quot;only&quot; # no @caption -&gt; caption= stays
+            end
+        end
+        figs = Pinax.current_document().pages[1].sections[1].figures
+        @test figs[1].caption == &quot;override&quot;</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t293</td><td>(figs[1]).caption == &quot;override&quot; <span class="pinax-src">@ test_document.jl:89</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test figs[2].caption == &quot;only&quot;</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t294</td><td>(figs[2]).caption == &quot;only&quot; <span class="pinax-src">@ test_document.jl:90</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">
+        # @caption in a section with no figure is non-fatal -&gt; WARNING
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; begin
+                @caption md&quot;orphan&quot;
+            end
+        end
+        diag = Pinax.current_document().diag.entries
+        @test any(e -&gt; e.severity == Pinax.WARNING &amp;&amp; occursin(&quot;caption&quot;, e.message), diag)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t295</td><td>any((e-&gt;begin
+            #= /home/runner/work/Pinax.jl/Pinax.jl/test/test_document.jl:100 =#
+            e… <span class="pinax-src">@ test_document.jl:100</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">                @figure 1
+                @figure 2
+            end
+        end
+        @page :d &quot;D&quot; begin
+            @no_thumbnail
+            @section :s &quot;S&quot; begin
+                @figure 1
+            end
+        end
+        pgs = Pinax.current_document().pages
+        @test Pinax.resolved_thumbnail(pgs[1]) == Pinax.FigRef(:picked)      # explicit</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t296</td><td>Pinax.resolved_thumbnail(pgs[1]) == Pinax.FigRef(:picked) <span class="pinax-src">@ test_document.jl:130</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test Pinax.resolved_thumbnail(pgs[2]) ==</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t297</td><td>Pinax.resolved_thumbnail(pgs[2]) == Pinax.FigRef((((pgs[2]).sections[1]).figures[2]).id) <span class="pinax-src">@ test_document.jl:131</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">            Pinax.FigRef(pgs[2].sections[1].figures[2].id)  # marker
+        @test Pinax.resolved_thumbnail(pgs[3]) ==</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t298</td><td>Pinax.resolved_thumbnail(pgs[3]) == Pinax.FigRef((((pgs[3]).sections[1]).figures[1]).id) <span class="pinax-src">@ test_document.jl:133</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">            Pinax.FigRef(pgs[3].sections[1].figures[1].id)  # top
+        @test Pinax.resolved_thumbnail(pgs[4]) === nothing                    # @no_thumbnail</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t299</td><td>Pinax.resolved_thumbnail(pgs[4]) === nothing <span class="pinax-src">@ test_document.jl:135</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;section kwargs: summary, layout&quot; begin
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; summary = &quot;blurb&quot; layout = :wide begin
+                @figure 1
+            end
+        end
+        sec = Pinax.current_document().pages[1].sections[1]
+        @test sec.summary == &quot;blurb&quot;</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t300</td><td>sec.summary == &quot;blurb&quot; <span class="pinax-src">@ test_document.jl:146</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test sec.layout === :wide</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t301</td><td>sec.layout === :wide <span class="pinax-src">@ test_document.jl:147</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;preamble: @pinaxsetup / @debug_mode / @bibliography / @newcommand&quot; begin
+        Pinax.reset!()
+        @pinaxsetup theme = :gallery debug = true numbering = :page index = :rich
+        m = Pinax.current_document().meta
+        @test m.theme === :gallery</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t302</td><td>m.theme === :gallery <span class="pinax-src">@ test_document.jl:154</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test m.debug</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t303</td><td>m.debug <span class="pinax-src">@ test_document.jl:155</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test m.numbering === :page</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t304</td><td>m.numbering === :page <span class="pinax-src">@ test_document.jl:156</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test m.index === :rich</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t305</td><td>m.index === :rich <span class="pinax-src">@ test_document.jl:157</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">
+        # theme-specific kw (css/js/features) are ignored in the structure layer (not an error)
+        @pinaxsetup theme = :gallery css = [&quot;x.css&quot;] js = [&quot;y.js&quot;] features = (:comments,)
+        @test Pinax.current_document().meta.theme === :gallery</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t306</td><td>(Pinax.current_document()).meta.theme === :gallery <span class="pinax-src">@ test_document.jl:161</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">
+        Pinax.reset!()
+        @debug_mode true
+        @test Pinax.current_document().meta.debug</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t307</td><td>(Pinax.current_document()).meta.debug <span class="pinax-src">@ test_document.jl:165</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">
+        Pinax.reset!()
+        @bibliography &quot;a.bib&quot; &quot;b.bib&quot;
+        @test Pinax.current_document().meta.bib_sources == [&quot;a.bib&quot;, &quot;b.bib&quot;]</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t308</td><td>(Pinax.current_document()).meta.bib_sources == [&quot;a.bib&quot;, &quot;b.bib&quot;] <span class="pinax-src">@ test_document.jl:169</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">
+        Pinax.reset!()
+        @newcommand raw&quot;\E&quot; raw&quot;\langle H\rangle&quot;
+        @test Pinax.current_document().newcommands[raw&quot;\E&quot;] == raw&quot;\langle H\rangle&quot;</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t309</td><td>(Pinax.current_document()).newcommands[raw&quot;\E&quot;] == raw&quot;\langle H\rangle&quot; <span class="pinax-src">@ test_document.jl:173</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;md\&quot;…\&quot; preserves \$ and backslash&quot; begin
+        s = md&quot;E = $H$ and \alpha&quot;
+        @test s == raw&quot;E = $H$ and \alpha&quot;</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t310</td><td>s == raw&quot;E = $H$ and \alpha&quot; <span class="pinax-src">@ test_document.jl:178</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">
+    @testset &quot;document() do-block isolates global state&quot; begin
+        Pinax.reset!()
+        outer = Pinax.current_document()
+        doc = Pinax.document() do
+            @page :scoped &quot;S&quot; begin
+                @section :s &quot;S&quot; begin
+                    @figure 1
+                end
+            end
+        end
+        @test length(doc.pages) == 1</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t311</td><td>length(doc.pages) == 1 <span class="pinax-src">@ test_document.jl:191</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test doc.pages[1].id === :scoped</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t312</td><td>(doc.pages[1]).id === :scoped <span class="pinax-src">@ test_document.jl:192</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test Pinax.current_document() === outer   # global state restored</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t313</td><td>Pinax.current_document() === outer <span class="pinax-src">@ test_document.jl:193</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+</tbody></table></div>
+<div class="figgrid">
+<figure id="test_document_jl_margins">
+<img src="assets/figures/test_document_jl/test_document_jl_margins.svg" alt="test_document_jl_margins">
+<a class="pinax-dl" href="assets/figures/test_document_jl/test_document_jl_margins.svg" download title="download test_document_jl_margins.svg">⤓ download</a>
+<figcaption><b>Fig. 11.</b> Tolerance budget spent by each check. The dashed line is the pass/fail boundary — a bar close to it passed, but barely. Showing the 40 worst of 41 checks &#40;the rest are in agent.json&#41;.</figcaption>
+</figure>
+</div>
+<nav><strong>Contents</strong>
+<a href="#test_document_jl_document_model_structure_pass_">document model (structure pass)</a>
+<a href="#test_document_jl_tree_shape">tree shape</a>
+<a href="#test_document_jl__figure_is_deferred">@figure is deferred</a>
+<a href="#test_document_jl_ids_auto_vs_explicit">ids: auto vs explicit</a>
+<a href="#test_document_jl_params_lineage">params lineage</a>
+<a href="#test_document_jl_caption_caption_precedence_diagnostics">caption: @caption, precedence, diagnostics</a>
+<a href="#test_document_jl_thumbnail_resolution_explicit_marker_top_none_">thumbnail resolution (explicit &gt; marker &gt; top &gt; none)</a>
+<a href="#test_document_jl_section_kwargs_summary_layout">section kwargs: summary, layout</a>
+<a href="#test_document_jl_preamble_pinaxsetup_debug_mode_bibliography_newcommand">preamble: @pinaxsetup / @debug_mode / @bibliography / @newcommand</a>
+<a href="#test_document_jl_md_preserves_and_backslash">md&quot;…&quot; preserves $ and backslash</a>
+<a href="#test_document_jl_document_do_block_isolates_global_state">document() do-block isolates global state</a>
+</nav>
+<section class="section" id="test_document_jl_document_model_structure_pass_"><h2>Sec. 80. document model (structure pass)</h2>
+</section>
+<section class="section" id="test_document_jl_tree_shape"><h2>Sec. 81. tree shape</h2>
+</section>
+<section class="section" id="test_document_jl__figure_is_deferred"><h2>Sec. 82. @figure is deferred</h2>
+</section>
+<section class="section" id="test_document_jl_ids_auto_vs_explicit"><h2>Sec. 83. ids: auto vs explicit</h2>
+</section>
+<section class="section" id="test_document_jl_params_lineage"><h2>Sec. 84. params lineage</h2>
+</section>
+<section class="section" id="test_document_jl_caption_caption_precedence_diagnostics"><h2>Sec. 85. caption: @caption, precedence, diagnostics</h2>
+</section>
+<section class="section" id="test_document_jl_thumbnail_resolution_explicit_marker_top_none_"><h2>Sec. 86. thumbnail resolution (explicit &gt; marker &gt; top &gt; none)</h2>
+</section>
+<section class="section" id="test_document_jl_section_kwargs_summary_layout"><h2>Sec. 87. section kwargs: summary, layout</h2>
+</section>
+<section class="section" id="test_document_jl_preamble_pinaxsetup_debug_mode_bibliography_newcommand"><h2>Sec. 88. preamble: @pinaxsetup / @debug_mode / @bibliography / @newcommand</h2>
+</section>
+<section class="section" id="test_document_jl_md_preserves_and_backslash"><h2>Sec. 89. md&quot;…&quot; preserves $ and backslash</h2>
+</section>
+<section class="section" id="test_document_jl_document_do_block_isolates_global_state"><h2>Sec. 90. document() do-block isolates global state</h2>
+</section>
+</section>
+<script src="app.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script><script>window.addEventListener("load",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],macros:{},throwOnError:false});});</script></body></html>

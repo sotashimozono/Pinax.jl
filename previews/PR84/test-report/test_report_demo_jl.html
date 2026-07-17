@@ -1,0 +1,98 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>test_report_demo.jl · Test report</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="style.css"></head><body>
+<nav class="pinax-top"><a href="index.html">← Test report</a></nav>
+<h1>test_report_demo.jl</h1>
+<div class="pinax-meta">3 figures</div>
+<script type="application/json" id="pinax-committed">{"comments":{},"bookmarks":{},"features":["comments","bookmarks","export"]}</script>
+<section class="page" id="test_report_demo_jl">
+<p class="pinax-subtitle">4/4 passed · 0.5s</p>
+<div class="pinax-benchmark">
+<div class="pinax-verdict pinax-verdict-pass">test_report_demo.jl   4/4 PASS</div>
+<table class="pinax-checks"><thead><tr><th></th><th>id</th><th>label</th><th>got</th><th>want</th><th>Δ vs tol (kind)</th></tr></thead><tbody>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    @desc md&quot;The midpoint rule for the integral of 4/(1+x^2) on [0,1] converges to π as O(1/n²). The report shows the estimate approaching π and the tolerance budget shrinking — from the numbers the suite already computed, with no figure code.&quot;
+
+    # `@code` shows the computation behind the figure (Documenter `@example`-like): the source is
+    # rendered as a snippet, and it still runs — the definition leaks out, so the sweep below uses it.
+    @code caption = &quot;the quadrature&quot; midpoint(n) =
+        sum(k -&gt; 4 / (1 + ((k - 0.5) / n)^2), 1:n) / n
+
+    # An unnamed `@testset for` is a SAMPLE, not a section: these four iterations fold into ONE
+    # convergence figure (got vs n, π as the reference, the tolerance as a band) plus a margin figure.
+    # `@caption` names the quantity, so the figure is titled `midpoint rule → π`, not the raw expression.
+    @testset for n in (8, 32, 128, 512)
+        @test isapprox(midpoint(n), π; rtol=0.01)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t633</td><td>midpoint rule → π  [n = 8] <span class="pinax-src">@ test_report_demo.jl:21</span></td><td>3.142894729591689</td><td>3.141592653589793</td><td>0.00041446366396609804 vs 0.01 (rel)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    @desc md&quot;The midpoint rule for the integral of 4/(1+x^2) on [0,1] converges to π as O(1/n²). The report shows the estimate approaching π and the tolerance budget shrinking — from the numbers the suite already computed, with no figure code.&quot;
+
+    # `@code` shows the computation behind the figure (Documenter `@example`-like): the source is
+    # rendered as a snippet, and it still runs — the definition leaks out, so the sweep below uses it.
+    @code caption = &quot;the quadrature&quot; midpoint(n) =
+        sum(k -&gt; 4 / (1 + ((k - 0.5) / n)^2), 1:n) / n
+
+    # An unnamed `@testset for` is a SAMPLE, not a section: these four iterations fold into ONE
+    # convergence figure (got vs n, π as the reference, the tolerance as a band) plus a margin figure.
+    # `@caption` names the quantity, so the figure is titled `midpoint rule → π`, not the raw expression.
+    @testset for n in (8, 32, 128, 512)
+        @test isapprox(midpoint(n), π; rtol=0.01)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t634</td><td>midpoint rule → π  [n = 32] <span class="pinax-src">@ test_report_demo.jl:21</span></td><td>3.1416740337963374</td><td>3.141592653589793</td><td>2.5904124282712304e-5 vs 0.01 (rel)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    @desc md&quot;The midpoint rule for the integral of 4/(1+x^2) on [0,1] converges to π as O(1/n²). The report shows the estimate approaching π and the tolerance budget shrinking — from the numbers the suite already computed, with no figure code.&quot;
+
+    # `@code` shows the computation behind the figure (Documenter `@example`-like): the source is
+    # rendered as a snippet, and it still runs — the definition leaks out, so the sweep below uses it.
+    @code caption = &quot;the quadrature&quot; midpoint(n) =
+        sum(k -&gt; 4 / (1 + ((k - 0.5) / n)^2), 1:n) / n
+
+    # An unnamed `@testset for` is a SAMPLE, not a section: these four iterations fold into ONE
+    # convergence figure (got vs n, π as the reference, the tolerance as a band) plus a margin figure.
+    # `@caption` names the quantity, so the figure is titled `midpoint rule → π`, not the raw expression.
+    @testset for n in (8, 32, 128, 512)
+        @test isapprox(midpoint(n), π; rtol=0.01)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t635</td><td>midpoint rule → π  [n = 128] <span class="pinax-src">@ test_report_demo.jl:21</span></td><td>3.1415977398528145</td><td>3.141592653589793</td><td>1.619007803450759e-6 vs 0.01 (rel)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    @desc md&quot;The midpoint rule for the integral of 4/(1+x^2) on [0,1] converges to π as O(1/n²). The report shows the estimate approaching π and the tolerance budget shrinking — from the numbers the suite already computed, with no figure code.&quot;
+
+    # `@code` shows the computation behind the figure (Documenter `@example`-like): the source is
+    # rendered as a snippet, and it still runs — the definition leaks out, so the sweep below uses it.
+    @code caption = &quot;the quadrature&quot; midpoint(n) =
+        sum(k -&gt; 4 / (1 + ((k - 0.5) / n)^2), 1:n) / n
+
+    # An unnamed `@testset for` is a SAMPLE, not a section: these four iterations fold into ONE
+    # convergence figure (got vs n, π as the reference, the tolerance as a band) plus a margin figure.
+    # `@caption` names the quantity, so the figure is titled `midpoint rule → π`, not the raw expression.
+    @testset for n in (8, 32, 128, 512)
+        @test isapprox(midpoint(n), π; rtol=0.01)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t636</td><td>midpoint rule → π  [n = 512] <span class="pinax-src">@ test_report_demo.jl:21</span></td><td>3.1415929714812307</td><td>3.141592653589793</td><td>1.0118798732693797e-7 vs 0.01 (rel)</td></tr>
+</tbody></table></div>
+<div class="figgrid">
+<figure id="test_report_demo_jl_margins">
+<img src="assets/figures/test_report_demo_jl/test_report_demo_jl_margins.svg" alt="test_report_demo_jl_margins">
+<a class="pinax-dl" href="assets/figures/test_report_demo_jl/test_report_demo_jl_margins.svg" download title="download test_report_demo_jl_margins.svg">⤓ download</a>
+<figcaption><b>Fig. 45.</b> Tolerance budget spent by each check. The dashed line is the pass/fail boundary — a bar close to it passed, but barely.</figcaption>
+</figure>
+</div>
+<nav><strong>Contents</strong>
+<a href="#test_report_demo_jl_midpoint_rule_a_convergence_study_">midpoint rule → π (a convergence study) <span class="nfig">(2)</span></a>
+</nav>
+<section class="section" id="test_report_demo_jl_midpoint_rule_a_convergence_study_"><h2>Sec. 193. midpoint rule → π (a convergence study) <span class="nfig">(2)</span></h2>
+<div class="desc"><p>The midpoint rule for the integral of 4/&#40;1&#43;x^2&#41; on &#91;0,1&#93; converges to π as O&#40;1/n²&#41;. The report shows the estimate approaching π and the tolerance budget shrinking — from the numbers the suite already computed, with no figure code.</p></div>
+<div class="pinax-code" id="midpoint_rule_a_convergence_study__code1">
+<div class="pinax-code-cap">the quadrature</div>
+<pre class="pinax-code-src"><code class="language-julia">midpoint(n) = begin
+        sum((k-&gt;begin
+                        4 / (1 + ((k - 0.5) / n) ^ 2)
+                    end), 1:n) / n
+    end</code></pre>
+</div>
+<div class="figgrid">
+<figure id="test_report_demo_jl_midpoint_rule_a_convergence_study__conv_1">
+<img src="assets/figures/test_report_demo_jl/test_report_demo_jl_midpoint_rule_a_convergence_study_/test_report_demo_jl_midpoint_rule_a_convergence_study__conv_1.svg" alt="test_report_demo_jl_midpoint_rule_a_convergence_study__conv_1">
+<a class="pinax-dl" href="assets/figures/test_report_demo_jl/test_report_demo_jl_midpoint_rule_a_convergence_study_/test_report_demo_jl_midpoint_rule_a_convergence_study__conv_1.svg" download title="download test_report_demo_jl_midpoint_rule_a_convergence_study__conv_1.svg">⤓ download</a>
+<figcaption><b>Fig. 46.</b> Convergence of <code>midpoint rule → π</code> over the swept axis <code>n</code>. Dashed line &#61; <code>want</code>; the shaded band is the tolerance; a red marker is a failed check.</figcaption>
+</figure>
+<figure id="test_report_demo_jl_midpoint_rule_a_convergence_study__swpmargin_1">
+<img src="assets/figures/test_report_demo_jl/test_report_demo_jl_midpoint_rule_a_convergence_study_/test_report_demo_jl_midpoint_rule_a_convergence_study__swpmargin_1.svg" alt="test_report_demo_jl_midpoint_rule_a_convergence_study__swpmargin_1">
+<a class="pinax-dl" href="assets/figures/test_report_demo_jl/test_report_demo_jl_midpoint_rule_a_convergence_study_/test_report_demo_jl_midpoint_rule_a_convergence_study__swpmargin_1.svg" download title="download test_report_demo_jl_midpoint_rule_a_convergence_study__swpmargin_1.svg">⤓ download</a>
+<figcaption><b>Fig. 47.</b> Tolerance budget <code>delta/tol</code> of <code>midpoint rule → π</code> over <code>n</code>; the dashed line at 1.0 is the pass/fail boundary.</figcaption>
+</figure>
+</div>
+</section>
+</section>
+<script src="app.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script><script>window.addEventListener("load",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],macros:{},throwOnError:false});});</script></body></html>

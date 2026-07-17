@@ -1,0 +1,71 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>test_katex.jl · Test report</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="style.css"></head><body>
+<nav class="pinax-top"><a href="index.html">← Test report</a></nav>
+<h1>test_katex.jl</h1>
+<div class="pinax-meta">1 figure</div>
+<script type="application/json" id="pinax-committed">{"comments":{},"bookmarks":{},"features":["comments","bookmarks","export"]}</script>
+<section class="page" id="test_katex_jl">
+<p class="pinax-subtitle">9/9 passed · 0.12s</p>
+<div class="pinax-benchmark">
+<div class="pinax-verdict pinax-verdict-pass">test_katex.jl   9/9 PASS</div>
+<table class="pinax-checks"><thead><tr><th></th><th>id</th><th>label</th><th>got</th><th>want</th><th>Δ vs tol (kind)</th></tr></thead><tbody>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    write(svg, &quot;&lt;svg xmlns='http://www.w3.org/2000/svg'&gt;&lt;rect/&gt;&lt;/svg&gt;&quot;)
+
+    @testset &quot;default :cdn references the CDN, copies nothing&quot; begin
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; begin
+                @figure svg
+            end
+        end
+        out = site(&quot;cdn&quot;)
+        html = read(Pinax.render(; out=out), String)
+        @test occursin(&quot;cdn.jsdelivr.net/npm/katex&quot;, html)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t486</td><td>occursin(&quot;cdn.jsdelivr.net/npm/katex&quot;, html) <span class="pinax-src">@ test_katex.jl:19</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test !isdir(joinpath(out, &quot;assets&quot;, &quot;katex&quot;))</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t487</td><td>!(isdir(joinpath(out, &quot;assets&quot;, &quot;katex&quot;))) <span class="pinax-src">@ test_katex.jl:20</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;:local vendors KaTeX into out/ and references it (offline)&quot; begin
+        Pinax.reset!(; katex=:local)
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; begin
+                @figure svg
+            end
+        end
+        out = site(&quot;local&quot;)
+        html = read(Pinax.render(; out=out), String)
+        @test occursin(&quot;href=\&quot;assets/katex/katex.min.css\&quot;&quot;, html)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t488</td><td>occursin(&quot;href=\&quot;assets/katex/katex.min.css\&quot;&quot;, html) <span class="pinax-src">@ test_katex.jl:32</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;src=\&quot;assets/katex/katex.min.js\&quot;&quot;, html)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t489</td><td>occursin(&quot;src=\&quot;assets/katex/katex.min.js\&quot;&quot;, html) <span class="pinax-src">@ test_katex.jl:33</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test !occursin(&quot;cdn.jsdelivr.net&quot;, html)                       # fully offline</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t490</td><td>!(occursin(&quot;cdn.jsdelivr.net&quot;, html)) <span class="pinax-src">@ test_katex.jl:34</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test isfile(joinpath(out, &quot;assets&quot;, &quot;katex&quot;, &quot;katex.min.css&quot;))</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t491</td><td>isfile(joinpath(out, &quot;assets&quot;, &quot;katex&quot;, &quot;katex.min.css&quot;)) <span class="pinax-src">@ test_katex.jl:35</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test isfile(joinpath(out, &quot;assets&quot;, &quot;katex&quot;, &quot;katex.min.js&quot;))</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t492</td><td>isfile(joinpath(out, &quot;assets&quot;, &quot;katex&quot;, &quot;katex.min.js&quot;)) <span class="pinax-src">@ test_katex.jl:36</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test isfile(joinpath(out, &quot;assets&quot;, &quot;katex&quot;, &quot;contrib&quot;, &quot;auto-render.min.js&quot;))</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t493</td><td>isfile(joinpath(out, &quot;assets&quot;, &quot;katex&quot;, &quot;contrib&quot;, &quot;auto-render.min.js&quot;)) <span class="pinax-src">@ test_katex.jl:37</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test length(readdir(joinpath(out, &quot;assets&quot;, &quot;katex&quot;, &quot;fonts&quot;))) &gt;= 1   # woff2 fonts copied</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t494</td><td>length(readdir(joinpath(out, &quot;assets&quot;, &quot;katex&quot;, &quot;fonts&quot;))) &gt;= 1 <span class="pinax-src">@ test_katex.jl:38</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+</tbody></table></div>
+<div class="figgrid">
+<figure id="test_katex_jl_margins">
+<img src="assets/figures/test_katex_jl/test_katex_jl_margins.svg" alt="test_katex_jl_margins">
+<a class="pinax-dl" href="assets/figures/test_katex_jl/test_katex_jl_margins.svg" download title="download test_katex_jl_margins.svg">⤓ download</a>
+<figcaption><b>Fig. 37.</b> Tolerance budget spent by each check. The dashed line is the pass/fail boundary — a bar close to it passed, but barely.</figcaption>
+</figure>
+</div>
+<nav><strong>Contents</strong>
+<a href="#test_katex_jl_katex_assets_cdn_default_vs_vendored_offline">KaTeX assets: CDN default vs vendored offline</a>
+<a href="#test_katex_jl_default_cdn_references_the_cdn_copies_nothing">default :cdn references the CDN, copies nothing</a>
+<a href="#test_katex_jl__local_vendors_katex_into_out_and_references_it_offline_">:local vendors KaTeX into out/ and references it (offline)</a>
+</nav>
+<section class="section" id="test_katex_jl_katex_assets_cdn_default_vs_vendored_offline"><h2>Sec. 141. KaTeX assets: CDN default vs vendored offline</h2>
+</section>
+<section class="section" id="test_katex_jl_default_cdn_references_the_cdn_copies_nothing"><h2>Sec. 142. default :cdn references the CDN, copies nothing</h2>
+</section>
+<section class="section" id="test_katex_jl__local_vendors_katex_into_out_and_references_it_offline_"><h2>Sec. 143. :local vendors KaTeX into out/ and references it (offline)</h2>
+</section>
+</section>
+<script src="app.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script><script>window.addEventListener("load",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],macros:{},throwOnError:false});});</script></body></html>
