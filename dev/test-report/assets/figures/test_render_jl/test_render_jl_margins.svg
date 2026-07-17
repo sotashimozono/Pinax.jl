@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="620" height="924" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11">
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="780" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11">
 <text x="8" y="14" font-size="12" fill="#444">tolerance budget spent (delta / tol)</text>
 <text x="242" y="39" text-anchor="end" fill="#333">path == joinpath(outdir, &quot;index…</text>
 <rect x="250" y="29" width="1.0" height="11" fill="#4c9f70" rx="2"/>
@@ -120,31 +120,7 @@
 <text x="242" y="741" text-anchor="end" fill="#333">!(occursin(&quot;a/b\&quot;&quot;, html))</text>
 <rect x="250" y="731" width="1.0" height="11" fill="#4c9f70" rx="2"/>
 <text x="256.0" y="741" fill="#666">0.0</text>
-<text x="242" y="759" text-anchor="end" fill="#333">occursin(&quot;Alpha &lt;span class=\&quot;n…</text>
-<rect x="250" y="749" width="1.0" height="11" fill="#4c9f70" rx="2"/>
-<text x="256.0" y="759" fill="#666">0.0</text>
-<text x="242" y="777" text-anchor="end" fill="#333">occursin(&quot;Beta &lt;span class=\&quot;nf…</text>
-<rect x="250" y="767" width="1.0" height="11" fill="#4c9f70" rx="2"/>
-<text x="256.0" y="777" fill="#666">0.0</text>
-<text x="242" y="795" text-anchor="end" fill="#333">occursin(&quot;href=\&quot;#a\&quot; style=\&quot;m…</text>
-<rect x="250" y="785" width="1.0" height="11" fill="#4c9f70" rx="2"/>
-<text x="256.0" y="795" fill="#666">0.0</text>
-<text x="242" y="813" text-anchor="end" fill="#333">occursin(&quot;&lt;div class=\&quot;pinax-me…</text>
-<rect x="250" y="803" width="1.0" height="11" fill="#4c9f70" rx="2"/>
-<text x="256.0" y="813" fill="#666">0.0</text>
-<text x="242" y="831" text-anchor="end" fill="#333">occursin(&quot;&lt;div class=\&quot;pinax-me…</text>
-<rect x="250" y="821" width="1.0" height="11" fill="#4c9f70" rx="2"/>
-<text x="256.0" y="831" fill="#666">0.0</text>
-<text x="242" y="849" text-anchor="end" fill="#333">occursin(&quot;&lt;table class='cov'&gt;&lt;t…</text>
-<rect x="250" y="839" width="1.0" height="11" fill="#4c9f70" rx="2"/>
-<text x="256.0" y="849" fill="#666">0.0</text>
-<text x="242" y="867" text-anchor="end" fill="#333">!(occursin(&quot;&amp;lt;table class='co…</text>
-<rect x="250" y="857" width="1.0" height="11" fill="#4c9f70" rx="2"/>
-<text x="256.0" y="867" fill="#666">0.0</text>
-<text x="242" y="885" text-anchor="end" fill="#333">di &lt; ti &lt; fi</text>
-<rect x="250" y="875" width="1.0" height="11" fill="#4c9f70" rx="2"/>
-<text x="256.0" y="885" fill="#666">0.0</text>
-<line x1="508.33333333333337" y1="22" x2="508.33333333333337" y2="892" stroke="#d9534f" stroke-width="1" stroke-dasharray="3,2"/>
-<text x="511.33333333333337" y="904" fill="#d9534f">tol</text>
-<line x1="250" y1="22" x2="250" y2="892" stroke="#bbb" stroke-width="1"/>
+<line x1="508.33333333333337" y1="22" x2="508.33333333333337" y2="748" stroke="#d9534f" stroke-width="1" stroke-dasharray="3,2"/>
+<text x="511.33333333333337" y="760" fill="#d9534f">tol</text>
+<line x1="250" y1="22" x2="250" y2="748" stroke="#bbb" stroke-width="1"/>
 </svg>

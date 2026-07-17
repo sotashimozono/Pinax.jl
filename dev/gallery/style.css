@@ -29,6 +29,7 @@ body{font-family:system-ui,sans-serif;max-width:1180px;margin:2rem auto;padding:
   .pinax-checks tr.pinax-pass .pinax-badge{color:#1a7f37}
   .pinax-checks tr.pinax-fail .pinax-badge{color:#a40e26}
   .pinax-checks .pinax-src{color:#8a949e;font:11px ui-monospace,SFMono-Regular,Menlo,monospace}
+  .pinax-checks tr.pinax-more td{color:#6a737d;font-style:italic;background:#f6f8fa}
   figure{margin:0;border:1px solid #e2e5e9;border-radius:8px;padding:.5rem;background:#fdfdfe}
   figure img{width:100%;height:auto}
   figure iframe.pinax-pdf{width:100%;height:460px;border:1px solid #eee;border-radius:4px;background:#fff}

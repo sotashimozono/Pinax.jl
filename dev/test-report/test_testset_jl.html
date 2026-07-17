@@ -4,9 +4,9 @@
 <div class="pinax-meta">1 figure</div>
 <script type="application/json" id="pinax-committed">{"comments":{},"bookmarks":{},"features":["comments","bookmarks","export"]}</script>
 <section class="page" id="test_testset_jl">
-<p class="pinax-subtitle">91/91 passed · 82.15s</p>
+<p class="pinax-subtitle">100/100 passed · 75.86s</p>
 <div class="pinax-benchmark">
-<div class="pinax-verdict pinax-verdict-pass">test_testset.jl   91/91 PASS</div>
+<div class="pinax-verdict pinax-verdict-pass">test_testset.jl   100/100 PASS</div>
 <table class="pinax-checks"><thead><tr><th></th><th>id</th><th>label</th><th>got</th><th>want</th><th>Δ vs tol (kind)</th></tr></thead><tbody>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t687</td><td>Ext !== nothing <span class="pinax-src">@ test_testset.jl:32</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t688</td><td>PinaxTestSet &lt;: Test.AbstractTestSet <span class="pinax-src">@ test_testset.jl:33</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
@@ -113,12 +113,23 @@
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t775</td><td>(root.checks[end]).source == &quot;test_x.jl:42&quot; &amp;&amp; !((root.checks[end]).pass) <span class="pinax-src">@ test_testset.jl:604</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t776</td><td>((Pinax.load_test_dump(d)).checks[1]).source == &quot;test_x.jl:42&quot; <span class="pinax-src">@ test_testset.jl:612</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t777</td><td>occursin(&quot;\&quot;source\&quot;:\&quot;test_x.jl:42\&quot;&quot;, aj) <span class="pinax-src">@ test_testset.jl:620</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t778</td><td>length(shown) == Pinax._MAX_CHECK_ROWS <span class="pinax-src">@ test_testset.jl:641</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t779</td><td>count((c-&gt;begin
+                #= /home/runner/work/Pinax.jl/Pinax.jl/test/test_testset.jl:642 =#
+        … <span class="pinax-src">@ test_testset.jl:642</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t780</td><td>hf == 0 &amp;&amp; hp == 500 - Pinax._MAX_CHECK_ROWS <span class="pinax-src">@ test_testset.jl:643</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t781</td><td>Pinax._cap_gallery_checks(small, Pinax._MAX_CHECK_ROWS) == (small, 0, 0) <span class="pinax-src">@ test_testset.jl:645</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t782</td><td>occursin(&quot;more not shown&quot;, html) <span class="pinax-src">@ test_testset.jl:652</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t783</td><td>occursin(&quot;$(500 - length(fails))/500&quot;, html) <span class="pinax-src">@ test_testset.jl:653</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t784</td><td>count(&quot;pinax-pass\&quot;&quot;, html) + count(&quot;pinax-fail\&quot;&quot;, html) &lt;= Pinax._MAX_CHECK_ROWS <span class="pinax-src">@ test_testset.jl:654</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t785</td><td>occursin(&quot;worst of 500&quot;, html) <span class="pinax-src">@ test_testset.jl:656</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t786</td><td>count(&quot;\&quot;pass\&quot;:&quot;, aj) &gt;= 500 <span class="pinax-src">@ test_testset.jl:658</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
 </tbody></table></div>
 <div class="figgrid">
 <figure id="test_testset_jl_margins">
 <img src="assets/figures/test_testset_jl/test_testset_jl_margins.svg" alt="test_testset_jl_margins">
 <a class="pinax-dl" href="assets/figures/test_testset_jl/test_testset_jl_margins.svg" download title="download test_testset_jl_margins.svg">⤓ download</a>
-<figcaption><b>Fig. 51.</b> Tolerance budget spent by each check. The dashed line is the pass/fail boundary — a bar close to it passed, but barely.</figcaption>
+<figcaption><b>Fig. 51.</b> Tolerance budget spent by each check. The dashed line is the pass/fail boundary — a bar close to it passed, but barely. Showing the 40 worst of 100 checks &#40;the rest are in agent.json&#41;.</figcaption>
 </figure>
 </div>
 <nav><strong>Contents</strong>
@@ -148,6 +159,7 @@
 <a href="#test_testset_jl__caption_after_a_test_names_the_check_s_quantity_c_follow_up_">@caption after a @test names the check's quantity (C follow-up)</a>
 <a href="#test_testset_jl__expect_inside_a_captured_test_is_forbidden_test_is_the_assertion_f_">@expect inside a captured test is forbidden — @test is the assertion (F)</a>
 <a href="#test_testset_jl_a_failing_check_carries_file_line_the_failure_payload_i_">a failing check carries file:line — the failure payload (I)</a>
+<a href="#test_testset_jl_at_scale_the_human_gallery_caps_rows_agent_json_stays_complete_j_">at scale the human gallery caps rows; agent.json stays complete (J)</a>
 </nav>
 <section class="section" id="test_testset_jl_pinaxtestset"><h2>Sec. 210. PinaxTestSet</h2>
 </section>
@@ -200,6 +212,8 @@
 <section class="section" id="test_testset_jl__expect_inside_a_captured_test_is_forbidden_test_is_the_assertion_f_"><h2>Sec. 234. @expect inside a captured test is forbidden — @test is the assertion (F)</h2>
 </section>
 <section class="section" id="test_testset_jl_a_failing_check_carries_file_line_the_failure_payload_i_"><h2>Sec. 235. a failing check carries file:line — the failure payload (I)</h2>
+</section>
+<section class="section" id="test_testset_jl_at_scale_the_human_gallery_caps_rows_agent_json_stays_complete_j_"><h2>Sec. 236. at scale the human gallery caps rows; agent.json stays complete (J)</h2>
 </section>
 </section>
 <script src="app.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script><script>window.addEventListener("load",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],macros:{},throwOnError:false});});</script></body></html>
