@@ -551,6 +551,15 @@ _check_for(r, i) = _check_from(_result_data_expr(r), Ext._label(r), r isa Test.P
             Test.pop_testset()
         end
         @test root.checks[end].label == "energy"     # the caption renamed the quantity
+
+        # …and with nothing before it (no figure, no check) it is a loud diagnostic, not an error
+        Pinax.reset!()
+        @page :orphan "P" begin
+            @caption "nothing to name"
+        end
+        @test any(
+            e -> occursin("no preceding", e.message), Pinax.current_document().diag.entries
+        )
     end
 
     @testset "@expect inside a captured test is forbidden — @test is the assertion (F)" begin

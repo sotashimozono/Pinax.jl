@@ -822,14 +822,16 @@ end
 function _set_caption!(s)
     c = _current_container()
     c === :inert && return nothing   # inside a test with the report off — no-op (invariant V)
-    if c === nothing
-        _diag!(WARNING, "?", "@caption with no preceding @figure or @test")
-    elseif !isempty(c.content) && c.content[end][1] === :check
+    if c !== nothing && !isempty(c.content) && c.content[end][1] === :check
         c.checks[c.content[end][2]].label = string(s)   # name the check's quantity
-    elseif !isempty(c.figures)
+    elseif c !== nothing && !isempty(c.figures)
         c.figures[end].caption = string(s)
     else
-        _diag!(WARNING, c.anchor, "@caption with no preceding @figure or @test")
+        _diag!(
+            WARNING,
+            c === nothing ? "?" : c.anchor,
+            "@caption with no preceding @figure or @test",
+        )
     end
     return nothing
 end
