@@ -90,6 +90,20 @@ let build = joinpath(@__DIR__, "build")
     cd(build) do
         return Base.include(Module(:PinaxGallery), GALLERY_JL)
     end
+    # Carry the Pinax self-test report into the deployed site (build/test-report/) so the "Test →
+    # Pinax" page can link a LIVE report of Pinax's own suite. It is DOWNLOADED from the CI run's
+    # artifact by the workflow (into ../pinax-report-dl/) — never re-run here, so the docs build does
+    # not re-test (that would double the suite; the report is exactly the delegation job's output).
+    let src = joinpath(@__DIR__, "..", "pinax-report-dl", "pinax-report_html"),
+        dst = joinpath(build, "test-report")
+
+        if isdir(src)
+            cp(src, dst; force=true)
+            @info "carried the Pinax self-test report into build/test-report/"
+        else
+            @info "no Pinax self-test report to carry (CI artifact absent) — the Test → Pinax link 404s"
+        end
+    end
 end
 
 deploydocs(;
