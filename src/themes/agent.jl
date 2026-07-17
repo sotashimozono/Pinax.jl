@@ -207,6 +207,8 @@ function emit_check(::AgentBase, chk, ctx)
         _jsonstr(string(chk.kind)),
         ",\"pass\":",
         _agent_jsonval(chk.pass),
+        ",\"source\":",
+        _jsonstr(chk.source),
         "}",
     )
     return nothing

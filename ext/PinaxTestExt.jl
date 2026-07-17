@@ -131,10 +131,20 @@ function Test.record(ts::PinaxTestSet, res)
     elseif res isa Test.Result                        # Pass / Fail / Error
         res isa Test.Error && (ts.nerror += 1)
         chk = _check_from(_result_data_expr(res), _label(res), res isa Test.Pass, 0)
+        chk.source = _source_str(res)                 # WHERE it failed (issue #69 I)
         push!(ts.checks, chk)
         push!(ts.content, :check => length(ts.checks))
     end
     return res
+end
+
+# "file:line" from a Test result's `source::LineNumberNode`, or "" — duck-typed via `hasproperty` since
+# a `Pass` may carry no source across Julia versions, and only a FAILING check really needs it.
+function _source_str(res)
+    hasproperty(res, :source) || return ""
+    s = getproperty(res, :source)
+    (s isa LineNumberNode && s.file !== nothing) || return ""
+    return string(basename(String(s.file)), ":", s.line)
 end
 
 function Test.finish(ts::PinaxTestSet)

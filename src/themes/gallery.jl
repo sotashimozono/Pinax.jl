@@ -115,6 +115,7 @@ const _GALLERY_CSS = """
   .pinax-checks .pinax-badge{font-weight:700}
   .pinax-checks tr.pinax-pass .pinax-badge{color:#1a7f37}
   .pinax-checks tr.pinax-fail .pinax-badge{color:#a40e26}
+  .pinax-checks .pinax-src{color:#8a949e;font:11px ui-monospace,SFMono-Regular,Menlo,monospace}
   figure{margin:0;border:1px solid #e2e5e9;border-radius:8px;padding:.5rem;background:#fdfdfe}
   figure img{width:100%;height:auto}
   figure iframe.pinax-pdf{width:100%;height:460px;border:1px solid #eee;border-radius:4px;background:#fff}
@@ -1273,7 +1274,10 @@ function emit_check(::GalleryBase, chk, ctx)
     print(io, "<tr class=\"", cls, "\">")
     print(io, "<td class=\"pinax-badge\">", badge, "</td>")
     print(io, "<td>", _esc(string(chk.id)), "</td>")
-    print(io, "<td>", _esc(chk.label), "</td>")
+    print(io, "<td>", _esc(chk.label))
+    isempty(chk.source) ||
+        print(io, " <span class=\"pinax-src\">@ ", _esc(chk.source), "</span>")
+    print(io, "</td>")
     print(io, "<td>", _esc(_cellstr(chk.got)), "</td>")
     print(io, "<td>", _esc(_cellstr(chk.want)), "</td>")
     print(

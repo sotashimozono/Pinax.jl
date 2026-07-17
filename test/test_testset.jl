@@ -576,4 +576,47 @@ _check_for(r, i) = _check_from(_result_data_expr(r), Ext._label(r), r isa Test.P
             Test.pop_testset()
         end
     end
+
+    @testset "a failing check carries file:line — the failure payload (I)" begin
+        # A failing @test records WHERE it failed (its LineNumberNode), so the report says where to
+        # look, not just what failed. Captured duck-typed (a Pass may carry no source), carried through
+        # a shard dump, and emitted as a structured field in agent.json.
+        fail = Test.Fail(
+            :test,
+            :(isapprox(a, b)),
+            "isapprox(0.5, 0.9; rtol = 0.01)",
+            nothing,
+            nothing,
+            LineNumberNode(42, Symbol("/proj/test/test_x.jl")),
+            false,
+        )
+        @test Ext._source_str(fail) == "test_x.jl:42"          # basename:line, not the full path
+        @test Ext._source_str(Test.Pass(:test, :x, :(1 == 1), nothing)) == ""   # no usable source → ""
+
+        # recorded onto the check, alongside its (failing) verdict…
+        root = PinaxTestSet("cap")
+        Test.push_testset(root)
+        try
+            Test.record(root, fail)
+        finally
+            Test.pop_testset()
+        end
+        @test root.checks[end].source == "test_x.jl:42" && !root.checks[end].pass
+
+        # …round-trips through a shard dump…
+        dir = mktempdir()
+        srcchk() = Check(:t, "e", 0.5, 0.9, 0.44, 0.01, :rel, false, "test_x.jl:42")
+        d = Pinax.dump_test_report(
+            TestNode("test_x.jl"; checks=[srcchk()]), joinpath(dir, "s.toml")
+        )
+        @test Pinax.load_test_dump(d).checks[1].source == "test_x.jl:42"
+
+        # …and is emitted as a structured field in agent.json (an agent reads WHERE, not just what).
+        render_test_report(
+            TestNode("Test report"; children=[TestNode("test_x.jl"; checks=[srcchk()])]);
+            out=joinpath(dir, "rep"),
+        )
+        aj = read(joinpath(dir, "rep_agent", "agent.json"), String)
+        @test occursin("\"source\":\"test_x.jl:42\"", aj)
+    end
 end

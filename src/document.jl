@@ -147,6 +147,13 @@ mutable struct Check
     tol::Float64
     kind::Symbol       # :rel or :abs (resolved; never :auto in the struct)
     pass::Bool
+    source::String     # "file:line" of the assertion (issue #69 I) — carried for a failing @test so the
+    # report says WHERE, not just what; "" when unknown (a passing @test / a manuscript @expect).
+end
+# Keep the 8-arg positional form working (source defaults to "") — every existing construction is
+# unchanged, and only the `Test` bridge, which has the failure's `LineNumberNode`, fills it in.
+function Check(id, label, got, want, delta, tol, kind, pass)
+    return Check(id, label, got, want, delta, tol, kind, pass, "")
 end
 
 "A section (a group of figures + a description)."

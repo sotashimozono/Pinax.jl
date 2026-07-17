@@ -181,7 +181,9 @@ function emit_check(::LaTeXBase, chk, ctx)
         join(
             (
                 _texesc(string(chk.id)),
-                _texesc(chk.label),
+                _texesc(
+                    isempty(chk.source) ? chk.label : string(chk.label, " @ ", chk.source)
+                ),
                 _texesc(_cellstr(chk.got)),
                 _texesc(_cellstr(chk.want)),
                 _texesc(_cellstr(chk.delta)),

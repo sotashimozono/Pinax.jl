@@ -525,6 +525,7 @@ function _emit_sweep!(n, counter::Ref{Int}, page_when::Function, acc::Vector{Che
             chk.tol,
             chk.kind,
             chk.pass,
+            chk.source,
         )
         _place_check!(c, tagged, counter, acc)
     end
@@ -1082,7 +1083,7 @@ end
 # `id` is deliberately NOT dumped: it is assigned at render time (t1, t2, …) so that merging several
 # shards produces one clean numbering rather than N colliding ones.
 function _check_to_dict(c::Check)
-    return Dict{String,Any}(
+    d = Dict{String,Any}(
         "label" => c.label,
         "got" => c.got,
         "want" => c.want,
@@ -1091,6 +1092,8 @@ function _check_to_dict(c::Check)
         "kind" => String(c.kind),
         "pass" => c.pass,
     )
+    isempty(c.source) || (d["source"] = c.source)   # carry WHERE it failed across a shard dump
+    return d
 end
 
 function _dict_to_node(d::AbstractDict)
@@ -1115,6 +1118,7 @@ function _dict_to_check(d::AbstractDict)
         Float64(d["tol"]),
         Symbol(d["kind"]),
         d["pass"],
+        get(d, "source", ""),
     )
 end
 
