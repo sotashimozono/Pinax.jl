@@ -157,6 +157,17 @@ _tofloat(x::Any) = nothing
 
 _margin(c::Check) = c.tol > 0 ? c.delta / c.tol : 0.0
 
+# A stable fingerprint of the data a DERIVED figure (the margin / convergence SVGs) draws, folded into
+# the figure's `code` so the render cache (which keys on code+params, computed without calling `gen`)
+# re-materializes the SVG iff the underlying checks changed (issue #69 L). Without it, `code=""` gives
+# every derived figure a CONSTANT key, so a docs rebuild falsely reuses a stale SVG when the numbers
+# moved. Dumps carry the checks, so they carry this key material implicitly — no separate cache key.
+function _checks_fingerprint(checks)
+    return string(
+        hash([(c.label, c.got, c.want, c.delta, c.tol, c.kind, c.pass) for c in checks])
+    )
+end
+
 # ── the checks ───────────────────────────────────────────────────────
 
 # One Check per @test. A numeric `isapprox` keeps its real got/want/tol (that is the whole point);
@@ -371,7 +382,7 @@ function _push_margin_figure!(page_id::Symbol, checks::Vector{Check})
     end
     _push_figure!(;
         gen=() -> _margin_svg(shown, tempname() * ".svg"),
-        code="",
+        code=_checks_fingerprint(shown),   # data-keyed so a rebuild re-draws iff the checks moved (L)
         caption="Tolerance budget spent by each check. The dashed line is the pass/fail " *
                 "boundary — a bar close to it passed, but barely." *
                 cap_note,
@@ -591,6 +602,17 @@ function _push_sweep_figures!(cid::Symbol, qi::Ref{Int}, label::AbstractString, 
     band = [(bandlo[i], bandhi[i]) for i in 1:K]
     qi[] += 1
     q = _trunc(label, 44)
+    # both SVGs derive from `pts` (+ the axis) — one data fingerprint keys their cache (issue #69 L).
+    fp = string(
+        hash((
+            xvar,
+            xticklabels,
+            [
+                (_binding_str(b), c.got, c.want, c.delta, c.tol, c.kind, c.pass) for
+                (b, c) in pts
+            ],
+        )),
+    )
     _push_figure!(;
         gen=() -> _sweep_plot_svg(
             tempname() * ".svg";
@@ -602,7 +624,7 @@ function _push_sweep_figures!(cid::Symbol, qi::Ref{Int}, label::AbstractString, 
             band=band,
             refline=wantv,
         ),
-        code="",
+        code=fp,
         caption="Convergence of `$(q)` over the swept axis `$(xvar)`. Dashed line = `want`; the shaded " *
                 "band is the tolerance; a red marker is a failed check.",
         id=Symbol(cid, :_conv_, qi[]),
@@ -625,7 +647,7 @@ function _push_sweep_figures!(cid::Symbol, qi::Ref{Int}, label::AbstractString, 
             series=marg_series,
             hline=1.0,
         ),
-        code="",
+        code=fp,
         caption="Tolerance budget `delta/tol` of `$(q)` over `$(xvar)`; the dashed line at 1.0 is the " *
                 "pass/fail boundary.",
         id=Symbol(cid, :_swpmargin_, qi[]),

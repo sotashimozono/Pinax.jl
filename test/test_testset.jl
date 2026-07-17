@@ -709,4 +709,37 @@ _check_for(r, i) = _check_from(_result_data_expr(r), Ext._label(r), r isa Test.P
             )
         end
     end
+
+    @testset "derived figures are data-keyed — no stale figure on rebuild (L)" begin
+        # The margin / convergence SVGs fold a fingerprint of the checks they draw into the figure
+        # `code`, so the render cache (keyed on code+params, computed without calling `gen`) re-draws a
+        # figure iff its numbers changed — a docs rebuild with unchanged checks reuses the SVG, and a
+        # stale figure can never survive a real change (which `code=""` used to allow: a constant key).
+        c1 = [Check(:t, "c", 1.0, 1.0, 0.0, 0.5, :abs, true)]
+        c2 = [Check(:t, "c", 5.0, 1.0, 4.0, 0.5, :abs, false)]
+        @test Pinax._checks_fingerprint(c1) == Pinax._checks_fingerprint(c1)   # stable
+        @test Pinax._checks_fingerprint(c1) != Pinax._checks_fingerprint(c2)   # data-dependent
+
+        out = joinpath(mktempdir(), "rep")
+        rep(chk) = render_test_report(
+            TestNode("T"; children=[TestNode("f.jl"; checks=chk)]); out=out
+        )
+        svgfor() = read(
+            only(
+                filter(
+                    p -> occursin("margins", p),
+                    readdir(
+                        joinpath(out * "_html", "assets", "figures", "f_jl"); join=true
+                    ),
+                ),
+            ),
+            String,
+        )
+        rep(c1)
+        s1 = svgfor()
+        rep(c1)
+        @test svgfor() == s1        # unchanged checks → identical SVG (cache-consistent)
+        rep(c2)
+        @test svgfor() != s1        # changed checks → the SVG reflects the new numbers (never stale)
+    end
 end
