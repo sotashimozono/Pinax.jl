@@ -1,0 +1,114 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="708" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11">
+<text x="8" y="14" font-size="12" fill="#444">tolerance budget spent (delta / tol)</text>
+<text x="242" y="39" text-anchor="end" fill="#333">(pg.tables[1]).header == [&quot;T&quot;, …</text>
+<rect x="250" y="29" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="39" fill="#666">0.0</text>
+<text x="242" y="57" text-anchor="end" fill="#333">(pg.tables[1]).rows == [[1.0, 0…</text>
+<rect x="250" y="47" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="57" fill="#666">0.0</text>
+<text x="242" y="75" text-anchor="end" fill="#333">(pg.tables[1]).caption == &quot;m(t)&quot;</text>
+<rect x="250" y="65" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="75" fill="#666">0.0</text>
+<text x="242" y="93" text-anchor="end" fill="#333">(pg.tables[1]).id == :p_tbl1</text>
+<rect x="250" y="83" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="93" fill="#666">0.0</text>
+<text x="242" y="111" text-anchor="end" fill="#333">(s.tables[1]).header == [&quot;a&quot;, &quot;b&quot;]</text>
+<rect x="250" y="101" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="111" fill="#666">0.0</text>
+<text x="242" y="129" text-anchor="end" fill="#333">(s.tables[1]).rows == [[1, 2], …</text>
+<rect x="250" y="119" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="129" fill="#666">0.0</text>
+<text x="242" y="147" text-anchor="end" fill="#333">(s.tables[2]).header == [&quot;name&quot;…</text>
+<rect x="250" y="137" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="147" fill="#666">0.0</text>
+<text x="242" y="165" text-anchor="end" fill="#333">(s.tables[2]).rows == [[&quot;x&quot;, 1]…</text>
+<rect x="250" y="155" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="165" fill="#666">0.0</text>
+<text x="242" y="183" text-anchor="end" fill="#333">occursin(&quot;class=\&quot;pinax-table\&quot;…</text>
+<rect x="250" y="173" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="183" fill="#666">0.0</text>
+<text x="242" y="201" text-anchor="end" fill="#333">occursin(&quot;&lt;th&gt;T&lt;/th&gt;&quot;, g)</text>
+<rect x="250" y="191" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="201" fill="#666">0.0</text>
+<text x="242" y="219" text-anchor="end" fill="#333">occursin(&quot;&lt;td&gt;0.5&lt;/td&gt;&quot;, g)</text>
+<rect x="250" y="209" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="219" fill="#666">0.0</text>
+<text x="242" y="237" text-anchor="end" fill="#333">occursin(&quot;\&quot;header\&quot;:[\&quot;T\&quot;,\&quot;M…</text>
+<rect x="250" y="227" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="237" fill="#666">0.0</text>
+<text x="242" y="255" text-anchor="end" fill="#333">occursin(&quot;\&quot;rows\&quot;:[[1.0,0.5],[…</text>
+<rect x="250" y="245" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="255" fill="#666">0.0</text>
+<text x="242" y="273" text-anchor="end" fill="#333">occursin(&quot;\&quot;tables\&quot;:[&quot;, aj)</text>
+<rect x="250" y="263" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="273" fill="#666">0.0</text>
+<text x="242" y="291" text-anchor="end" fill="#333">occursin(&quot;| T | M |&quot;, am)</text>
+<rect x="250" y="281" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="291" fill="#666">0.0</text>
+<text x="242" y="309" text-anchor="end" fill="#333">occursin(&quot;\\begin{tabular}&quot;, lx)</text>
+<rect x="250" y="299" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="309" fill="#666">0.0</text>
+<text x="242" y="327" text-anchor="end" fill="#333">occursin(&quot;T &amp; M&quot;, lx)</text>
+<rect x="250" y="317" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="327" fill="#666">0.0</text>
+<text x="242" y="345" text-anchor="end" fill="#333">occursin(&quot;[2,null]&quot;, aj)</text>
+<rect x="250" y="335" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="345" fill="#666">0.0</text>
+<text x="242" y="363" text-anchor="end" fill="#333">Pinax._normalize_table(42, noth…</text>
+<rect x="250" y="353" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="363" fill="#666">0.0</text>
+<text x="242" y="381" text-anchor="end" fill="#333">h == [&quot;x&quot;, &quot;y&quot;]</text>
+<rect x="250" y="371" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="381" fill="#666">0.0</text>
+<text x="242" y="399" text-anchor="end" fill="#333">r == [[10, 20], [30, 40]]</text>
+<rect x="250" y="389" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="399" fill="#666">0.0</text>
+<text x="242" y="417" text-anchor="end" fill="#333">h2 == [&quot;1&quot;, &quot;2&quot;, &quot;3&quot;]</text>
+<rect x="250" y="407" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="417" fill="#666">0.0</text>
+<text x="242" y="435" text-anchor="end" fill="#333">r2 == [[1, 2, 3]]</text>
+<rect x="250" y="425" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="435" fill="#666">0.0</text>
+<text x="242" y="453" text-anchor="end" fill="#333">#= /home/runner/work/Pinax.jl/P…</text>
+<rect x="250" y="443" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="453" fill="#666">0.0</text>
+<text x="242" y="471" text-anchor="end" fill="#333">#= /home/runner/work/Pinax.jl/P…</text>
+<rect x="250" y="461" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="471" fill="#666">0.0</text>
+<text x="242" y="489" text-anchor="end" fill="#333">occursin(&quot;a&amp;amp;b&quot;, g)</text>
+<rect x="250" y="479" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="489" fill="#666">0.0</text>
+<text x="242" y="507" text-anchor="end" fill="#333">occursin(&quot;&lt;td&gt;&lt;/td&gt;&quot;, g)</text>
+<rect x="250" y="497" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="507" fill="#666">0.0</text>
+<text x="242" y="525" text-anchor="end" fill="#333">occursin(&quot;a\\&amp;b&quot;, lx)</text>
+<rect x="250" y="515" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="525" fill="#666">0.0</text>
+<text x="242" y="543" text-anchor="end" fill="#333">occursin(&quot;c\\_d&quot;, lx)</text>
+<rect x="250" y="533" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="543" fill="#666">0.0</text>
+<text x="242" y="561" text-anchor="end" fill="#333">occursin(&quot;\&quot;custom_tbl\&quot;:\&quot;p_tb…</text>
+<rect x="250" y="551" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="561" fill="#666">0.0</text>
+<text x="242" y="579" text-anchor="end" fill="#333">!(occursin(&quot;\&quot;header\&quot;&quot;, j))</text>
+<rect x="250" y="569" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="579" fill="#666">0.0</text>
+<text x="242" y="597" text-anchor="end" fill="#333">ord(g)</text>
+<rect x="250" y="587" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="597" fill="#666">0.0</text>
+<text x="242" y="615" text-anchor="end" fill="#333">count(&quot;class=\&quot;figgrid&quot;, g) == 2</text>
+<rect x="250" y="605" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="615" fill="#666">0.0</text>
+<text x="242" y="633" text-anchor="end" fill="#333">ord(read(joinpath(tmp, &quot;a&quot;, &quot;ag…</text>
+<rect x="250" y="623" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="633" fill="#666">0.0</text>
+<text x="242" y="651" text-anchor="end" fill="#333">occursin(&quot;\&quot;content\&quot;:[{\&quot;kind\…</text>
+<rect x="250" y="641" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="651" fill="#666">0.0</text>
+<text x="242" y="669" text-anchor="end" fill="#333">ord(read(Pinax.render(; out = j…</text>
+<rect x="250" y="659" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="669" fill="#666">0.0</text>
+<line x1="508.33333333333337" y1="22" x2="508.33333333333337" y2="676" stroke="#d9534f" stroke-width="1" stroke-dasharray="3,2"/>
+<text x="511.33333333333337" y="688" fill="#d9534f">tol</text>
+<line x1="250" y1="22" x2="250" y2="676" stroke="#bbb" stroke-width="1"/>
+</svg>

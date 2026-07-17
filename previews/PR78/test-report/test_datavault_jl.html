@@ -1,0 +1,51 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>test_datavault.jl · Test report</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="style.css"></head><body>
+<nav class="pinax-top"><a href="index.html">← Test report</a></nav>
+<h1>test_datavault.jl</h1>
+<div class="pinax-meta">1 figure</div>
+<script type="application/json" id="pinax-committed">{"comments":{},"bookmarks":{},"features":["comments","bookmarks","export"]}</script>
+<section class="page" id="test_datavault_jl">
+<p class="pinax-subtitle">14/14 passed · 10.24s</p>
+<div class="pinax-benchmark">
+<div class="pinax-verdict pinax-verdict-pass">test_datavault.jl   14/14 PASS</div>
+<table class="pinax-checks"><thead><tr><th></th><th>id</th><th>label</th><th>got</th><th>want</th><th>Δ vs tol (kind)</th></tr></thead><tbody>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t246</td><td>calls[] == 1</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t247</td><td>calls[] == 1</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t248</td><td>calls[] == 2</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t249</td><td>calls[] == 1</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t250</td><td>calls[] == 1</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t251</td><td>isfile(meta)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t252</td><td>occursin(&quot;git_hash&quot;, read(meta, String))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t253</td><td>res.n == 3</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t254</td><td>isfile(res.gallery)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t255</td><td>isfile(res.agent)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t256</td><td>occursin(&quot;\&quot;val\&quot;&quot;, read(res.agent, String))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t257</td><td>occursin(&quot;64&quot;, read(res.agent, String))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t258</td><td>occursin(&quot;| N | val |&quot;, md)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t259</td><td>Pinax.report(42, recipe; title = &quot;x&quot;, out = joinpath(tmp, &quot;z&quot;))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+</tbody></table></div>
+<div class="figgrid">
+<figure id="test_datavault_jl_margins">
+<img src="assets/figures/test_datavault_jl/test_datavault_jl_margins.svg" alt="test_datavault_jl_margins">
+<a class="pinax-dl" href="assets/figures/test_datavault_jl/test_datavault_jl_margins.svg" download title="download test_datavault_jl_margins.svg">⤓ download</a>
+<figcaption><b>Fig. 9.</b> Tolerance budget spent by each check. The dashed line is the pass/fail boundary — a bar close to it passed, but barely.</figcaption>
+</figure>
+</div>
+<nav><strong>Contents</strong>
+<a href="#test_datavault_jl_datavault_integration_data_content_cache_fingerprint_provenance">DataVault integration: data-content cache fingerprint + provenance</a>
+<a href="#test_datavault_jl_recomputing_the_data_invalidates_the_cache_critique_8_">recomputing the data invalidates the cache (critique #8)</a>
+<a href="#test_datavault_jl_without_a_vault_data_changes_are_not_detected_prior_behavior_">without a vault, data changes are not detected (prior behavior)</a>
+<a href="#test_datavault_jl_record_figure_writes_study_provenance_meta_toml">record_figure writes study provenance meta.toml</a>
+<a href="#test_datavault_jl_report_vault_recipe_vault_gallery_agent_json">report(vault, recipe): vault → gallery + agent.json</a>
+</nav>
+<section class="section" id="test_datavault_jl_datavault_integration_data_content_cache_fingerprint_provenance"><h2>Sec. 72. DataVault integration: data-content cache fingerprint + provenance</h2>
+</section>
+<section class="section" id="test_datavault_jl_recomputing_the_data_invalidates_the_cache_critique_8_"><h2>Sec. 73. recomputing the data invalidates the cache (critique #8)</h2>
+</section>
+<section class="section" id="test_datavault_jl_without_a_vault_data_changes_are_not_detected_prior_behavior_"><h2>Sec. 74. without a vault, data changes are not detected (prior behavior)</h2>
+</section>
+<section class="section" id="test_datavault_jl_record_figure_writes_study_provenance_meta_toml"><h2>Sec. 75. record_figure writes study provenance meta.toml</h2>
+</section>
+<section class="section" id="test_datavault_jl_report_vault_recipe_vault_gallery_agent_json"><h2>Sec. 76. report(vault, recipe): vault → gallery + agent.json</h2>
+</section>
+</section>
+<script src="app.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script><script>window.addEventListener("load",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],macros:{},throwOnError:false});});</script></body></html>
