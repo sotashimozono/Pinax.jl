@@ -699,6 +699,10 @@ nonzero reference, `:abs` (a residual against `want=0`). `@expect "E1" "energy d
 The tolerance is relative by default with a nonzero `want`, absolute for a residual (`want=0`);
 `kind=:rel` with `want=0` is an error, and a non-finite `got`/`want` or a non-positive `tol` is an
 error — a check is a trust gate, so an ill-posed assertion fails loudly rather than mis-reporting.
+
+`@expect` is **manuscript** vocabulary (a `@page`/`@benchmark`/`@section`). Inside a **test suite** the
+assertion is `@test` — Pinax recovers its `got`/`want`/`tol` and shows the same margin — so `@expect`
+used directly in a `@testset` is an error, not a silently-unenforced check (issue #69 F).
 """
 macro expect(args...)
     length(args) >= 2 || error("@expect needs an id and a \"label\" (plus kwargs)")
@@ -711,9 +715,22 @@ macro expect(args...)
 end
 
 function _push_check!(; id, label, got, want=0.0, tol, kind=:auto)
-    c = _current_container()
-    c === :inert && return nothing   # inside a test with the report off — no-op (invariant V)
-    c === nothing && error("@expect outside of a @benchmark/@section/@page")
+    # `@expect` is MANUSCRIPT vocabulary. Inside a test suite the assertion is `@test` — whose margin
+    # the report already recovers and shows — so `@expect` used directly in a `@testset` is a mistake:
+    # it records a check the test runner does not enforce, i.e. a GREEN run for a failing check when the
+    # report is off (issue #69 F). Forbid it loudly (and keep the report's on/off state from ever
+    # deciding the verdict, invariant IV). A manuscript built *inside* a test — an open `CTX` page /
+    # section, as Pinax's own tests do — is real manuscript content, so `_ctx_container()` is non-nothing
+    # there and this passes straight through.
+    c = _ctx_container()
+    if c === nothing
+        _probe_test_container() === :none &&
+            error("@expect $(id): outside of a @benchmark/@section/@page")
+        error(
+            "@expect $(id): `@expect` is a manuscript check, not a suite assertion — inside a " *
+            "`@testset` write `@test` (Pinax already recovers and shows its margin in the report).",
+        )
+    end
     g = Float64(got)
     w = Float64(want)
     t = Float64(tol)

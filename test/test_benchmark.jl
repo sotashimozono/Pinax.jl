@@ -184,12 +184,16 @@ end
         @test occursin("\"custom_chk\":\"E\"", j)   # override fired via _agent_benchmark! dispatch
     end
 
-    @testset DefaultTestSet "@expect with no container is inert inside a test (invariant V)" begin
-        # No container open + inside a testset → the content seam is inert → `_push_check!` no-ops
-        # (returns nothing) rather than erroring. With a container open (a `@benchmark` page) the
-        # value-validation gate still fires, so ill-posed checks are still caught (below).
+    @testset DefaultTestSet "@expect directly inside a test is forbidden — use @test (#69 F)" begin
+        # No manuscript open + inside a testset → `@expect` is a MISTAKE: it would record a check the
+        # test runner does not enforce (a GREEN run for a failing check when the report is off). It now
+        # errors, pointing to `@test`, rather than silently no-op'ing — so the report's on/off state can
+        # never decide the verdict (invariant IV). A manuscript built inside a test is still fine (an
+        # open `@page`/`@benchmark` container is non-nothing; exercised throughout this file).
         Pinax.reset!()
-        @test Pinax._push_check!(; id=:x, label="y", got=1.0, tol=1e-3) === nothing
+        @test_throws "manuscript check" Pinax._push_check!(;
+            id=:x, label="y", got=1.0, tol=1e-3
+        )
     end
 
     @testset "ill-posed checks error (the trust gate)" begin

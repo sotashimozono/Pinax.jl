@@ -538,4 +538,19 @@ _check_for(r, i) = _check_from(_result_data_expr(r), Ext._label(r), r isa Test.P
             @test !any(r -> r.field == "repo", rows)   # an empty CI repo is omitted, not blank
         end
     end
+
+    @testset "@expect inside a captured test is forbidden — @test is the assertion (F)" begin
+        # `@expect` is manuscript vocabulary. Directly inside a test — here a captured `PinaxTestSet`,
+        # the report-ON path — it errors and points to `@test`, so a check can never be recorded but
+        # left unenforced (which under a bare `Pkg.test()` would be a green run for a failing check).
+        root = PinaxTestSet("cap")
+        Test.push_testset(root)
+        try
+            @test_throws "manuscript check" Pinax._push_check!(;
+                id=:E, label="energy", got=1.0, want=1.0, tol=1e-3
+            )
+        finally
+            Test.pop_testset()
+        end
+    end
 end
