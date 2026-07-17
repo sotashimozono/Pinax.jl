@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="780" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11">
+<text x="8" y="14" font-size="12" fill="#444">tolerance budget spent (delta / tol)</text>
+<text x="242" y="39" text-anchor="end" fill="#333">path == joinpath(outdir, &quot;index…</text>
+<rect x="250" y="29" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="39" fill="#666">0.0</text>
+<text x="242" y="57" text-anchor="end" fill="#333">isfile(path)</text>
+<rect x="250" y="47" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="57" fill="#666">0.0</text>
+<text x="242" y="75" text-anchor="end" fill="#333">occursin(&quot;Thermal&quot;, html)</text>
+<rect x="250" y="65" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="75" fill="#666">0.0</text>
+<text x="242" y="93" text-anchor="end" fill="#333">occursin(&quot;Energy vs T&quot;, html)</text>
+<rect x="250" y="83" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="93" fill="#666">0.0</text>
+<text x="242" y="111" text-anchor="end" fill="#333">occursin(&quot;panel A&quot;, html)</text>
+<rect x="250" y="101" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="111" fill="#666">0.0</text>
+<text x="242" y="129" text-anchor="end" fill="#333">occursin(&quot;id=\&quot;energy\&quot;&quot;, html)</text>
+<rect x="250" y="119" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="129" fill="#666">0.0</text>
+<text x="242" y="147" text-anchor="end" fill="#333">occursin(&quot;E/N comparison&quot;, html)</text>
+<rect x="250" y="137" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="147" fill="#666">0.0</text>
+<text x="242" y="165" text-anchor="end" fill="#333">occursin(&quot;href=\&quot;#energy\&quot;&quot;, html)</text>
+<rect x="250" y="155" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="165" fill="#666">0.0</text>
+<text x="242" y="183" text-anchor="end" fill="#333">isfile(a1)</text>
+<rect x="250" y="173" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="183" fill="#666">0.0</text>
+<text x="242" y="201" text-anchor="end" fill="#333">isfile(a2)</text>
+<rect x="250" y="191" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="201" fill="#666">0.0</text>
+<text x="242" y="219" text-anchor="end" fill="#333">occursin(&quot;assets/figures/eq/ene…</text>
+<rect x="250" y="209" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="219" fill="#666">0.0</text>
+<text x="242" y="237" text-anchor="end" fill="#333">read(a1, String) == read(svg1, …</text>
+<rect x="250" y="227" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="237" fill="#666">0.0</text>
+<text x="242" y="255" text-anchor="end" fill="#333">Pinax.render(; out = outdir) ==…</text>
+<rect x="250" y="245" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="255" fill="#666">0.0</text>
+<text x="242" y="273" text-anchor="end" fill="#333">occursin(&quot;Diagnostics&quot;, html)</text>
+<rect x="250" y="263" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="273" fill="#666">0.0</text>
+<text x="242" y="291" text-anchor="end" fill="#333">occursin(&quot;figure failed&quot;, html)</text>
+<rect x="250" y="281" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="291" fill="#666">0.0</text>
+<text x="242" y="309" text-anchor="end" fill="#333">occursin(&quot;materialize failed&quot;, …</text>
+<rect x="250" y="299" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="309" fill="#666">0.0</text>
+<text x="242" y="327" text-anchor="end" fill="#333">occursin(&quot;does_not_exist&quot;, html)</text>
+<rect x="250" y="317" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="327" fill="#666">0.0</text>
+<text x="242" y="345" text-anchor="end" fill="#333">isempty((Pinax.current_document…</text>
+<rect x="250" y="335" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="345" fill="#666">0.0</text>
+<text x="242" y="363" text-anchor="end" fill="#333">Pinax.render(nothing; out = joi…</text>
+<rect x="250" y="353" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="363" fill="#666">0.0</text>
+<text x="242" y="381" text-anchor="end" fill="#333">doc.refs[:pg] isa Pinax.Page</text>
+<rect x="250" y="371" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="381" fill="#666">0.0</text>
+<text x="242" y="399" text-anchor="end" fill="#333">doc.refs[:sec] isa Pinax.Section</text>
+<rect x="250" y="389" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="399" fill="#666">0.0</text>
+<text x="242" y="417" text-anchor="end" fill="#333">doc.refs[:fig] isa Pinax.Figure</text>
+<rect x="250" y="407" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="417" fill="#666">0.0</text>
+<text x="242" y="435" text-anchor="end" fill="#333">occursin(&quot;A &amp;amp; B &amp;lt;x&amp;gt;&quot;,…</text>
+<rect x="250" y="425" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="435" fill="#666">0.0</text>
+<text x="242" y="453" text-anchor="end" fill="#333">occursin(&quot;cap &amp;amp; &amp;lt;i&amp;gt;&quot;,…</text>
+<rect x="250" y="443" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="453" fill="#666">0.0</text>
+<text x="242" y="471" text-anchor="end" fill="#333">occursin(&quot;&amp;lt;script&amp;gt;&quot;, html)</text>
+<rect x="250" y="461" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="471" fill="#666">0.0</text>
+<text x="242" y="489" text-anchor="end" fill="#333">!(occursin(&quot;&lt;script&gt;alert&quot;, html))</text>
+<rect x="250" y="479" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="489" fill="#666">0.0</text>
+<text x="242" y="507" text-anchor="end" fill="#333">isfile(joinpath(outdir, &quot;assets…</text>
+<rect x="250" y="497" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="507" fill="#666">0.0</text>
+<text x="242" y="525" text-anchor="end" fill="#333">occursin(&quot;&lt;iframe class=\&quot;pinax…</text>
+<rect x="250" y="515" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="525" fill="#666">0.0</text>
+<text x="242" y="543" text-anchor="end" fill="#333">occursin(&quot;&lt;a class=\&quot;pinax-open…</text>
+<rect x="250" y="533" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="543" fill="#666">0.0</text>
+<text x="242" y="561" text-anchor="end" fill="#333">!(occursin(&quot;s_fig1.pdf\&quot; alt&quot;, …</text>
+<rect x="250" y="551" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="561" fill="#666">0.0</text>
+<text x="242" y="579" text-anchor="end" fill="#333">isfile(joinpath(outdir, &quot;assets…</text>
+<rect x="250" y="569" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="579" fill="#666">0.0</text>
+<text x="242" y="597" text-anchor="end" fill="#333">occursin(&quot;&lt;a href=\&quot;assets/figu…</text>
+<rect x="250" y="587" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="597" fill="#666">0.0</text>
+<text x="242" y="615" text-anchor="end" fill="#333">!(occursin(&quot;s_fig1.csv\&quot; alt&quot;, …</text>
+<rect x="250" y="605" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="615" fill="#666">0.0</text>
+<text x="242" y="633" text-anchor="end" fill="#333">!(occursin(&quot;&lt;iframe&quot;, html))</text>
+<rect x="250" y="623" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="633" fill="#666">0.0</text>
+<text x="242" y="651" text-anchor="end" fill="#333">occursin(&quot;figure failed&quot;, html)</text>
+<rect x="250" y="641" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="651" fill="#666">0.0</text>
+<text x="242" y="669" text-anchor="end" fill="#333">occursin(&quot;Int&quot;, html)</text>
+<rect x="250" y="659" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="669" fill="#666">0.0</text>
+<text x="242" y="687" text-anchor="end" fill="#333">length(readdir(joinpath(outdir,…</text>
+<rect x="250" y="677" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="687" fill="#666">0.0</text>
+<text x="242" y="705" text-anchor="end" fill="#333">isdir(joinpath(outdir, &quot;assets&quot;…</text>
+<rect x="250" y="695" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="705" fill="#666">0.0</text>
+<text x="242" y="723" text-anchor="end" fill="#333">occursin(&quot;id=\&quot;a_b\&quot;&quot;, html)</text>
+<rect x="250" y="713" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="723" fill="#666">0.0</text>
+<text x="242" y="741" text-anchor="end" fill="#333">!(occursin(&quot;a/b\&quot;&quot;, html))</text>
+<rect x="250" y="731" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="741" fill="#666">0.0</text>
+<line x1="508.33333333333337" y1="22" x2="508.33333333333337" y2="748" stroke="#d9534f" stroke-width="1" stroke-dasharray="3,2"/>
+<text x="511.33333333333337" y="760" fill="#d9534f">tol</text>
+<line x1="250" y1="22" x2="250" y2="748" stroke="#bbb" stroke-width="1"/>
+</svg>

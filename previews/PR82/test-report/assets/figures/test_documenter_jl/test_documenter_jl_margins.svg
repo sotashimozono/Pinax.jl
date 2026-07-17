@@ -1,0 +1,128 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="780" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11">
+<text x="8" y="14" font-size="12" fill="#444">tolerance budget spent (delta / tol)</text>
+<text x="242" y="39" text-anchor="end" fill="#333">DOCEXT !== nothing</text>
+<rect x="250" y="29" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="39" fill="#666">0.0</text>
+<text x="242" y="57" text-anchor="end" fill="#333">startswith(s, &quot;```@raw html\n&quot;)</text>
+<rect x="250" y="47" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="57" fill="#666">0.0</text>
+<text x="242" y="75" text-anchor="end" fill="#333">endswith(s, &quot;```\n&quot;)</text>
+<rect x="250" y="65" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="75" fill="#666">0.0</text>
+<text x="242" y="93" text-anchor="end" fill="#333">occursin(&quot;&lt;iframe&quot;, s)</text>
+<rect x="250" y="83" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="93" fill="#666">0.0</text>
+<text x="242" y="111" text-anchor="end" fill="#333">occursin(&quot;src=\&quot;../gallery/\&quot;&quot;, s)</text>
+<rect x="250" y="101" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="111" fill="#666">0.0</text>
+<text x="242" y="129" text-anchor="end" fill="#333">occursin(&quot;min-height:420px&quot;, s)</text>
+<rect x="250" y="119" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="129" fill="#666">0.0</text>
+<text x="242" y="147" text-anchor="end" fill="#333">occursin(&quot;ResizeObserver&quot;, s)</text>
+<rect x="250" y="137" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="147" fill="#666">0.0</text>
+<text x="242" y="165" text-anchor="end" fill="#333">occursin(&quot;addEventListener(\&quot;lo…</text>
+<rect x="250" y="155" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="165" fill="#666">0.0</text>
+<text x="242" y="183" text-anchor="end" fill="#333">occursin(&quot;Open the gallery in a…</text>
+<rect x="250" y="173" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="183" fill="#666">0.0</text>
+<text x="242" y="201" text-anchor="end" fill="#333">occursin(&quot;id=\&quot;pinax-embed-gall…</text>
+<rect x="250" y="191" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="201" fill="#666">0.0</text>
+<text x="242" y="219" text-anchor="end" fill="#333">occursin(&quot;height:600px&quot;, s)</text>
+<rect x="250" y="209" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="219" fill="#666">0.0</text>
+<text x="242" y="237" text-anchor="end" fill="#333">!(occursin(&quot;min-height&quot;, s))</text>
+<rect x="250" y="227" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="237" fill="#666">0.0</text>
+<text x="242" y="255" text-anchor="end" fill="#333">!(occursin(&quot;Open the gallery&quot;, s))</text>
+<rect x="250" y="245" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="255" fill="#666">0.0</text>
+<text x="242" y="273" text-anchor="end" fill="#333">occursin(&quot;id=\&quot;mine\&quot;&quot;, s)</text>
+<rect x="250" y="263" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="273" fill="#666">0.0</text>
+<text x="242" y="291" text-anchor="end" fill="#333">occursin(&quot;title=\&quot;My gallery\&quot;&quot;…</text>
+<rect x="250" y="281" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="291" fill="#666">0.0</text>
+<text x="242" y="309" text-anchor="end" fill="#333">occursin(&quot;height:80vh&quot;, documen…</text>
+<rect x="250" y="299" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="309" fill="#666">0.0</text>
+<text x="242" y="327" text-anchor="end" fill="#333">occursin(&quot;background:#fff&quot;, doc…</text>
+<rect x="250" y="317" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="327" fill="#666">0.0</text>
+<text x="242" y="345" text-anchor="end" fill="#333">occursin(&quot;title=\&quot;a&amp;quot;b&amp;lt;c…</text>
+<rect x="250" y="335" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="345" fill="#666">0.0</text>
+<text x="242" y="363" text-anchor="end" fill="#333">!(occursin(&quot;title=\&quot;a\&quot;b&quot;, s))</text>
+<rect x="250" y="353" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="363" fill="#666">0.0</text>
+<text x="242" y="381" text-anchor="end" fill="#333">occursin(&quot;id=\&quot;pinax-embed-one\…</text>
+<rect x="250" y="371" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="381" fill="#666">0.0</text>
+<text x="242" y="399" text-anchor="end" fill="#333">occursin(&quot;id=\&quot;pinax-embed-two\…</text>
+<rect x="250" y="389" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="399" fill="#666">0.0</text>
+<text x="242" y="417" text-anchor="end" fill="#333">occursin(&quot;src=\&quot;../gallery/\&quot;&quot;,…</text>
+<rect x="250" y="407" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="417" fill="#666">0.0</text>
+<text x="242" y="435" text-anchor="end" fill="#333">occursin(&quot;src=\&quot;gallery/\&quot;&quot;, do…</text>
+<rect x="250" y="425" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="435" fill="#666">0.0</text>
+<text x="242" y="453" text-anchor="end" fill="#333">occursin(&quot;src=\&quot;../../gallery/\…</text>
+<rect x="250" y="443" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="453" fill="#666">0.0</text>
+<text x="242" y="471" text-anchor="end" fill="#333">occursin(&quot;src=\&quot;../gallery/\&quot;&quot;,…</text>
+<rect x="250" y="461" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="471" fill="#666">0.0</text>
+<text x="242" y="489" text-anchor="end" fill="#333">occursin(&quot;src=\&quot;gallery/\&quot;&quot;, do…</text>
+<rect x="250" y="479" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="489" fill="#666">0.0</text>
+<text x="242" y="507" text-anchor="end" fill="#333">occursin(&quot;src=\&quot;/gallery/\&quot;&quot;, d…</text>
+<rect x="250" y="497" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="507" fill="#666">0.0</text>
+<text x="242" y="525" text-anchor="end" fill="#333">occursin(&quot;id=\&quot;z\&quot;&quot;, documenter…</text>
+<rect x="250" y="515" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="525" fill="#666">0.0</text>
+<text x="242" y="543" text-anchor="end" fill="#333">rel(&quot;g/&quot;, &quot;examples.md&quot;, true) …</text>
+<rect x="250" y="533" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="543" fill="#666">0.0</text>
+<text x="242" y="561" text-anchor="end" fill="#333">rel(&quot;g/&quot;, &quot;examples.md&quot;, false)…</text>
+<rect x="250" y="551" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="561" fill="#666">0.0</text>
+<text x="242" y="579" text-anchor="end" fill="#333">rel(&quot;g/&quot;, &quot;a/b.md&quot;, true) == &quot;.…</text>
+<rect x="250" y="569" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="579" fill="#666">0.0</text>
+<text x="242" y="597" text-anchor="end" fill="#333">rel(&quot;g/&quot;, &quot;a/b.md&quot;, false) == &quot;…</text>
+<rect x="250" y="587" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="597" fill="#666">0.0</text>
+<text x="242" y="615" text-anchor="end" fill="#333">rel(&quot;g/&quot;, &quot;index.md&quot;, true) == …</text>
+<rect x="250" y="605" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="615" fill="#666">0.0</text>
+<text x="242" y="633" text-anchor="end" fill="#333">rel(&quot;g/&quot;, &quot;a/index.md&quot;, true) =…</text>
+<rect x="250" y="623" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="633" fill="#666">0.0</text>
+<text x="242" y="651" text-anchor="end" fill="#333">rel(&quot;/g/&quot;, &quot;a/b.md&quot;, true) == &quot;…</text>
+<rect x="250" y="641" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="651" fill="#666">0.0</text>
+<text x="242" y="669" text-anchor="end" fill="#333">any((a-&gt;begin
+            #= /h…</text>
+<rect x="250" y="659" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="669" fill="#666">0.0</text>
+<text x="242" y="687" text-anchor="end" fill="#333">any((a-&gt;begin
+            #= /h…</text>
+<rect x="250" y="677" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="687" fill="#666">0.0</text>
+<text x="242" y="705" text-anchor="end" fill="#333">rendered_assets(dir; ext = &quot;pdf…</text>
+<rect x="250" y="695" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="705" fill="#666">0.0</text>
+<text x="242" y="723" text-anchor="end" fill="#333">rendered_assets(dir; ext = &quot;.pd…</text>
+<rect x="250" y="713" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="723" fill="#666">0.0</text>
+<text x="242" y="741" text-anchor="end" fill="#333">all(isabspath, abss) &amp;&amp; all(isf…</text>
+<rect x="250" y="731" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="741" fill="#666">0.0</text>
+<line x1="508.33333333333337" y1="22" x2="508.33333333333337" y2="748" stroke="#d9534f" stroke-width="1" stroke-dasharray="3,2"/>
+<text x="511.33333333333337" y="760" fill="#d9534f">tol</text>
+<line x1="250" y1="22" x2="250" y2="748" stroke="#bbb" stroke-width="1"/>
+</svg>

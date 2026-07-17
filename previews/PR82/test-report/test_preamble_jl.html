@@ -1,0 +1,47 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>test_preamble.jl · Test report</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="style.css"></head><body>
+<nav class="pinax-top"><a href="index.html">← Test report</a></nav>
+<h1>test_preamble.jl</h1>
+<div class="pinax-meta">1 figure</div>
+<script type="application/json" id="pinax-committed">{"comments":{},"bookmarks":{},"features":["comments","bookmarks","export"]}</script>
+<section class="page" id="test_preamble_jl">
+<p class="pinax-subtitle">7/7 passed · 0.18s</p>
+<div class="pinax-benchmark">
+<div class="pinax-verdict pinax-verdict-pass">test_preamble.jl   7/7 PASS</div>
+<table class="pinax-checks"><thead><tr><th></th><th>id</th><th>label</th><th>got</th><th>want</th><th>Δ vs tol (kind)</th></tr></thead><tbody>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t554</td><td>occursin(&quot;macros:{&quot;, html) <span class="pinax-src">@ test_preamble.jl:19</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t555</td><td>occursin(&quot;\\\\E&quot;, html) <span class="pinax-src">@ test_preamble.jl:20</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t556</td><td>occursin(&quot;\\\\langle H\\\\rangle&quot;, html) <span class="pinax-src">@ test_preamble.jl:21</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t557</td><td>occursin(&quot;macros:{}&quot;, html) <span class="pinax-src">@ test_preamble.jl:32</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t558</td><td>occursin(&quot;.MYMARK{color:red}&quot;, html) <span class="pinax-src">@ test_preamble.jl:45</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t559</td><td>occursin(&quot;console.log('MYJSMARK');&quot;, html) <span class="pinax-src">@ test_preamble.jl:58</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t560</td><td>occursin(&quot;overlay file not found&quot;, html) <span class="pinax-src">@ test_preamble.jl:69</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+</tbody></table></div>
+<div class="figgrid">
+<figure id="test_preamble_jl_margins">
+<img src="assets/figures/test_preamble_jl/test_preamble_jl_margins.svg" alt="test_preamble_jl_margins">
+<a class="pinax-dl" href="assets/figures/test_preamble_jl/test_preamble_jl_margins.svg" download title="download test_preamble_jl_margins.svg">⤓ download</a>
+<figcaption><b>Fig. 42.</b> Tolerance budget spent by each check. The dashed line is the pass/fail boundary — a bar close to it passed, but barely.</figcaption>
+</figure>
+</div>
+<nav><strong>Contents</strong>
+<a href="#test_preamble_jl_preamble_extensions_newcommand_katex_macros_css_js_overlay_">preamble extensions (@newcommand -&gt; KaTeX macros, css/js overlay)</a>
+<a href="#test_preamble_jl__newcommand_is_wired_into_katex_macros">@newcommand is wired into KaTeX macros</a>
+<a href="#test_preamble_jl_no_newcommand_empty_macros_object">no @newcommand -&gt; empty macros object</a>
+<a href="#test_preamble_jl_css_overlay_is_inlined_after_the_theme_css">css overlay is inlined after the theme CSS</a>
+<a href="#test_preamble_jl_js_overlay_is_inlined">js overlay is inlined</a>
+<a href="#test_preamble_jl_missing_overlay_file_diagnostic_non_fatal_">missing overlay file -&gt; diagnostic (non-fatal)</a>
+</nav>
+<section class="section" id="test_preamble_jl_preamble_extensions_newcommand_katex_macros_css_js_overlay_"><h2>Sec. 162. preamble extensions (@newcommand -&gt; KaTeX macros, css/js overlay)</h2>
+</section>
+<section class="section" id="test_preamble_jl__newcommand_is_wired_into_katex_macros"><h2>Sec. 163. @newcommand is wired into KaTeX macros</h2>
+</section>
+<section class="section" id="test_preamble_jl_no_newcommand_empty_macros_object"><h2>Sec. 164. no @newcommand -&gt; empty macros object</h2>
+</section>
+<section class="section" id="test_preamble_jl_css_overlay_is_inlined_after_the_theme_css"><h2>Sec. 165. css overlay is inlined after the theme CSS</h2>
+</section>
+<section class="section" id="test_preamble_jl_js_overlay_is_inlined"><h2>Sec. 166. js overlay is inlined</h2>
+</section>
+<section class="section" id="test_preamble_jl_missing_overlay_file_diagnostic_non_fatal_"><h2>Sec. 167. missing overlay file -&gt; diagnostic (non-fatal)</h2>
+</section>
+</section>
+<script src="app.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script><script>window.addEventListener("load",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],macros:{},throwOnError:false});});</script></body></html>

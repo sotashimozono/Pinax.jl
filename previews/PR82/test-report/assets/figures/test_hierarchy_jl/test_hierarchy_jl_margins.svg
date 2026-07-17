@@ -1,0 +1,111 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="690" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11">
+<text x="8" y="14" font-size="12" fill="#444">tolerance budget spent (delta / tol)</text>
+<text x="242" y="39" text-anchor="end" fill="#333">doc.parts == [:thermal =&gt; &quot;Ther…</text>
+<rect x="250" y="29" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="39" fill="#666">0.0</text>
+<text x="242" y="57" text-anchor="end" fill="#333">[p.part for p = doc.pages] == […</text>
+<rect x="250" y="47" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="57" fill="#666">0.0</text>
+<text x="242" y="75" text-anchor="end" fill="#333">length((doc.pages[1]).figures) …</text>
+<rect x="250" y="65" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="75" fill="#666">0.0</text>
+<text x="242" y="93" text-anchor="end" fill="#333">isempty((doc.pages[1]).sections)</text>
+<rect x="250" y="83" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="93" fill="#666">0.0</text>
+<text x="242" y="111" text-anchor="end" fill="#333">occursin(&quot;&lt;details class=\&quot;pina…</text>
+<rect x="250" y="101" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="111" fill="#666">0.0</text>
+<text x="242" y="129" text-anchor="end" fill="#333">occursin(&quot;&lt;details class=\&quot;pina…</text>
+<rect x="250" y="119" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="129" fill="#666">0.0</text>
+<text x="242" y="147" text-anchor="end" fill="#333">isfile(joinpath(sitedir(&quot;grp&quot;),…</text>
+<rect x="250" y="137" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="147" fill="#666">0.0</text>
+<text x="242" y="165" text-anchor="end" fill="#333">isfile(joinpath(sitedir(&quot;grp&quot;),…</text>
+<rect x="250" y="155" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="165" fill="#666">0.0</text>
+<text x="242" y="183" text-anchor="end" fill="#333">occursin(&quot;EQ1&quot;, read(joinpath(s…</text>
+<rect x="250" y="173" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="183" fill="#666">0.0</text>
+<text x="242" y="201" text-anchor="end" fill="#333">occursin(&quot;EQ2&quot;, read(joinpath(s…</text>
+<rect x="250" y="191" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="201" fill="#666">0.0</text>
+<text x="242" y="219" text-anchor="end" fill="#333">occursin(&quot;GQ1&quot;, read(joinpath(s…</text>
+<rect x="250" y="209" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="219" fill="#666">0.0</text>
+<text x="242" y="237" text-anchor="end" fill="#333">occursin(&quot;&lt;div class=\&quot;card-thu…</text>
+<rect x="250" y="227" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="237" fill="#666">0.0</text>
+<text x="242" y="255" text-anchor="end" fill="#333">occursin(&quot;class=\&quot;card-thumb-pd…</text>
+<rect x="250" y="245" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="255" fill="#666">0.0</text>
+<text x="242" y="273" text-anchor="end" fill="#333">occursin(&quot;loading=\&quot;lazy\&quot;&quot;, idx)</text>
+<rect x="250" y="263" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="273" fill="#666">0.0</text>
+<text x="242" y="291" text-anchor="end" fill="#333">!(occursin(&quot;card-thumb-ph&quot;, idx))</text>
+<rect x="250" y="281" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="291" fill="#666">0.0</text>
+<text x="242" y="309" text-anchor="end" fill="#333">occursin(&quot;card-thumb card-thumb…</text>
+<rect x="250" y="299" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="309" fill="#666">0.0</text>
+<text x="242" y="327" text-anchor="end" fill="#333">occursin(&quot;class=\&quot;card-thumb-pd…</text>
+<rect x="250" y="317" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="327" fill="#666">0.0</text>
+<text x="242" y="345" text-anchor="end" fill="#333">haskey((Pinax.current_document(…</text>
+<rect x="250" y="335" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="345" fill="#666">0.0</text>
+<text x="242" y="363" text-anchor="end" fill="#333">occursin(&quot;&lt;div class=\&quot;part-des…</text>
+<rect x="250" y="353" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="363" fill="#666">0.0</text>
+<text x="242" y="381" text-anchor="end" fill="#333">occursin(&quot;&lt;strong&gt;reproducing&lt;/…</text>
+<rect x="250" y="371" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="381" fill="#666">0.0</text>
+<text x="242" y="399" text-anchor="end" fill="#333">occursin(&quot;sudden-quench dynamic…</text>
+<rect x="250" y="389" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="399" fill="#666">0.0</text>
+<text x="242" y="417" text-anchor="end" fill="#333">occursin(&quot;&lt;p class=\&quot;pinax-subt…</text>
+<rect x="250" y="407" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="417" fill="#666">0.0</text>
+<text x="242" y="435" text-anchor="end" fill="#333">occursin(&quot;&lt;div class=\&quot;card-sum…</text>
+<rect x="250" y="425" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="435" fill="#666">0.0</text>
+<text x="242" y="453" text-anchor="end" fill="#333">pg.desc !== nothing &amp;&amp; occursin…</text>
+<rect x="250" y="443" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="453" fill="#666">0.0</text>
+<text x="242" y="471" text-anchor="end" fill="#333">pg.panels == [&quot;&lt;div class=\&quot;ban…</text>
+<rect x="250" y="461" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="471" fill="#666">0.0</text>
+<text x="242" y="489" text-anchor="end" fill="#333">occursin(&quot;page level desc&quot;, html)</text>
+<rect x="250" y="479" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="489" fill="#666">0.0</text>
+<text x="242" y="507" text-anchor="end" fill="#333">occursin(&quot;&lt;div class=\&quot;banner\&quot;…</text>
+<rect x="250" y="497" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="507" fill="#666">0.0</text>
+<text x="242" y="525" text-anchor="end" fill="#333">(pages[:log]).status == :trial</text>
+<rect x="250" y="515" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="525" fill="#666">0.0</text>
+<text x="242" y="543" text-anchor="end" fill="#333">(pages[:keep]).status == :final</text>
+<rect x="250" y="533" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="543" fill="#666">0.0</text>
+<text x="242" y="561" text-anchor="end" fill="#333">(pages[:res]).status == :final</text>
+<rect x="250" y="551" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="561" fill="#666">0.0</text>
+<text x="242" y="579" text-anchor="end" fill="#333">occursin(&quot;\&quot;status\&quot;:\&quot;trial\&quot;&quot;…</text>
+<rect x="250" y="569" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="579" fill="#666">0.0</text>
+<text x="242" y="597" text-anchor="end" fill="#333">occursin(&quot;\&quot;status\&quot;:\&quot;final\&quot;&quot;…</text>
+<rect x="250" y="587" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="597" fill="#666">0.0</text>
+<text x="242" y="615" text-anchor="end" fill="#333">occursin(&quot;[status: trial]&quot;, md)</text>
+<rect x="250" y="605" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="615" fill="#666">0.0</text>
+<text x="242" y="633" text-anchor="end" fill="#333">!(occursin(&quot;[status: final]&quot;, md))</text>
+<rect x="250" y="623" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="633" fill="#666">0.0</text>
+<text x="242" y="651" text-anchor="end" fill="#333">occursin(&quot;card-status&quot;, idx)</text>
+<rect x="250" y="641" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="651" fill="#666">0.0</text>
+<line x1="508.33333333333337" y1="22" x2="508.33333333333337" y2="658" stroke="#d9534f" stroke-width="1" stroke-dasharray="3,2"/>
+<text x="511.33333333333337" y="670" fill="#d9534f">tol</text>
+<line x1="250" y1="22" x2="250" y2="658" stroke="#bbb" stroke-width="1"/>
+</svg>
