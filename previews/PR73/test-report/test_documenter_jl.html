@@ -1,0 +1,129 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>test_documenter.jl · Test report</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="style.css"></head><body>
+<nav class="pinax-top"><a href="index.html">← Test report</a></nav>
+<h1>test_documenter.jl</h1>
+<div class="pinax-meta">1 figure</div>
+<script type="application/json" id="pinax-committed">{"comments":{},"bookmarks":{},"features":["comments","bookmarks","export"]}</script>
+<section class="page" id="test_documenter_jl">
+<p class="pinax-subtitle">66/66 passed · 3.78s</p>
+<div class="pinax-benchmark">
+<div class="pinax-verdict pinax-verdict-pass">test_documenter.jl   66/66 PASS</div>
+<table class="pinax-checks"><thead><tr><th></th><th>id</th><th>label</th><th>got</th><th>want</th><th>Δ vs tol (kind)</th></tr></thead><tbody>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t314</td><td>DOCEXT !== nothing</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t315</td><td>startswith(s, &quot;```@raw html\n&quot;)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t316</td><td>endswith(s, &quot;```\n&quot;)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t317</td><td>occursin(&quot;&lt;iframe&quot;, s)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t318</td><td>occursin(&quot;src=\&quot;../gallery/\&quot;&quot;, s)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t319</td><td>occursin(&quot;min-height:420px&quot;, s)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t320</td><td>occursin(&quot;ResizeObserver&quot;, s)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t321</td><td>occursin(&quot;addEventListener(\&quot;load\&quot;&quot;, s)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t322</td><td>occursin(&quot;Open the gallery in a new tab&quot;, s)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t323</td><td>occursin(&quot;id=\&quot;pinax-embed-gallery\&quot;&quot;, s)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t324</td><td>occursin(&quot;height:600px&quot;, s)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t325</td><td>!(occursin(&quot;min-height&quot;, s))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t326</td><td>!(occursin(&quot;Open the gallery&quot;, s))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t327</td><td>occursin(&quot;id=\&quot;mine\&quot;&quot;, s)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t328</td><td>occursin(&quot;title=\&quot;My gallery\&quot;&quot;, s)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t329</td><td>occursin(&quot;height:80vh&quot;, documenter_embed(&quot;g/&quot;; height = &quot;80vh&quot;))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t330</td><td>occursin(&quot;background:#fff&quot;, documenter_embed(&quot;g/&quot;; style = &quot;background:#fff&quot;))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t331</td><td>occursin(&quot;title=\&quot;a&amp;quot;b&amp;lt;c&amp;gt;\&quot;&quot;, s)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t332</td><td>!(occursin(&quot;title=\&quot;a\&quot;b&quot;, s))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t333</td><td>occursin(&quot;id=\&quot;pinax-embed-one\&quot;&quot;, a)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t334</td><td>occursin(&quot;id=\&quot;pinax-embed-two\&quot;&quot;, b)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t335</td><td>occursin(&quot;src=\&quot;../gallery/\&quot;&quot;, documenter_embed(&quot;gallery/&quot;, pretty; page = &quot;examples.md&quot;))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t336</td><td>occursin(&quot;src=\&quot;gallery/\&quot;&quot;, documenter_embed(&quot;gallery/&quot;, plain; page = &quot;examples.md&quot;))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t337</td><td>occursin(&quot;src=\&quot;../../gallery/\&quot;&quot;, documenter_embed(&quot;gallery/&quot;, pretty; page = &quot;man/examples.md&quot;))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t338</td><td>occursin(&quot;src=\&quot;../gallery/\&quot;&quot;, documenter_embed(&quot;gallery/&quot;, plain; page = &quot;man/examples.md&quot;))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t339</td><td>occursin(&quot;src=\&quot;gallery/\&quot;&quot;, documenter_embed(&quot;gallery/&quot;, pretty; page = &quot;index.md&quot;))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t340</td><td>occursin(&quot;src=\&quot;/gallery/\&quot;&quot;, documenter_embed(&quot;/gallery/&quot;, pretty; page = &quot;man/x.md&quot;))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t341</td><td>occursin(&quot;id=\&quot;z\&quot;&quot;, documenter_embed(&quot;gallery/&quot;, pretty; page = &quot;index.md&quot;, id = &quot;z&quot;))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t342</td><td>rel(&quot;g/&quot;, &quot;examples.md&quot;, true) == &quot;../g/&quot;</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t343</td><td>rel(&quot;g/&quot;, &quot;examples.md&quot;, false) == &quot;g/&quot;</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t344</td><td>rel(&quot;g/&quot;, &quot;a/b.md&quot;, true) == &quot;../../g/&quot;</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t345</td><td>rel(&quot;g/&quot;, &quot;a/b.md&quot;, false) == &quot;../g/&quot;</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t346</td><td>rel(&quot;g/&quot;, &quot;index.md&quot;, true) == &quot;g/&quot;</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t347</td><td>rel(&quot;g/&quot;, &quot;a/index.md&quot;, true) == &quot;../g/&quot;</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t348</td><td>rel(&quot;/g/&quot;, &quot;a/b.md&quot;, true) == &quot;/g/&quot;</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t349</td><td>any((a-&gt;begin
+            #= /home/runner/work/Pinax.jl/Pinax.jl/test/test_documenter.jl:124 =#
+           …</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t350</td><td>any((a-&gt;begin
+            #= /home/runner/work/Pinax.jl/Pinax.jl/test/test_documenter.jl:125 =#
+           …</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t351</td><td>rendered_assets(dir; ext = &quot;pdf&quot;) == filter((a-&gt;begin
+                #= /home/runner/work/Pinax.jl/Pinax.j…</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t352</td><td>rendered_assets(dir; ext = &quot;.pdf&quot;) == rendered_assets(dir; ext = &quot;pdf&quot;)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t353</td><td>all(isabspath, abss) &amp;&amp; all(isfile, abss)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t354</td><td>rendered_assets(joinpath(mktempdir(), &quot;nope&quot;)) == String[]</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t355</td><td>issorted(paths) &amp;&amp; allunique(paths)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t356</td><td>staged[]</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t357</td><td>res.dir == abspath(joinpath(src, &quot;gallery&quot;))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t358</td><td>res.siteroot == &quot;gallery/&quot;</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t359</td><td>isfile(joinpath(res.dir, &quot;index.html&quot;))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t360</td><td>occursin(&quot;src=\&quot;gallery/\&quot;&quot;, res.embed)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t361</td><td>!(isempty(rendered_assets(res.dir; ext = &quot;pdf&quot;)))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t362</td><td>res.assets == rendered_assets(res.dir)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t363</td><td>documenter_gallery(&quot;no_such.jl&quot;; out = &quot;g&quot;, src = src)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t364</td><td>res.dir == abspath(joinpath(src, &quot;g&quot;))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t365</td><td>isfile(joinpath(res.dir, &quot;index.html&quot;))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t366</td><td>!(isempty(rendered_assets(res.dir; ext = &quot;pdf&quot;)))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t367</td><td>occursin(&quot;src=\&quot;g/\&quot;&quot;, res.embed)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t368</td><td>res.assets == rendered_assets(res.dir)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t369</td><td>documenter_stage(empty; src = src, out = &quot;g2&quot;)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t370</td><td>documenter_stage(joinpath(empty, &quot;nope&quot;); src = src, out = &quot;g3&quot;)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t371</td><td>startswith(d, &quot;```@raw html\n&quot;) &amp;&amp; endswith(d, &quot;```\n&quot;)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t372</td><td>occursin(&quot;&lt;b&gt;Reports&lt;/b&gt;&quot;, d)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t373</td><td>occursin(&quot;download&gt;&quot;, d)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t374</td><td>occursin(&quot;href=\&quot;gallery/assets/&quot;, d) &amp;&amp; occursin(&quot;.pdf\&quot;&quot;, d)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t375</td><td>!(occursin(&quot;.svg\&quot;&quot;, d))</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t376</td><td>occursin(&quot;href=\&quot;gallery/assets/&quot;, dp)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t377</td><td>occursin(&quot;href=\&quot;../../gallery/assets/&quot;, de)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t378</td><td>occursin(&quot;&gt;IMG&lt;/a&gt;&quot;, dl) &amp;&amp; occursin(&quot;.svg\&quot;&quot;, dl)</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t379</td><td>documenter_downloads(res, plain; page = &quot;index.md&quot;, ext = &quot;zip&quot;) == &quot;&quot;</td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+</tbody></table></div>
+<div class="figgrid">
+<figure id="test_documenter_jl_margins">
+<img src="assets/figures/test_documenter_jl/test_documenter_jl_margins.svg" alt="test_documenter_jl_margins">
+<a class="pinax-dl" href="assets/figures/test_documenter_jl/test_documenter_jl_margins.svg" download title="download test_documenter_jl_margins.svg">⤓ download</a>
+<figcaption><b>Fig. 12.</b> Tolerance budget spent by each check. The dashed line is the pass/fail boundary — a bar close to it passed, but barely.</figcaption>
+</figure>
+</div>
+<nav><strong>Contents</strong>
+<a href="#test_documenter_jl_documenter_bridge_raw_html_iframe_embed">documenter bridge: @raw html iframe embed</a>
+<a href="#test_documenter_jl_extension_is_loaded">extension is loaded</a>
+<a href="#test_documenter_jl_basic_embed_wraps_the_url_in_an_auto_resizing_raw_html_iframe">basic embed wraps the url in an auto-resizing @raw html iframe</a>
+<a href="#test_documenter_jl_options_fixed_height_no_link_custom_id_title_extra_style">options: fixed height, no link, custom id/title, extra style</a>
+<a href="#test_documenter_jl_attributes_are_html_escaped_no_attribute_break_out_">attributes are HTML-escaped (no attribute break-out)</a>
+<a href="#test_documenter_jl_distinct_urls_distinct_iframe_ids_two_embeds_on_one_page_">distinct urls → distinct iframe ids (two embeds on one page)</a>
+<a href="#test_documenter_jl_prettyurls_aware_url_resolution_documenter_html_">prettyurls-aware url resolution (Documenter.HTML)</a>
+<a href="#test_documenter_jl__relativize_unit_table">_relativize unit table</a>
+<a href="#test_documenter_jl_rendered_assets_identify_a_render_s_output_paths_incl_pdfs_">rendered_assets: identify a render's output paths (incl. PDFs)</a>
+<a href="#test_documenter_jl_documenter_gallery_run_a_manuscript_jl_render_wiring">documenter_gallery: run a manuscript .jl → render → wiring</a>
+<a href="#test_documenter_jl_documenter_stage_carry_a_gitignore_d_local_gallery_into_the_source_tree_b_">documenter_stage: carry a gitignore'd local gallery into the source tree (B)</a>
+<a href="#test_documenter_jl_documenter_downloads_raw_html_pdf_download_links_c_">documenter_downloads: @raw html PDF download links (C)</a>
+</nav>
+<section class="section" id="test_documenter_jl_documenter_bridge_raw_html_iframe_embed"><h2>Sec. 91. documenter bridge: @raw html iframe embed</h2>
+</section>
+<section class="section" id="test_documenter_jl_extension_is_loaded"><h2>Sec. 92. extension is loaded</h2>
+</section>
+<section class="section" id="test_documenter_jl_basic_embed_wraps_the_url_in_an_auto_resizing_raw_html_iframe"><h2>Sec. 93. basic embed wraps the url in an auto-resizing @raw html iframe</h2>
+</section>
+<section class="section" id="test_documenter_jl_options_fixed_height_no_link_custom_id_title_extra_style"><h2>Sec. 94. options: fixed height, no link, custom id/title, extra style</h2>
+</section>
+<section class="section" id="test_documenter_jl_attributes_are_html_escaped_no_attribute_break_out_"><h2>Sec. 95. attributes are HTML-escaped (no attribute break-out)</h2>
+</section>
+<section class="section" id="test_documenter_jl_distinct_urls_distinct_iframe_ids_two_embeds_on_one_page_"><h2>Sec. 96. distinct urls → distinct iframe ids (two embeds on one page)</h2>
+</section>
+<section class="section" id="test_documenter_jl_prettyurls_aware_url_resolution_documenter_html_"><h2>Sec. 97. prettyurls-aware url resolution (Documenter.HTML)</h2>
+</section>
+<section class="section" id="test_documenter_jl__relativize_unit_table"><h2>Sec. 98. _relativize unit table</h2>
+</section>
+<section class="section" id="test_documenter_jl_rendered_assets_identify_a_render_s_output_paths_incl_pdfs_"><h2>Sec. 99. rendered_assets: identify a render's output paths (incl. PDFs)</h2>
+</section>
+<section class="section" id="test_documenter_jl_documenter_gallery_run_a_manuscript_jl_render_wiring"><h2>Sec. 100. documenter_gallery: run a manuscript .jl → render → wiring</h2>
+</section>
+<section class="section" id="test_documenter_jl_documenter_stage_carry_a_gitignore_d_local_gallery_into_the_source_tree_b_"><h2>Sec. 101. documenter_stage: carry a gitignore'd local gallery into the source tree (B)</h2>
+</section>
+<section class="section" id="test_documenter_jl_documenter_downloads_raw_html_pdf_download_links_c_"><h2>Sec. 102. documenter_downloads: @raw html PDF download links (C)</h2>
+</section>
+</section>
+<script src="app.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script><script>window.addEventListener("load",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],macros:{},throwOnError:false});});</script></body></html>
