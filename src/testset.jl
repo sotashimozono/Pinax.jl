@@ -559,6 +559,7 @@ function _emit_sweep!(n, counter::Ref{Int}, page_when::Function, acc::Vector{Che
             chk.kind,
             chk.pass,
             chk.source,
+            chk.code,
         )
         _place_check!(c, tagged, counter, acc)
     end
@@ -1253,6 +1254,7 @@ function _check_to_dict(c::Check)
         "pass" => c.pass,
     )
     isempty(c.source) || (d["source"] = c.source)   # carry WHERE it failed across a shard dump
+    isempty(c.code) || (d["code"] = c.code)          # …and the code that produced it
     return d
 end
 
@@ -1280,6 +1282,7 @@ function _dict_to_check(d::AbstractDict)
         Symbol(d["kind"]),
         d["pass"],
         get(d, "source", ""),
+        get(d, "code", ""),
     )
 end
 

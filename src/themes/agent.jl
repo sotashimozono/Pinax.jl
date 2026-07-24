@@ -238,6 +238,8 @@ function emit_check(::AgentBase, chk, ctx)
         _agent_jsonval(chk.pass),
         ",\"source\":",
         _jsonstr(chk.source),
+        ",\"code\":",
+        _jsonstr(chk.code),
         "}",
     )
     return nothing
@@ -493,6 +495,11 @@ end
 # A single @expect check as a markdown list line (the LLM read view): a ✓/✗ badge + the numbers.
 function _agent_md_check(io, chk)
     badge = chk.pass ? "PASS" : "FAIL"
+    if !isempty(chk.code)
+        println(io, "```julia")
+        println(io, chk.code)
+        println(io, "```")
+    end
     println(
         io,
         "- [",

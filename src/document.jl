@@ -149,11 +149,16 @@ mutable struct Check
     pass::Bool
     source::String     # "file:line" of the assertion (issue #69 I) — carried for a failing @test so the
     # report says WHERE, not just what; "" when unknown (a passing @test / a manuscript @expect).
+    code::String       # the test's SOURCE REGION (the computation + the assertion), captured from the
+    # file so a report shows the code that produced this profile, together with it; "" when unknown.
 end
-# Keep the 8-arg positional form working (source defaults to "") — every existing construction is
-# unchanged, and only the `Test` bridge, which has the failure's `LineNumberNode`, fills it in.
+# Keep the 8-/9-arg positional forms working (source/code default to "") — every existing construction
+# is unchanged, and only the `Test` bridge, which has the `LineNumberNode`, fills them in.
 function Check(id, label, got, want, delta, tol, kind, pass)
-    return Check(id, label, got, want, delta, tol, kind, pass, "")
+    return Check(id, label, got, want, delta, tol, kind, pass, "", "")
+end
+function Check(id, label, got, want, delta, tol, kind, pass, source)
+    return Check(id, label, got, want, delta, tol, kind, pass, source, "")
 end
 
 """

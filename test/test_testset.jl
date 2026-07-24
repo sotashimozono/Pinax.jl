@@ -788,4 +788,34 @@ _check_for(r, i) = _check_from(_result_data_expr(r), Ext._label(r), r isa Test.P
             read(joinpath(dir, "rep_agent", "agent.json"), String),
         )
     end
+
+    @testset "each @test auto-captures its source region — code + profile together (default)" begin
+        # A test's computation + assertion is read from its file at record time and shown WITH its
+        # profile; the region runs from just after the PREVIOUS test (bounded), so consecutive tests
+        # don't repeat each other's setup.
+        f = joinpath(mktempdir(), "t.jl")
+        write(f, "a = 1\nb = 2\n@test a + b == 3\nc = 4\n@test c == 4\n")
+        mk(line) = Test.Fail(
+            :test, :x, "x", nothing, nothing, LineNumberNode(line, Symbol(f)), false
+        )
+        empty!(Ext._REGION_LAST)
+        r3 = Ext._capture_region(mk(3))
+        r5 = Ext._capture_region(mk(5))
+        @test occursin("a = 1", r3) && occursin("@test a + b == 3", r3)   # first test: from the top
+        @test occursin("c = 4", r5) && !occursin("a = 1", r5)             # second: no bleed from the first
+
+        # the code renders WITH the profile (gallery row + agent.json field) and rides a dump
+        dir = mktempdir()
+        chk = Check(:t, "chk", 1.0, 1.0, 0.0, 0.5, :abs, true, "", "x = compute()")
+        n = TestNode("f.jl"; checks=[chk])
+        d = Pinax.dump_test_report(TestNode("r"; children=[n]), joinpath(dir, "s.toml"))
+        @test Pinax.load_test_dump(d).children[1].checks[1].code == "x = compute()"  # round-trips a shard
+        render_test_report(TestNode("T"; children=[n]); out=joinpath(dir, "rep"))
+        html = read(joinpath(dir, "rep_html", "f_jl.html"), String)
+        @test occursin("x = compute()", html) && occursin("pinax-code-row", html)
+        @test occursin(
+            "\"code\":\"x = compute()\"",
+            read(joinpath(dir, "rep_agent", "agent.json"), String),
+        )
+    end
 end
