@@ -1,0 +1,79 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>test_layout.jl · Test report</title><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"><link rel="stylesheet" href="style.css"></head><body>
+<nav class="pinax-top"><a href="index.html">← Test report</a></nav>
+<h1>test_layout.jl</h1>
+<div class="pinax-meta">1 figure</div>
+<script type="application/json" id="pinax-committed">{"comments":{},"bookmarks":{},"features":["comments","bookmarks","export"]}</script>
+<section class="page" id="test_layout_jl">
+<p class="pinax-subtitle">9/9 passed · 0.09s</p>
+<div class="pinax-benchmark">
+<div class="pinax-verdict pinax-verdict-pass">test_layout.jl   9/9 PASS</div>
+<table class="pinax-checks"><thead><tr><th></th><th>id</th><th>label</th><th>got</th><th>want</th><th>Δ vs tol (kind)</th></tr></thead><tbody>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">            @section :g &quot;Grid&quot; begin            # no layout → default grid
+                @figure svg
+            end
+            @section :s &quot;Single&quot; layout = :single begin
+                @figure svg
+            end
+            @section :w &quot;Wide&quot; layout = :wide begin
+                @figure svg
+            end
+        end
+        html = read(Pinax.render(; out=site(&quot;lay&quot;)), String)
+        @test occursin(&quot;&lt;div class=\&quot;figgrid\&quot;&gt;&quot;, html)              # default, no modifier</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t514</td><td>occursin(&quot;&lt;div class=\&quot;figgrid\&quot;&gt;&quot;, html) <span class="pinax-src">@ test_layout.jl:27</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;&lt;div class=\&quot;figgrid figgrid-single\&quot;&gt;&quot;, html)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t515</td><td>occursin(&quot;&lt;div class=\&quot;figgrid figgrid-single\&quot;&gt;&quot;, html) <span class="pinax-src">@ test_layout.jl:28</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;&lt;div class=\&quot;figgrid figgrid-wide\&quot;&gt;&quot;, html)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t516</td><td>occursin(&quot;&lt;div class=\&quot;figgrid figgrid-wide\&quot;&gt;&quot;, html) <span class="pinax-src">@ test_layout.jl:29</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        # the modifier CSS is present so the classes actually do something
+        @test occursin(&quot;.figgrid-single{&quot;, html)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t517</td><td>occursin(&quot;.figgrid-single{&quot;, html) <span class="pinax-src">@ test_layout.jl:31</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;.figgrid-wide{&quot;, html)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t518</td><td>occursin(&quot;.figgrid-wide{&quot;, html) <span class="pinax-src">@ test_layout.jl:32</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;explicit layout=:grid is the same as the default&quot; begin
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :g &quot;G&quot; layout = :grid begin
+                @figure svg
+            end
+        end
+        html = read(Pinax.render(; out=site(&quot;grid&quot;)), String)
+        @test occursin(&quot;&lt;div class=\&quot;figgrid\&quot;&gt;&quot;, html)                   # same as the default</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t519</td><td>occursin(&quot;&lt;div class=\&quot;figgrid\&quot;&gt;&quot;, html) <span class="pinax-src">@ test_layout.jl:43</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test !occursin(&quot;&lt;div class=\&quot;figgrid figgrid-single\&quot;&gt;&quot;, html)   # no modifier emitted</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t520</td><td>!(occursin(&quot;&lt;div class=\&quot;figgrid figgrid-single\&quot;&gt;&quot;, html)) <span class="pinax-src">@ test_layout.jl:44</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test !occursin(&quot;&lt;div class=\&quot;figgrid figgrid-wide\&quot;&gt;&quot;, html)</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t521</td><td>!(occursin(&quot;&lt;div class=\&quot;figgrid figgrid-wide\&quot;&gt;&quot;, html)) <span class="pinax-src">@ test_layout.jl:45</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;an invalid layout= is rejected, not silently ignored&quot; begin
+        Pinax.reset!()
+        @test_throws ErrorException @page :p &quot;P&quot; begin</code></pre></td></tr>
+<tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t522</td><td>#= /home/runner/work/Pinax.jl/Pinax.jl/test/test_layout.jl:50 =# @page :p &quot;P&quot; begin
+        #= /home/runner… <span class="pinax-src">@ test_layout.jl:50</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+</tbody></table></div>
+<div class="figgrid">
+<figure id="test_layout_jl_margins">
+<img src="assets/figures/test_layout_jl/test_layout_jl_margins.svg" alt="test_layout_jl_margins">
+<a class="pinax-dl" href="assets/figures/test_layout_jl/test_layout_jl_margins.svg" download title="download test_layout_jl_margins.svg">⤓ download</a>
+<figcaption><b>Fig. 39.</b> Tolerance budget spent by each check. The dashed line is the pass/fail boundary — a bar close to it passed, but barely.</figcaption>
+</figure>
+</div>
+<nav><strong>Contents</strong>
+<a href="#test_layout_jl_section_layout_hint">section layout= hint</a>
+<a href="#test_layout_jl_layout_maps_to_a_figgrid_modifier_class">layout maps to a figgrid modifier class</a>
+<a href="#test_layout_jl_explicit_layout_grid_is_the_same_as_the_default">explicit layout=:grid is the same as the default</a>
+<a href="#test_layout_jl_an_invalid_layout_is_rejected_not_silently_ignored">an invalid layout= is rejected, not silently ignored</a>
+</nav>
+<section class="section" id="test_layout_jl_section_layout_hint"><h2>Sec. 147. section layout= hint</h2>
+</section>
+<section class="section" id="test_layout_jl_layout_maps_to_a_figgrid_modifier_class"><h2>Sec. 148. layout maps to a figgrid modifier class</h2>
+</section>
+<section class="section" id="test_layout_jl_explicit_layout_grid_is_the_same_as_the_default"><h2>Sec. 149. explicit layout=:grid is the same as the default</h2>
+</section>
+<section class="section" id="test_layout_jl_an_invalid_layout_is_rejected_not_silently_ignored"><h2>Sec. 150. an invalid layout= is rejected, not silently ignored</h2>
+</section>
+</section>
+<script src="app.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script><script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script><script>window.addEventListener("load",function(){renderMathInElement(document.body,{delimiters:[{left:"$$",right:"$$",display:true},{left:"$",right:"$",display:false}],macros:{},throwOnError:false});});</script></body></html>

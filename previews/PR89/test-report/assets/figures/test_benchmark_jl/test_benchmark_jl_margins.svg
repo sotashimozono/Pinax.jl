@@ -1,0 +1,126 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="620" height="780" font-family="ui-monospace,SFMono-Regular,Menlo,monospace" font-size="11">
+<text x="8" y="14" font-size="12" fill="#444">tolerance budget spent (delta / tol)</text>
+<text x="242" y="39" text-anchor="end" fill="#333">c.id == :E1</text>
+<rect x="250" y="29" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="39" fill="#666">0.0</text>
+<text x="242" y="57" text-anchor="end" fill="#333">c.label == &quot;energy density e&quot;</text>
+<rect x="250" y="47" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="57" fill="#666">0.0</text>
+<text x="242" y="75" text-anchor="end" fill="#333">c.kind == :rel</text>
+<rect x="250" y="65" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="75" fill="#666">0.0</text>
+<text x="242" y="93" text-anchor="end" fill="#333">c.delta ≈ abs(-0.81034 - -0.8…</text>
+<rect x="250" y="83" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="93" fill="#666">0.0</text>
+<text x="242" y="111" text-anchor="end" fill="#333">c.pass</text>
+<rect x="250" y="101" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="111" fill="#666">0.0</text>
+<text x="242" y="129" text-anchor="end" fill="#333">c.kind == :abs</text>
+<rect x="250" y="119" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="129" fill="#666">0.0</text>
+<text x="242" y="147" text-anchor="end" fill="#333">c.delta ≈ 1.0e-5</text>
+<rect x="250" y="137" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="147" fill="#666">0.0</text>
+<text x="242" y="165" text-anchor="end" fill="#333">c.want == 0.0</text>
+<rect x="250" y="155" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="165" fill="#666">0.0</text>
+<text x="242" y="183" text-anchor="end" fill="#333">c.pass</text>
+<rect x="250" y="173" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="183" fill="#666">0.0</text>
+<text x="242" y="201" text-anchor="end" fill="#333">c.kind == :abs</text>
+<rect x="250" y="191" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="201" fill="#666">0.0</text>
+<text x="242" y="219" text-anchor="end" fill="#333">c.delta ≈ 0.5</text>
+<rect x="250" y="209" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="219" fill="#666">0.0</text>
+<text x="242" y="237" text-anchor="end" fill="#333">c.pass</text>
+<rect x="250" y="227" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="237" fill="#666">0.0</text>
+<text x="242" y="255" text-anchor="end" fill="#333">c.kind == :abs</text>
+<rect x="250" y="245" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="255" fill="#666">0.0</text>
+<text x="242" y="273" text-anchor="end" fill="#333">!(c.pass)</text>
+<rect x="250" y="263" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="273" fill="#666">0.0</text>
+<text x="242" y="291" text-anchor="end" fill="#333">(cs[1]).id == :S1</text>
+<rect x="250" y="281" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="291" fill="#666">0.0</text>
+<text x="242" y="309" text-anchor="end" fill="#333">(cs[2]).id == :S2</text>
+<rect x="250" y="299" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="309" fill="#666">0.0</text>
+<text x="242" y="327" text-anchor="end" fill="#333">pg.id == :aa_tl</text>
+<rect x="250" y="317" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="327" fill="#666">0.0</text>
+<text x="242" y="345" text-anchor="end" fill="#333">pg.title == &quot;AA TL test set&quot;</text>
+<rect x="250" y="335" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="345" fill="#666">0.0</text>
+<text x="242" y="363" text-anchor="end" fill="#333">pg.status === :benchmark</text>
+<rect x="250" y="353" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="363" fill="#666">0.0</text>
+<text x="242" y="381" text-anchor="end" fill="#333">length(pg.checks) == 1</text>
+<rect x="250" y="371" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="381" fill="#666">0.0</text>
+<text x="242" y="399" text-anchor="end" fill="#333">occursin(&quot;\&quot;kind\&quot;:\&quot;benchmark\…</text>
+<rect x="250" y="389" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="399" fill="#666">0.0</text>
+<text x="242" y="417" text-anchor="end" fill="#333">occursin(&quot;\&quot;id\&quot;:\&quot;aa_tl\&quot;&quot;, aj)</text>
+<rect x="250" y="407" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="417" fill="#666">0.0</text>
+<text x="242" y="435" text-anchor="end" fill="#333">occursin(&quot;\&quot;verdict\&quot;:\&quot;FAIL\&quot;&quot;…</text>
+<rect x="250" y="425" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="435" fill="#666">0.0</text>
+<text x="242" y="453" text-anchor="end" fill="#333">occursin(&quot;\&quot;passed\&quot;:2&quot;, aj)</text>
+<rect x="250" y="443" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="453" fill="#666">0.0</text>
+<text x="242" y="471" text-anchor="end" fill="#333">occursin(&quot;\&quot;total\&quot;:3&quot;, aj)</text>
+<rect x="250" y="461" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="471" fill="#666">0.0</text>
+<text x="242" y="489" text-anchor="end" fill="#333">occursin(&quot;\&quot;failed\&quot;:[\&quot;G2\&quot;]&quot;,…</text>
+<rect x="250" y="479" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="489" fill="#666">0.0</text>
+<text x="242" y="507" text-anchor="end" fill="#333">occursin(&quot;\&quot;id\&quot;:\&quot;E1\&quot;,\&quot;label…</text>
+<rect x="250" y="497" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="507" fill="#666">0.0</text>
+<text x="242" y="525" text-anchor="end" fill="#333">occursin(&quot;\&quot;kind\&quot;:\&quot;rel\&quot;&quot;, aj)</text>
+<rect x="250" y="515" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="525" fill="#666">0.0</text>
+<text x="242" y="543" text-anchor="end" fill="#333">occursin(&quot;\&quot;kind\&quot;:\&quot;abs\&quot;&quot;, aj)</text>
+<rect x="250" y="533" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="543" fill="#666">0.0</text>
+<text x="242" y="561" text-anchor="end" fill="#333">occursin(&quot;\&quot;got\&quot;:0.5,\&quot;want\&quot;:…</text>
+<rect x="250" y="551" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="561" fill="#666">0.0</text>
+<text x="242" y="579" text-anchor="end" fill="#333">occursin(&quot;\&quot;pass\&quot;:false&quot;, aj)</text>
+<rect x="250" y="569" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="579" fill="#666">0.0</text>
+<text x="242" y="597" text-anchor="end" fill="#333">occursin(&quot;\&quot;pass\&quot;:true&quot;, aj)</text>
+<rect x="250" y="587" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="597" fill="#666">0.0</text>
+<text x="242" y="615" text-anchor="end" fill="#333">occursin(&quot;\&quot;status\&quot;:\&quot;benchmar…</text>
+<rect x="250" y="605" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="615" fill="#666">0.0</text>
+<text x="242" y="633" text-anchor="end" fill="#333">occursin(&quot;2/3 FAIL&quot;, am)</text>
+<rect x="250" y="623" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="633" fill="#666">0.0</text>
+<text x="242" y="651" text-anchor="end" fill="#333">occursin(&quot;[FAIL] G2&quot;, am)</text>
+<rect x="250" y="641" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="651" fill="#666">0.0</text>
+<text x="242" y="669" text-anchor="end" fill="#333">occursin(&quot;pinax-benchmark&quot;, g)</text>
+<rect x="250" y="659" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="669" fill="#666">0.0</text>
+<text x="242" y="687" text-anchor="end" fill="#333">occursin(&quot;pinax-verdict-fail&quot;, g)</text>
+<rect x="250" y="677" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="687" fill="#666">0.0</text>
+<text x="242" y="705" text-anchor="end" fill="#333">occursin(&quot;AA TL test set   2/3 …</text>
+<rect x="250" y="695" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="705" fill="#666">0.0</text>
+<text x="242" y="723" text-anchor="end" fill="#333">occursin(&quot;class=\&quot;pinax-checks\…</text>
+<rect x="250" y="713" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="723" fill="#666">0.0</text>
+<text x="242" y="741" text-anchor="end" fill="#333">count(&quot;&lt;tr class=\&quot;pinax-pass\&quot;…</text>
+<rect x="250" y="731" width="1.0" height="11" fill="#4c9f70" rx="2"/>
+<text x="256.0" y="741" fill="#666">0.0</text>
+<line x1="508.33333333333337" y1="22" x2="508.33333333333337" y2="748" stroke="#d9534f" stroke-width="1" stroke-dasharray="3,2"/>
+<text x="511.33333333333337" y="760" fill="#d9534f">tol</text>
+<line x1="250" y1="22" x2="250" y2="748" stroke="#bbb" stroke-width="1"/>
+</svg>
