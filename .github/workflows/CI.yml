@@ -49,7 +49,7 @@ jobs:
       - uses: julia-actions/julia-buildpkg@v1
       - name: "Pinax.test() renders the suite via the Pkg.test -L capturing root"
         run: julia --project=. -e 'using Pinax; Pinax.test(; out="pinax-report")'
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: pinax-report-delegation
@@ -78,7 +78,7 @@ jobs:
             using Pinax, Test          # Test loads PinaxTestExt, where the in-process test(runtests) lives
             Pinax.test("test/runtests.jl"; out="pinax-report")
           '
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: pinax-report-inprocess
