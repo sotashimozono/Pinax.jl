@@ -4,44 +4,190 @@
 <div class="pinax-meta">1 figure</div>
 <script type="application/json" id="pinax-committed">{"comments":{},"bookmarks":{},"features":["comments","bookmarks","export"]}</script>
 <section class="page" id="test_hierarchy_jl">
-<p class="pinax-subtitle">35/35 passed · 0.9s</p>
+<p class="pinax-subtitle">35/35 passed · 1.05s</p>
 <div class="pinax-benchmark">
 <div class="pinax-verdict pinax-verdict-pass">test_hierarchy.jl   35/35 PASS</div>
 <table class="pinax-checks"><thead><tr><th></th><th>id</th><th>label</th><th>got</th><th>want</th><th>Δ vs tol (kind)</th></tr></thead><tbody>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">            end
+            @page :cv &quot;Cv&quot; begin
+                @figure svg
+            end
+        end
+        @part :quench &quot;Quench&quot; begin
+            @page :dqt &quot;DQT&quot; begin
+                @figure svg
+            end
+        end
+        doc = Pinax.current_document()
+        @test doc.parts == [:thermal =&gt; &quot;Thermal&quot;, :quench =&gt; &quot;Quench&quot;]</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t413</td><td>doc.parts == [:thermal =&gt; &quot;Thermal&quot;, :quench =&gt; &quot;Quench&quot;] <span class="pinax-src">@ test_hierarchy.jl:29</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test [p.part for p in doc.pages] == [:thermal, :thermal, :quench]</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t414</td><td>[p.part for p = doc.pages] == [:thermal, :thermal, :quench] <span class="pinax-src">@ test_hierarchy.jl:30</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        # page-as-leaf: figures attach to the page, not a section
+        @test length(doc.pages[1].figures) == 1</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t415</td><td>length((doc.pages[1]).figures) == 1 <span class="pinax-src">@ test_hierarchy.jl:32</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test isempty(doc.pages[1].sections)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t416</td><td>isempty((doc.pages[1]).sections) <span class="pinax-src">@ test_hierarchy.jl:33</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @part :thermal &quot;Thermal&quot; begin
+            @page :energy &quot;Energy&quot; begin
+                @figure svg
+            end
+        end
+        @part :quench &quot;Quench&quot; begin
+            @page :dqt &quot;DQT&quot; begin
+                @figure svg
+            end
+        end
+        idx = read(Pinax.render(; out=sitedir(&quot;grp&quot;)), String)
+        @test occursin(&quot;&lt;details class=\&quot;pinax-group\&quot; open&gt;&lt;summary&gt;Thermal&quot;, idx)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t417</td><td>occursin(&quot;&lt;details class=\&quot;pinax-group\&quot; open&gt;&lt;summary&gt;Thermal&quot;, idx) <span class="pinax-src">@ test_hierarchy.jl:49</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;&lt;details class=\&quot;pinax-group\&quot; open&gt;&lt;summary&gt;Quench&quot;, idx)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t418</td><td>occursin(&quot;&lt;details class=\&quot;pinax-group\&quot; open&gt;&lt;summary&gt;Quench&quot;, idx) <span class="pinax-src">@ test_hierarchy.jl:50</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        # each page became its own file
+        @test isfile(joinpath(sitedir(&quot;grp&quot;), &quot;energy.html&quot;))</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t419</td><td>isfile(joinpath(sitedir(&quot;grp&quot;), &quot;energy.html&quot;)) <span class="pinax-src">@ test_hierarchy.jl:52</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test isfile(joinpath(sitedir(&quot;grp&quot;), &quot;dqt.html&quot;))</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t420</td><td>isfile(joinpath(sitedir(&quot;grp&quot;), &quot;dqt.html&quot;)) <span class="pinax-src">@ test_hierarchy.jl:53</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">            end
+            @page :cv &quot;Cv&quot; begin
+                @figure svg
+            end
+        end
+        @part :quench &quot;Quench&quot; begin
+            @page :dqt &quot;DQT&quot; begin
+                @figure svg
+            end
+        end
+        Pinax.render(; out=sitedir(&quot;num&quot;))
+        @test occursin(&quot;EQ1&quot;, read(joinpath(sitedir(&quot;num&quot;), &quot;energy.html&quot;), String))</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t421</td><td>occursin(&quot;EQ1&quot;, read(joinpath(sitedir(&quot;num&quot;), &quot;energy.html&quot;), String)) <span class="pinax-src">@ test_hierarchy.jl:80</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;EQ2&quot;, read(joinpath(sitedir(&quot;num&quot;), &quot;cv.html&quot;), String))</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t422</td><td>occursin(&quot;EQ2&quot;, read(joinpath(sitedir(&quot;num&quot;), &quot;cv.html&quot;), String)) <span class="pinax-src">@ test_hierarchy.jl:81</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;GQ1&quot;, read(joinpath(sitedir(&quot;num&quot;), &quot;dqt.html&quot;), String))   # reset per part</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t423</td><td>occursin(&quot;GQ1&quot;, read(joinpath(sitedir(&quot;num&quot;), &quot;dqt.html&quot;), String)) <span class="pinax-src">@ test_hierarchy.jl:82</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @page :b &quot;B&quot; begin
+            @figure pdf                 # PDF only → lazy mini-preview of the first figure
+        end
+        @page :c &quot;C&quot; begin
+            @desc md&quot;text only&quot;         # no figure → plain &quot;no figure&quot; (empty), not a placeholder glyph
+        end
+        @page :d &quot;D&quot; begin
+            @no_thumbnail
+            @figure pdf                 # opted out → empty
+        end
+        idx = read(Pinax.render(; out=sitedir(&quot;thumb&quot;)), String)
+        @test occursin(&quot;&lt;div class=\&quot;card-thumb\&quot;&gt;&lt;img src=&quot;, idx)        # raster figure → img</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t424</td><td>occursin(&quot;&lt;div class=\&quot;card-thumb\&quot;&gt;&lt;img src=&quot;, idx) <span class="pinax-src">@ test_hierarchy.jl:103</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;class=\&quot;card-thumb-pdf\&quot;&quot;, idx)                   # PDF first-figure mini-preview</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t425</td><td>occursin(&quot;class=\&quot;card-thumb-pdf\&quot;&quot;, idx) <span class="pinax-src">@ test_hierarchy.jl:104</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;loading=\&quot;lazy\&quot;&quot;, idx)                          # only visible cards load</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t426</td><td>occursin(&quot;loading=\&quot;lazy\&quot;&quot;, idx) <span class="pinax-src">@ test_hierarchy.jl:105</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test !occursin(&quot;card-thumb-ph&quot;, idx)                            # no glyph placeholder anymore</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t427</td><td>!(occursin(&quot;card-thumb-ph&quot;, idx)) <span class="pinax-src">@ test_hierarchy.jl:106</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;card-thumb card-thumb-empty&quot;, idx)               # no-figure page + opt-out → empty</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t428</td><td>occursin(&quot;card-thumb card-thumb-empty&quot;, idx) <span class="pinax-src">@ test_hierarchy.jl:107</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">            @figure pdf                 # …but this one is bookmarked, so it should win
+        end
+        @page :other &quot;Other&quot; begin
+            @figure svg
+        end
+        out = sitedir(&quot;bm&quot;)
+        mkpath(out)
+        cf = joinpath(out, &quot;comments.toml&quot;)
+        write(cf, &quot;[bookmark]\nbm_fig2 = true\n&quot;)   # bookmark the 2nd (PDF) figure of :bm
+        idx = read(Pinax.render(; out=out, comments_file=cf), String)
+        # the only PDF in the doc is :bm's fig2; a PDF preview proves the bookmark beat the first (svg) figure
+        @test occursin(&quot;class=\&quot;card-thumb-pdf\&quot;&quot;, idx)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t429</td><td>occursin(&quot;class=\&quot;card-thumb-pdf\&quot;&quot;, idx) <span class="pinax-src">@ test_hierarchy.jl:127</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        Pinax.reset!()
+        @part :thermal &quot;Thermal&quot; desc = md&quot;equilibrium results, **reproducing** prior work&quot; begin
+            @page :energy &quot;Energy&quot; begin
+                @figure svg
+            end
+        end
+        @part :quench &quot;Quench&quot; desc = md&quot;sudden-quench dynamics&quot; begin
+            @page :dqt &quot;DQT&quot; begin
+                @figure svg
+            end
+        end
+        @test haskey(Pinax.current_document().part_descs, :thermal)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t430</td><td>haskey((Pinax.current_document()).part_descs, :thermal) <span class="pinax-src">@ test_hierarchy.jl:142</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        idx = read(Pinax.render(; out=sitedir(&quot;pd&quot;)), String)
+        @test occursin(&quot;&lt;div class=\&quot;part-desc\&quot;&gt;&quot;, idx)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t431</td><td>occursin(&quot;&lt;div class=\&quot;part-desc\&quot;&gt;&quot;, idx) <span class="pinax-src">@ test_hierarchy.jl:144</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;&lt;strong&gt;reproducing&lt;/strong&gt;&quot;, idx)   # markdown rendered</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t432</td><td>occursin(&quot;&lt;strong&gt;reproducing&lt;/strong&gt;&quot;, idx) <span class="pinax-src">@ test_hierarchy.jl:145</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;sudden-quench dynamics&quot;, idx)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t433</td><td>occursin(&quot;sudden-quench dynamics&quot;, idx) <span class="pinax-src">@ test_hierarchy.jl:146</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">
+    @testset &quot;page summary renders as a subtitle on the page, and on the card&quot; begin
+        Pinax.reset!()
+        @page :a &quot;A&quot; summary = &quot;スイープ: χ&quot; begin
+            @figure svg
+        end
+        @page :b &quot;B&quot; begin
+            @figure svg
+        end
+        Pinax.render(; out=sitedir(&quot;sub&quot;))
+        a = read(joinpath(sitedir(&quot;sub&quot;), &quot;a.html&quot;), String)
+        @test occursin(&quot;&lt;p class=\&quot;pinax-subtitle\&quot;&gt;スイープ: χ&lt;/p&gt;&quot;, a)   # on the page</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t434</td><td>occursin(&quot;&lt;p class=\&quot;pinax-subtitle\&quot;&gt;スイープ: χ&lt;/p&gt;&quot;, a) <span class="pinax-src">@ test_hierarchy.jl:159</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        idx = read(joinpath(sitedir(&quot;sub&quot;), &quot;index.html&quot;), String)
+        @test occursin(&quot;&lt;div class=\&quot;card-summary\&quot;&gt;スイープ: χ&lt;/div&gt;&quot;, idx)  # on the card</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t435</td><td>occursin(&quot;&lt;div class=\&quot;card-summary\&quot;&gt;スイープ: χ&lt;/div&gt;&quot;, idx) <span class="pinax-src">@ test_hierarchy.jl:161</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;page-as-leaf @desc/@raw attach to the page&quot; begin
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @desc md&quot;page level desc&quot;
+            @raw &quot;&lt;div class=\&quot;banner\&quot;&gt;hi&lt;/div&gt;&quot;
+            @figure svg
+        end
+        pg = Pinax.current_document().pages[1]
+        @test pg.desc !== nothing &amp;&amp; occursin(&quot;page level desc&quot;, pg.desc.source)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t436</td><td>pg.desc !== nothing &amp;&amp; occursin(&quot;page level desc&quot;, pg.desc.source) <span class="pinax-src">@ test_hierarchy.jl:172</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test pg.panels == [&quot;&lt;div class=\&quot;banner\&quot;&gt;hi&lt;/div&gt;&quot;]</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t437</td><td>pg.panels == [&quot;&lt;div class=\&quot;banner\&quot;&gt;hi&lt;/div&gt;&quot;] <span class="pinax-src">@ test_hierarchy.jl:173</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        html = read(Pinax.render(; out=sitedir(&quot;leaf&quot;)), String)   # single page → one index.html
+        @test occursin(&quot;page level desc&quot;, html)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t438</td><td>occursin(&quot;page level desc&quot;, html) <span class="pinax-src">@ test_hierarchy.jl:175</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;&lt;div class=\&quot;banner\&quot;&gt;hi&lt;/div&gt;&quot;, html)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t439</td><td>occursin(&quot;&lt;div class=\&quot;banner\&quot;&gt;hi&lt;/div&gt;&quot;, html) <span class="pinax-src">@ test_hierarchy.jl:176</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @page :log &quot;Log&quot; begin
+            @desc md&quot;raw&quot;
+        end
+        @page :keep &quot;Keep&quot; status=:final begin   # explicit override inside a trial part
+            @desc md&quot;override&quot;
+        end
+    end
+    @page :res &quot;Result&quot; begin
+        @desc md&quot;curated&quot;
+    end
+    pages = Dict(p.id =&gt; p for p in Pinax.current_document().pages)
+    @test pages[:log].status == :trial       # inherited from the part</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t440</td><td>(pages[:log]).status == :trial <span class="pinax-src">@ test_hierarchy.jl:198</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    @test pages[:keep].status == :final      # explicit override wins</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t441</td><td>(pages[:keep]).status == :final <span class="pinax-src">@ test_hierarchy.jl:199</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    @test pages[:res].status == :final       # default outside any part</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t442</td><td>(pages[:res]).status == :final <span class="pinax-src">@ test_hierarchy.jl:200</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">
+    ap = Pinax.render(; out=joinpath(tmp, &quot;agent&quot;), theme=:agent)
+    j = read(ap, String)
+    @test occursin(&quot;\&quot;status\&quot;:\&quot;trial\&quot;&quot;, j)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t443</td><td>occursin(&quot;\&quot;status\&quot;:\&quot;trial\&quot;&quot;, j) <span class="pinax-src">@ test_hierarchy.jl:204</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    @test occursin(&quot;\&quot;status\&quot;:\&quot;final\&quot;&quot;, j)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t444</td><td>occursin(&quot;\&quot;status\&quot;:\&quot;final\&quot;&quot;, j) <span class="pinax-src">@ test_hierarchy.jl:205</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    md = read(joinpath(tmp, &quot;agent&quot;, &quot;agent.md&quot;), String)
+    @test occursin(&quot;[status: trial]&quot;, md)         # trial page marked</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t445</td><td>occursin(&quot;[status: trial]&quot;, md) <span class="pinax-src">@ test_hierarchy.jl:207</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    @test !occursin(&quot;[status: final]&quot;, md)        # default not noised up</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t446</td><td>!(occursin(&quot;[status: final]&quot;, md)) <span class="pinax-src">@ test_hierarchy.jl:208</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">
+    idx = read(
+        joinpath(Pinax.render(; out=joinpath(tmp, &quot;site&quot;)) |&gt; dirname, &quot;index.html&quot;), String
+    )
+    @test occursin(&quot;card-status&quot;, idx)            # gallery badges the trial page</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t447</td><td>occursin(&quot;card-status&quot;, idx) <span class="pinax-src">@ test_hierarchy.jl:213</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
 </tbody></table></div>
 <div class="figgrid">

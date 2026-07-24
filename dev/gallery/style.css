@@ -30,6 +30,8 @@ body{font-family:system-ui,sans-serif;max-width:1180px;margin:2rem auto;padding:
   .pinax-checks tr.pinax-fail .pinax-badge{color:#a40e26}
   .pinax-checks .pinax-src{color:#8a949e;font:11px ui-monospace,SFMono-Regular,Menlo,monospace}
   .pinax-checks tr.pinax-more td{color:#6a737d;font-style:italic;background:#f6f8fa}
+  .pinax-checks tr.pinax-code-row td{padding:.35rem .5rem .15rem;background:inherit}
+  .pinax-checks tr.pinax-code-row pre{margin:0}
   .pinax-code{margin:.6rem 0}
   .pinax-code-cap{color:#57606a;font-size:.9em;margin-bottom:.2rem}
   .pinax-code pre{margin:0;padding:.6rem .8rem;border-radius:8px;overflow:auto;font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace}

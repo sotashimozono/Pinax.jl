@@ -4,18 +4,53 @@
 <div class="pinax-meta">1 figure</div>
 <script type="application/json" id="pinax-committed">{"comments":{},"bookmarks":{},"features":["comments","bookmarks","export"]}</script>
 <section class="page" id="test_layout_jl">
-<p class="pinax-subtitle">9/9 passed · 0.08s</p>
+<p class="pinax-subtitle">9/9 passed · 0.09s</p>
 <div class="pinax-benchmark">
 <div class="pinax-verdict pinax-verdict-pass">test_layout.jl   9/9 PASS</div>
 <table class="pinax-checks"><thead><tr><th></th><th>id</th><th>label</th><th>got</th><th>want</th><th>Δ vs tol (kind)</th></tr></thead><tbody>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">            @section :g &quot;Grid&quot; begin            # no layout → default grid
+                @figure svg
+            end
+            @section :s &quot;Single&quot; layout = :single begin
+                @figure svg
+            end
+            @section :w &quot;Wide&quot; layout = :wide begin
+                @figure svg
+            end
+        end
+        html = read(Pinax.render(; out=site(&quot;lay&quot;)), String)
+        @test occursin(&quot;&lt;div class=\&quot;figgrid\&quot;&gt;&quot;, html)              # default, no modifier</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t514</td><td>occursin(&quot;&lt;div class=\&quot;figgrid\&quot;&gt;&quot;, html) <span class="pinax-src">@ test_layout.jl:27</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;&lt;div class=\&quot;figgrid figgrid-single\&quot;&gt;&quot;, html)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t515</td><td>occursin(&quot;&lt;div class=\&quot;figgrid figgrid-single\&quot;&gt;&quot;, html) <span class="pinax-src">@ test_layout.jl:28</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;&lt;div class=\&quot;figgrid figgrid-wide\&quot;&gt;&quot;, html)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t516</td><td>occursin(&quot;&lt;div class=\&quot;figgrid figgrid-wide\&quot;&gt;&quot;, html) <span class="pinax-src">@ test_layout.jl:29</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        # the modifier CSS is present so the classes actually do something
+        @test occursin(&quot;.figgrid-single{&quot;, html)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t517</td><td>occursin(&quot;.figgrid-single{&quot;, html) <span class="pinax-src">@ test_layout.jl:31</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;.figgrid-wide{&quot;, html)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t518</td><td>occursin(&quot;.figgrid-wide{&quot;, html) <span class="pinax-src">@ test_layout.jl:32</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;explicit layout=:grid is the same as the default&quot; begin
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :g &quot;G&quot; layout = :grid begin
+                @figure svg
+            end
+        end
+        html = read(Pinax.render(; out=site(&quot;grid&quot;)), String)
+        @test occursin(&quot;&lt;div class=\&quot;figgrid\&quot;&gt;&quot;, html)                   # same as the default</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t519</td><td>occursin(&quot;&lt;div class=\&quot;figgrid\&quot;&gt;&quot;, html) <span class="pinax-src">@ test_layout.jl:43</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test !occursin(&quot;&lt;div class=\&quot;figgrid figgrid-single\&quot;&gt;&quot;, html)   # no modifier emitted</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t520</td><td>!(occursin(&quot;&lt;div class=\&quot;figgrid figgrid-single\&quot;&gt;&quot;, html)) <span class="pinax-src">@ test_layout.jl:44</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test !occursin(&quot;&lt;div class=\&quot;figgrid figgrid-wide\&quot;&gt;&quot;, html)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t521</td><td>!(occursin(&quot;&lt;div class=\&quot;figgrid figgrid-wide\&quot;&gt;&quot;, html)) <span class="pinax-src">@ test_layout.jl:45</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;an invalid layout= is rejected, not silently ignored&quot; begin
+        Pinax.reset!()
+        @test_throws ErrorException @page :p &quot;P&quot; begin</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t522</td><td>#= /home/runner/work/Pinax.jl/Pinax.jl/test/test_layout.jl:50 =# @page :p &quot;P&quot; begin
         #= /home/runner… <span class="pinax-src">@ test_layout.jl:50</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
 </tbody></table></div>

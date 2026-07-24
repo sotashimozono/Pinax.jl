@@ -4,11 +4,24 @@
 <div class="pinax-meta">1 figure</div>
 <script type="application/json" id="pinax-committed">{"comments":{},"bookmarks":{},"features":["comments","bookmarks","export"]}</script>
 <section class="page" id="test_lightpath_jl">
-<p class="pinax-subtitle">2/2 passed · 6.31s</p>
+<p class="pinax-subtitle">2/2 passed · 7.16s</p>
 <div class="pinax-benchmark">
 <div class="pinax-verdict pinax-verdict-pass">test_lightpath.jl   2/2 PASS</div>
 <table class="pinax-checks"><thead><tr><th></th><th>id</th><th>label</th><th>got</th><th>want</th><th>Δ vs tol (kind)</th></tr></thead><tbody>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    &quot;&quot;&quot;
+    buf = IOBuffer()
+    cmd = pipeline(
+        `$(Base.julia_cmd()) --startup-file=no --project=$(Base.active_project()) -e $(script)`;
+        stdout=buf,
+        stderr=buf,
+    )
+    ok = success(cmd)
+    out = String(take!(buf))
+    (ok &amp;&amp; occursin(&quot;LIGHTPATH_OK&quot;, out)) ||
+        @error &quot;light-path subprocess failed&quot; output = out
+    @test ok</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t523</td><td>ok <span class="pinax-src">@ test_lightpath.jl:42</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    @test occursin(&quot;LIGHTPATH_OK&quot;, out)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t524</td><td>occursin(&quot;LIGHTPATH_OK&quot;, out) <span class="pinax-src">@ test_lightpath.jl:43</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
 </tbody></table></div>
 <div class="figgrid">

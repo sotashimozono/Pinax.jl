@@ -4,20 +4,96 @@
 <div class="pinax-meta">1 figure</div>
 <script type="application/json" id="pinax-committed">{"comments":{},"bookmarks":{},"features":["comments","bookmarks","export"]}</script>
 <section class="page" id="test_cache_jl">
-<p class="pinax-subtitle">11/11 passed · 0.17s</p>
+<p class="pinax-subtitle">11/11 passed · 0.19s</p>
 <div class="pinax-benchmark">
 <div class="pinax-verdict pinax-verdict-pass">test_cache.jl   11/11 PASS</div>
 <table class="pinax-checks"><thead><tr><th></th><th>id</th><th>label</th><th>got</th><th>want</th><th>Δ vs tol (kind)</th></tr></thead><tbody>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        outdir = joinpath(tmp, &quot;hit&quot;)
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; begin
+                @figure begin
+                    cnt[] += 1
+                    svg1
+                end
+            end
+        end
+        Pinax.render(; out=outdir)
+        @test cnt[] == 1                      # materialized once</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t157</td><td>cnt[] == 1 <span class="pinax-src">@ test_cache.jl:24</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test isfile(joinpath(outdir, &quot;.pinax-manifest.toml&quot;))</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t158</td><td>isfile(joinpath(outdir, &quot;.pinax-manifest.toml&quot;)) <span class="pinax-src">@ test_cache.jl:25</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        Pinax.render(; out=outdir)            # same doc + outdir -&gt; key unchanged, asset present
+        @test cnt[] == 1                      # cache hit: gen NOT called again</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t159</td><td>cnt[] == 1 <span class="pinax-src">@ test_cache.jl:27</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        outdir = joinpath(tmp, &quot;force&quot;)
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; begin
+                @figure begin
+                    cnt[] += 1
+                    svg1
+                end
+            end
+        end
+        Pinax.render(; out=outdir)
+        @test cnt[] == 1</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t160</td><td>cnt[] == 1 <span class="pinax-src">@ test_cache.jl:43</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        Pinax.render(; out=outdir, force=true)
+        @test cnt[] == 2                      # force bypasses the cache</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t161</td><td>cnt[] == 2 <span class="pinax-src">@ test_cache.jl:45</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        outdir = joinpath(tmp, &quot;codechange&quot;)
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; begin
+                @figure begin
+                    cnt[] += 1
+                    svg1
+                end
+            end
+        end
+        Pinax.render(; out=outdir)
+        @test cnt[] == 1</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t162</td><td>cnt[] == 1 <span class="pinax-src">@ test_cache.jl:61</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        # rebuild with different code at the same figure position (same anchor, different key)
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; begin
+                @figure begin
+                    cnt[] += 10
+                    svg2
+                end
+            end
+        end
+        Pinax.render(; out=outdir)
+        @test cnt[] == 11                     # miss: gen called again</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t163</td><td>cnt[] == 11 <span class="pinax-src">@ test_cache.jl:73</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        outdir = joinpath(tmp, &quot;orphan&quot;)
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; begin
+                @figure svg1
+                @figure svg2
+            end
+        end
+        Pinax.render(; out=outdir)
+        a1 = joinpath(outdir, &quot;assets&quot;, &quot;figures&quot;, &quot;p&quot;, &quot;s&quot;, &quot;s_fig1.svg&quot;)
+        a2 = joinpath(outdir, &quot;assets&quot;, &quot;figures&quot;, &quot;p&quot;, &quot;s&quot;, &quot;s_fig2.svg&quot;)
+        @test isfile(a1)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t164</td><td>isfile(a1) <span class="pinax-src">@ test_cache.jl:88</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test isfile(a2)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t165</td><td>isfile(a2) <span class="pinax-src">@ test_cache.jl:89</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        # rebuild with only the first figure -&gt; the second figure's asset is now an orphan
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; begin
+                @figure svg1
+            end
+        end
+        Pinax.render(; out=outdir)
+        @test isfile(a1)                      # still referenced</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t166</td><td>isfile(a1) <span class="pinax-src">@ test_cache.jl:98</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test !isfile(a2)                     # orphan cleaned up</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t167</td><td>!(isfile(a2)) <span class="pinax-src">@ test_cache.jl:99</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
 </tbody></table></div>
 <div class="figgrid">

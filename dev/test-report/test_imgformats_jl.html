@@ -8,9 +8,24 @@
 <div class="pinax-benchmark">
 <div class="pinax-verdict pinax-verdict-pass">test_imgformats.jl   4/4 PASS</div>
 <table class="pinax-checks"><thead><tr><th></th><th>id</th><th>label</th><th>got</th><th>want</th><th>Δ vs tol (kind)</th></tr></thead><tbody>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    write(txt, &quot;not an image&quot;)
+
+    Pinax.reset!()
+    @page :p &quot;P&quot; begin
+        @section :s &quot;S&quot; begin
+            @figure gif
+            @figure webp
+            @figure txt
+        end
+    end
+    html = read(Pinax.render(; out=site(&quot;img&quot;)), String)
+    @test occursin(r&quot;&lt;img src=\&quot;[^\&quot;]+\.gif\&quot;&quot;, html)    # gif inline (animation plays)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t448</td><td>occursin(r&quot;&lt;img src=\&quot;[^\&quot;]+\.gif\&quot;&quot;, html) <span class="pinax-src">@ test_imgformats.jl:26</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    @test occursin(r&quot;&lt;img src=\&quot;[^\&quot;]+\.webp\&quot;&quot;, html)   # webp inline</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t449</td><td>occursin(r&quot;&lt;img src=\&quot;[^\&quot;]+\.webp\&quot;&quot;, html) <span class="pinax-src">@ test_imgformats.jl:27</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    @test !occursin(r&quot;&lt;img src=\&quot;[^\&quot;]+\.txt\&quot;&quot;, html)   # a non-image is never an &lt;img&gt;</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t450</td><td>!(occursin(r&quot;&lt;img src=\&quot;[^\&quot;]+\.txt\&quot;&quot;, html)) <span class="pinax-src">@ test_imgformats.jl:28</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    @test occursin(r&quot;&lt;a href=\&quot;[^\&quot;]+\.txt\&quot;&gt;&quot;, html)    # …it stays a download link</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t451</td><td>occursin(r&quot;&lt;a href=\&quot;[^\&quot;]+\.txt\&quot;&gt;&quot;, html) <span class="pinax-src">@ test_imgformats.jl:29</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
 </tbody></table></div>
 <div class="figgrid">

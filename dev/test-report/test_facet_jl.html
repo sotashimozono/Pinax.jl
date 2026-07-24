@@ -4,20 +4,88 @@
 <div class="pinax-meta">19 figures</div>
 <script type="application/json" id="pinax-committed">{"comments":{},"bookmarks":{},"features":["comments","bookmarks","export"]}</script>
 <section class="page" id="test_facet_jl">
-<p class="pinax-subtitle">11/11 passed · 0.85s</p>
+<p class="pinax-subtitle">11/11 passed · 0.9s</p>
 <div class="pinax-benchmark">
 <div class="pinax-verdict pinax-verdict-pass">test_facet.jl   11/11 PASS</div>
 <table class="pinax-checks"><thead><tr><th></th><th>id</th><th>label</th><th>got</th><th>want</th><th>Δ vs tol (kind)</th></tr></thead><tbody>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">
+    @testset &quot;figures grouped by a param axis, sorted by value&quot; begin
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; by = &quot;system.g&quot; begin
+                @figure svg params = k(1.0)
+                @figure svg params = k(0.5)
+                @figure svg params = k(1.0)
+            end
+        end
+        html = read(Pinax.render(; out=site(&quot;f1&quot;)), String)
+        @test occursin(&quot;system.g = 0.5&quot;, html)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t402</td><td>occursin(&quot;system.g = 0.5&quot;, html)  [by = param facet] <span class="pinax-src">@ test_facet.jl:22</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;system.g = 1.0&quot;, html)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t403</td><td>occursin(&quot;system.g = 1.0&quot;, html)  [by = param facet] <span class="pinax-src">@ test_facet.jl:23</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test first(findfirst(&quot;system.g = 0.5&quot;, html)) &lt;</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t404</td><td>first(findfirst(&quot;system.g = 0.5&quot;, html)) &lt; first(findfirst(&quot;system.g = 1.0&quot;, html))  [by = param facet] <span class="pinax-src">@ test_facet.jl:24</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">            first(findfirst(&quot;system.g = 1.0&quot;, html))   # 0.5 group before 1.0
+        @test count(&quot;class=\&quot;facet\&quot;&quot;, html) == 2       # two groups</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t405</td><td>count(&quot;class=\&quot;facet\&quot;&quot;, html) == 2  [by = param facet] <span class="pinax-src">@ test_facet.jl:26</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;figure missing the facet param -&gt; (unset) group&quot; begin
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; by = &quot;system.g&quot; begin
+                @figure svg params = k(0.5)
+                @figure svg                       # no params
+            end
+        end
+        html = read(Pinax.render(; out=site(&quot;f2&quot;)), String)
+        @test occursin(&quot;system.g = 0.5&quot;, html)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t406</td><td>occursin(&quot;system.g = 0.5&quot;, html)  [by = param facet] <span class="pinax-src">@ test_facet.jl:38</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test occursin(&quot;system.g: (unset)&quot;, html)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t407</td><td>occursin(&quot;system.g: (unset)&quot;, html)  [by = param facet] <span class="pinax-src">@ test_facet.jl:39</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;non-faceted section renders a single flat grid&quot; begin
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; begin
+                @figure svg
+                @figure svg
+            end
+        end
+        html = read(Pinax.render(; out=site(&quot;f3&quot;)), String)
+        @test !occursin(&quot;class=\&quot;facet\&quot;&quot;, html)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t408</td><td>!(occursin(&quot;class=\&quot;facet\&quot;&quot;, html))  [by = param facet] <span class="pinax-src">@ test_facet.jl:51</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test count(&quot;class=\&quot;figgrid\&quot;&quot;, html) == 1</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t409</td><td>count(&quot;class=\&quot;figgrid\&quot;&quot;, html) == 1  [by = param facet] <span class="pinax-src">@ test_facet.jl:52</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">                @figure svg params = ParamIO.DataKey(
+                    Dict{String,Any}(&quot;system.g&quot; =&gt; &quot;high&quot;), 0
+                )
+                @figure svg params = k(0.5)
+                @figure svg params = k(2.0)
+            end
+        end
+        html = read(Pinax.render(; out=site(&quot;fmix&quot;)), String)
+        p05 = first(findfirst(&quot;system.g = 0.5&quot;, html))
+        p20 = first(findfirst(&quot;system.g = 2.0&quot;, html))
+        phi = first(findfirst(&quot;system.g = high&quot;, html))
+        @test p05 &lt; p20 &lt; phi   # numbers (by value) before strings</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t410</td><td>p05 &lt; p20 &lt; phi  [by = param facet] <span class="pinax-src">@ test_facet.jl:70</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;facet preserves document-order figure numbers&quot; begin
+        Pinax.reset!()
+        @page :p &quot;P&quot; begin
+            @section :s &quot;S&quot; by = &quot;system.g&quot; begin
+                @figure svg params = k(1.0)   # doc order 1 -&gt; Fig. 1, emitted in the 1.0 group (2nd)
+                @figure svg params = k(0.5)   # doc order 2 -&gt; Fig. 2, emitted in the 0.5 group (1st)
+            end
+        end
+        html = read(Pinax.render(; out=site(&quot;fnum&quot;)), String)
+        @test first(findfirst(&quot;system.g = 0.5&quot;, html)) &lt;</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t411</td><td>first(findfirst(&quot;system.g = 0.5&quot;, html)) &lt; first(findfirst(&quot;system.g = 1.0&quot;, html))  [by = param facet] <span class="pinax-src">@ test_facet.jl:82</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">            first(findfirst(&quot;system.g = 1.0&quot;, html))
+        @test first(findfirst(&quot;Fig. 2&quot;, html)) &lt; first(findfirst(&quot;Fig. 1&quot;, html))  # numbers follow doc order</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t412</td><td>first(findfirst(&quot;Fig. 2&quot;, html)) &lt; first(findfirst(&quot;Fig. 1&quot;, html))  [by = param facet] <span class="pinax-src">@ test_facet.jl:84</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
 </tbody></table></div>
 <div class="figgrid">

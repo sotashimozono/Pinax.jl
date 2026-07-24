@@ -4,15 +4,43 @@
 <div class="pinax-meta">1 figure</div>
 <script type="application/json" id="pinax-committed">{"comments":{},"bookmarks":{},"features":["comments","bookmarks","export"]}</script>
 <section class="page" id="test_assets_jl">
-<p class="pinax-subtitle">6/6 passed · 0.35s</p>
+<p class="pinax-subtitle">6/6 passed · 0.4s</p>
 <div class="pinax-benchmark">
 <div class="pinax-verdict pinax-verdict-pass">test_assets.jl   6/6 PASS</div>
 <table class="pinax-checks"><thead><tr><th></th><th>id</th><th>label</th><th>got</th><th>want</th><th>Δ vs tol (kind)</th></tr></thead><tbody>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">            end
+            @page :b &quot;B&quot; begin
+                @figure svg
+            end
+        end
+    end
+
+    @testset &quot;:default (the default) writes a shared style.css the pages link&quot; begin
+        Pinax.reset!(; title=&quot;x&quot;)
+        build()
+        Pinax.render(; out=site(&quot;def&quot;))
+        @test isfile(joinpath(site(&quot;def&quot;), &quot;style.css&quot;))</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t16</td><td>isfile(joinpath(site(&quot;def&quot;), &quot;style.css&quot;)) <span class="pinax-src">@ test_assets.jl:27</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        a = read(joinpath(site(&quot;def&quot;), &quot;a.html&quot;), String)
+        @test occursin(&quot;href=\&quot;style.css\&quot;&quot;, a)   # links the shared sheet</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t17</td><td>occursin(&quot;href=\&quot;style.css\&quot;&quot;, a) <span class="pinax-src">@ test_assets.jl:29</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        @test !occursin(&quot;body{&quot;, a)               # …gallery CSS is not inlined</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t18</td><td>!(occursin(&quot;body{&quot;, a)) <span class="pinax-src">@ test_assets.jl:30</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;:inline embeds the CSS (single self-contained file)&quot; begin
+        Pinax.reset!(; title=&quot;x&quot;, assets=:inline)
+        build()
+        Pinax.render(; out=site(&quot;inl&quot;))
+        @test !isfile(joinpath(site(&quot;inl&quot;), &quot;style.css&quot;))</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t19</td><td>!(isfile(joinpath(site(&quot;inl&quot;), &quot;style.css&quot;))) <span class="pinax-src">@ test_assets.jl:37</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">        a = read(joinpath(site(&quot;inl&quot;), &quot;a.html&quot;), String)
+        @test occursin(&quot;body{&quot;, a)                # gallery CSS inlined</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t20</td><td>occursin(&quot;body{&quot;, a) <span class="pinax-src">@ test_assets.jl:39</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    end
+
+    @testset &quot;an invalid asset mode errors&quot; begin
+        @test_throws ErrorException Pinax.reset!(; assets=:bogus)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t21</td><td>Pinax.reset!(; assets = :bogus) <span class="pinax-src">@ test_assets.jl:43</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
 </tbody></table></div>
 <div class="figgrid">

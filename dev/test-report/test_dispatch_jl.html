@@ -4,22 +4,72 @@
 <div class="pinax-meta">1 figure</div>
 <script type="application/json" id="pinax-committed">{"comments":{},"bookmarks":{},"features":["comments","bookmarks","export"]}</script>
 <section class="page" id="test_dispatch_jl">
-<p class="pinax-subtitle">13/13 passed · 1.44s</p>
+<p class="pinax-subtitle">13/13 passed · 1.76s</p>
 <div class="pinax-benchmark">
 <div class="pinax-verdict pinax-verdict-pass">test_dispatch.jl   13/13 PASS</div>
 <table class="pinax-checks"><thead><tr><th></th><th>id</th><th>label</th><th>got</th><th>want</th><th>Δ vs tol (kind)</th></tr></thead><tbody>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    Pinax.reset!(; title=&quot;dispatch&quot;)
+    @page :p &quot;P&quot; begin
+        @section :s &quot;S&quot; begin
+            @figure svg
+            @caption &quot;cap&quot;
+        end
+    end
+
+    g = read(Pinax.render(; out=joinpath(tmp, &quot;default&quot;), theme=:gallery), String)
+    b = read(Pinax.render(; out=joinpath(tmp, &quot;variant&quot;), theme=BadgeGallery()), String)
+
+    @test occursin(&quot;&lt;figcaption&gt;&quot;, g)        # default figure rendering (caption etc.)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t260</td><td>occursin(&quot;&lt;figcaption&gt;&quot;, g) <span class="pinax-src">@ test_dispatch.jl:29</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    @test !occursin(&quot;BADGE:&quot;, g)</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t261</td><td>!(occursin(&quot;BADGE:&quot;, g)) <span class="pinax-src">@ test_dispatch.jl:30</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    @test occursin(&quot;BADGE:s_fig1&quot;, b)         # the variant's emit_figure is dispatched</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t262</td><td>occursin(&quot;BADGE:s_fig1&quot;, b) <span class="pinax-src">@ test_dispatch.jl:31</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    @test !occursin(&quot;&lt;figcaption&gt;&quot;, b)        # …replacing the default figure entirely</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t263</td><td>!(occursin(&quot;&lt;figcaption&gt;&quot;, b)) <span class="pinax-src">@ test_dispatch.jl:32</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    @test occursin(&quot;&lt;title&gt;dispatch&quot;, b)      # but emit_document (the shell) is inherited</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t264</td><td>occursin(&quot;&lt;title&gt;dispatch&quot;, b) <span class="pinax-src">@ test_dispatch.jl:33</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    @test occursin(&quot;class=\&quot;section\&quot;&quot;, b)    # …and emit_section too</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t265</td><td>occursin(&quot;class=\&quot;section\&quot;&quot;, b) <span class="pinax-src">@ test_dispatch.jl:34</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    tmp = mktempdir()
+    svg = joinpath(tmp, &quot;f.svg&quot;)
+    write(svg, &quot;&lt;svg xmlns='http://www.w3.org/2000/svg'&gt;&lt;rect/&gt;&lt;/svg&gt;&quot;)
+    Pinax.reset!(; title=&quot;t&quot;)
+    @page :p &quot;P&quot; begin
+        @section :s &quot;S&quot; begin
+            @desc md&quot;hello&quot;
+            @figure svg
+        end
+    end
+    h = read(Pinax.render(; out=joinpath(tmp, &quot;o&quot;), theme=PlainText()), String)
+    @test occursin(&quot;TXT[hello]&quot;, h)   # the overridden text renderer is used for the section desc</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t266</td><td>occursin(&quot;TXT[hello]&quot;, h) <span class="pinax-src">@ test_dispatch.jl:54</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">            @figure svg
+            @caption &quot;c&quot;
+        end
+    end
+    Pinax.add_comment(cf, :s, &quot;a note&quot;; author=&quot;me&quot;)
+
+    # latex: emit_figure overridden; emit_document/page/section + emit_comments inherited
+    tex = read(
+        Pinax.render(; out=joinpath(tmp, &quot;tex&quot;), theme=TaggedTeX(), comments_file=cf),
+        String,
+    )
+    @test occursin(&quot;%% TAGFIG s_fig1&quot;, tex)   # the override fired</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t267</td><td>occursin(&quot;%% TAGFIG s_fig1&quot;, tex) <span class="pinax-src">@ test_dispatch.jl:91</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    @test occursin(&quot;\\subsection{S}&quot;, tex)    # emit_section inherited</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t268</td><td>occursin(&quot;\\subsection{S}&quot;, tex) <span class="pinax-src">@ test_dispatch.jl:92</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    @test occursin(&quot;Notes&quot;, tex)              # emit_comments (the section's comment) exercised</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t269</td><td>occursin(&quot;Notes&quot;, tex) <span class="pinax-src">@ test_dispatch.jl:93</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    @test Pinax.figure_formats(TaggedTeX()) == Symbol[:svg]  # trait override dispatches to the variant</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t270</td><td>Pinax.figure_formats(TaggedTeX()) == Symbol[:svg] <span class="pinax-src">@ test_dispatch.jl:94</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">
+    # agent: emit_figure overridden; emit_section (the &quot;sections&quot; array) inherited
+    Pinax.render(; out=joinpath(tmp, &quot;agent&quot;), theme=TaggedAgent(), comments_file=cf)
+    j = read(joinpath(tmp, &quot;agent&quot;, &quot;agent.json&quot;), String)
+    @test occursin(&quot;\&quot;tagged\&quot;:true&quot;, j)      # the override fired</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t271</td><td>occursin(&quot;\&quot;tagged\&quot;:true&quot;, j) <span class="pinax-src">@ test_dispatch.jl:99</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
+<tr class="pinax-code-row pinax-pass"><td></td><td colspan="5"><pre class="pinax-code-src"><code class="language-julia">    @test occursin(&quot;\&quot;sections\&quot;:[&quot;, j)       # emit_section(::AgentBase) emitted the sections array</code></pre></td></tr>
 <tr class="pinax-pass"><td class="pinax-badge">✓</td><td>t272</td><td>occursin(&quot;\&quot;sections\&quot;:[&quot;, j) <span class="pinax-src">@ test_dispatch.jl:100</span></td><td>1.0</td><td>1.0</td><td>0.0 vs 0.5 (abs)</td></tr>
 </tbody></table></div>
 <div class="figgrid">
